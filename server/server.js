@@ -2,9 +2,16 @@ var express = require('express');
 var app = express();
 var __dirname = '../client';
 var mysql = require('mysql');
-var routes = require('./routes/index')
 
-app.use('/', routes);
+var views = require('./routes/views');
+var user_routes = require('./routes/users');
+var resource_routes = require('./routes/resources');
+var reservation_routes = require('./routes/reservations');
+
+app.use('/', views);
+app.use('/user', user_routes);
+app.use('/resource', resource_routes);
+app.use('/reservations', reservation_routes);
 // First you need to create a connection to the db
 var con = mysql.createConnection({
   host: 'localhost',
