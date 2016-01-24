@@ -17,21 +17,17 @@ Node Modules:
 
 Local Development Servers
 
-Stephen -> http://colab-sbx-123.oit.duke.edu
-
-Rahul -> http://colab-sbx-212.oit.duke.edu
-
 Ashwin -> http://colab-sbx-366.oit.duke.edu
 
 Chris -> http://colab-sbx-202.oit.duke.edu
 
-
-
 Test Server
 
+http://colab-sbx-212.oit.duke.edu (aliased by http://resource-tracker-test.colab.duke.edu)
 
 Production Server
 
+http://colab-sbx-123.oit.duke.edu (aliased by http://resource-tracker-prod.colab.duke.edu)
 
 MySQL Database Password: db
 
