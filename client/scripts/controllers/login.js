@@ -4,12 +4,13 @@ angular.module('resourceTracker')
   .controller('LoginCtrl', function ($scope, $http) {
   	$scope.user =  {
   		username: '',
-  		password: ''
+  		password: '',
+      permission_level: ''
   	};
 
   	$scope.login = function() {
-  		console.log($scope.user.username);
-  		console.log($scope.user.password);
+      $http.get('/user', $scope.user).then(function(data) {
+        console.log(data);
+      });
   	};
-
   });
