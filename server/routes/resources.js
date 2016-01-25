@@ -7,7 +7,12 @@ var res_service = require('../services/resources');
 
 router.get('/', function(req, res, next){
   //read user
-  res_service.get_res("chris");
+  var callback = function (err, result) {
+  		console.log(result);
+  };
+
+
+  res_service.get_resource_by_name("chris", callback);
   res.type('text/plain');
   res.send('YOU ARE LOGGED IN');
 });
