@@ -41,7 +41,7 @@ function validate_user(username, password, permission_level, callback){
 
 	db_sql.connection.query(query)
 		.on('result', function (row) {
-      callback(row);
+      callback(JSON.stringify(row));
      })
     .on('error', function (err) {
       callback({error: true, err: err});

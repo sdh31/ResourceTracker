@@ -5,7 +5,7 @@ var user_service = require('../services/users');
 router.get('/', function(req, res, next){
 	console.log('get called on back end');
 	//read user
-	var callback = function(err, result){
+	var callback = function(result){
   		//console.log(result);
   		res.send(result);
     	//need to add json response
