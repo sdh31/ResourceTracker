@@ -2,12 +2,9 @@ var express = require('express');
 var router = express.Router();
 var res_service = require('../services/resources');
 
-
-//var connection = db_sql.pool.getConnection();
-
 router.get('/', function(req, res, next){
   //read user from name in URL queries
-  var callback = function (err, result) {
+  var callback = function (result) {
       res.send(result);
   		//need to modify response here
   };
@@ -24,7 +21,7 @@ router.get('/', function(req, res, next){
 router.put('/', function(req, res, next){
   //create user
 
-  var callback = function(err, result){
+  var callback = function(result){
     res.send(result);
     //Maybe just send a json true or false?
   }
