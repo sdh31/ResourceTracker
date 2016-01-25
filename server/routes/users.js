@@ -3,6 +3,7 @@ var router = express.Router();
 var user_service = require('../services/users');
 
 router.get('/', function(req, res, next){
+	console.log('get called on back end');
 	//read user
 	var callback = function(err, result){
   		//console.log(result);

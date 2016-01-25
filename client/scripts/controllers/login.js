@@ -9,8 +9,11 @@ angular.module('resourceTracker')
   	};
 
   	$scope.login = function() {
+      console.log('calling login...');
       $http.get('/user', $scope.user).then(function(data) {
         console.log(data);
+      }, function(err) {
+        console.log(err);
       });
   	};
   });
