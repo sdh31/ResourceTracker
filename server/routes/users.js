@@ -3,8 +3,6 @@ var router = express.Router();
 
 router.get('/', function(req, res, next){
   //read user
-  res.type('text/plain');
-  res.send('HELLO');
 });
 
 router.put('/', function(req, res, next){

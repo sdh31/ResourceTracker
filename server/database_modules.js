@@ -35,3 +35,5 @@ rl.on('close', function(){
 
   });
 };
+
+exports.pool = pool;
