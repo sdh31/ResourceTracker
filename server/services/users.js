@@ -1,4 +1,4 @@
-var db_sql = require('../database_modules.js');
+var db_sql = require('./db_wrapper');
 var squel = require('squel');
 
 function create_user(username, password, permission_level, callback){
@@ -9,10 +9,16 @@ function create_user(username, password, permission_level, callback){
 		.set("permission_level", permission_level)
 		.toString();
 
-	var result = db_sql.pool.query(query, function(err, rows, fields){
-		if(err) throw err;
-		callback(err, rows);
-	});
+	db_sql.connection.query(query)
+		.on('result', function (row) {
+      console.log(row);
+      callback(row);
+     })
+    .on('error', function (err) {
+      console.log(err);
+      callback({error: true, err: err});
+     });
+	
 }
 
 function validate_user(username, password, permission_level, callback){
@@ -33,13 +39,14 @@ function validate_user(username, password, permission_level, callback){
 
 	query.toString();
 
-
-	var result = db_sql.pool.query(query, function(err, rows, fields){
-		if(err) throw err;	
-		callback(err, JSON.stringify(rows));
-	});
+	db_sql.connection.query(query)
+		.on('result', function (row) {
+      callback(row);
+     })
+    .on('error', function (err) {
+      callback({error: true, err: err});
+     });
 }
-
 
 module.exports = {
 	create_user: create_user,

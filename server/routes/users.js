@@ -9,7 +9,7 @@ router.get('/', function(req, res, next){
   		res.send(result);
     	//need to add json response
 	}
-	username=req.query["usename"];
+	username=req.query["username"];
 	password=req.query["password"];
 	permission_level=req.query["permission_level"];
 	user_service.validate_user(username, password, callback);
@@ -18,9 +18,9 @@ router.get('/', function(req, res, next){
 router.put('/', function(req, res, next){
 	//create user
   	var callback = function(err, result){
-  		if !Object.keys(obj).length{
+  		//if !Object.keys(obj).length{
 
-  		}
+  		//}
   	}
   	//These might need to be changed to json body fields
   	username = req.query["username"];

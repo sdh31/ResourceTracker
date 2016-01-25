@@ -1,6 +1,5 @@
-var db_sql = require('../database_modules.js');
+var db_sql = require('./db_wrapper');
 var squel = require('squel');
-
 
 function get_resource_by_name(name, callback){
 //Gets resource by name
@@ -10,10 +9,13 @@ function get_resource_by_name(name, callback){
 		.where("name = '" + name + "'")
 		.toString();
 		//Query the database, return all resources with given name
-	var result = db_sql.pool.query(query, function(err, rows, fields){
-		if(err) throw err;
-		callback(err, JSON.stringify(rows));
-	});
+	db_sql.connection.query(query)
+		.on('result', function (row) {
+      callback(row);
+     })
+    .on('error', function (err) {
+      callback({error: true, err: err});
+     });
 }
 
 function find_resources_by_tag(tag){
@@ -32,11 +34,13 @@ function create_resource(name, description, max_users, callback){
 		.set("max_users", max_users)
 		.toString();
 
-		db_sql.pool.query(query, function(err, rows, fields){
-			if(err) throw err;
-			callback(err, JSON.stringify(rows));
-		}
-	);
+	db_sql.connection.query(query)
+		.on('result', function (row) {
+      callback(row);
+     })
+    .on('error', function (err) {
+      callback({error: true, err: err});
+     });
 }
 
 function update_resource_by_id(id, name, description, max_users, callback){
@@ -48,15 +52,14 @@ function update_resource_by_id(id, name, description, max_users, callback){
 		.set("description", description)
 		.set("max_users", max_users)
 
-			db_sql.pool.query(query, function(err, rows, fields){
-				if(err) throw err;
-				callback(err, JSON.stringify(rows));
-			}
-	);
+	db_sql.connection.query(query)
+		.on('result', function (row) {
+      callback(row);
+     })
+    .on('error', function (err) {
+      callback({error: true, err: err});
+     });
 }
-
-
-
 
 module.exports = {
 	get_resource_by_name: get_resource_by_name,
