@@ -11,8 +11,7 @@ function create_user(username, password, permission_level, callback){
 
 	db_sql.connection.query(query)
 		.on('result', function (row) {
-      console.log(row);
-      callback(row);
+      callback(JSON.stringify(row));
      })
     .on('error', function (err) {
       console.log(err);
@@ -21,7 +20,7 @@ function create_user(username, password, permission_level, callback){
 	
 }
 
-function validate_user(username, password, permission_level, callback){
+function validate_user(username, password, callback){
 	//Check if user is valid 
 	var query = squel.select().from("user")
 	
@@ -33,15 +32,11 @@ function validate_user(username, password, permission_level, callback){
 		query = query.where("password = '" + password + "'");
 	}
 
-	if (permission_level != null){
-		query = query.where("permission_level = '" + permission_level + "'");
-	}
-
-	query.toString();
+	query = query.toString();
 
 	db_sql.connection.query(query)
 		.on('result', function (row) {
-      callback(row);
+      callback(JSON.stringify(row));
      })
     .on('error', function (err) {
       callback({error: true, err: err});

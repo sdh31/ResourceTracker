@@ -11,7 +11,7 @@ function get_resource_by_name(name, callback){
 		//Query the database, return all resources with given name
 	db_sql.connection.query(query)
 		.on('result', function (row) {
-      callback(row);
+      callback(JSON.stringify(row));
      })
     .on('error', function (err) {
       callback({error: true, err: err});
@@ -36,7 +36,7 @@ function create_resource(name, description, max_users, callback){
 
 	db_sql.connection.query(query)
 		.on('result', function (row) {
-      callback(row);
+      callback(JSON.stringify(row));
      })
     .on('error', function (err) {
       callback({error: true, err: err});
@@ -54,7 +54,7 @@ function update_resource_by_id(id, name, description, max_users, callback){
 
 	db_sql.connection.query(query)
 		.on('result', function (row) {
-      callback(row);
+      callback(JSON.stringify(row));
      })
     .on('error', function (err) {
       callback({error: true, err: err});
