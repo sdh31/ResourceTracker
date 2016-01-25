@@ -1,6 +1,7 @@
 var db_sql = require('../database_modules.js');
 var squel = require('squel');
 
+
 function get_resource_by_name(name, callback){
 //Gets resource by name
 	//Generate query String
@@ -9,11 +10,10 @@ function get_resource_by_name(name, callback){
 		.where("name = '" + name + "'")
 		.toString();
 		//Query the database, return all resources with given name
-		var result = db_sql.pool.query(query, function(err, rows, fields){
-			if(err) throw err;
-			callback(err, JSON.stringify(rows));
-		}
-	);
+	var result = db_sql.pool.query(query, function(err, rows, fields){
+		if(err) throw err;
+		callback(err, JSON.stringify(rows));
+	});
 }
 
 function find_resources_by_tag(tag){

@@ -9,15 +9,30 @@ router.get('/', function(req, res, next){
     res.send(result);
     //need to add json response
   }
-  username=req.query["username"];
+  username=req.query["usename"];
   password=req.query["password"];
+  permission_level=req.query["permission_level"];
   user_service.validate_user(username, password, callback);
 
 });
 
 router.put('/', function(req, res, next){
   //create user
-  user_service.create_user()
+  var callback = function(err, result){
+    if !Object.keys(obj).length{
+      
+    }
+  }
+  username = req.query["username"];
+  password = req.query["password"];
+  permission_level = req.query["permission_level"];
+
+  if(username == null || password == null || permission_level == null){
+    res.sendStatus(401);
+  }
+  else{
+    user_service.create_user(username, password, permission_level, callback);
+  }
 });
 
 router.post('/', function(req, res, next){

@@ -6,19 +6,28 @@ var res_service = require('../services/resources');
 //var connection = db_sql.pool.getConnection();
 
 router.get('/', function(req, res, next){
-  //read user
+  //read user from name in URL queries
   var callback = function (err, result) {
-  		console.log(result);
+      res.send(result);
+  		//need to modify response here
   };
 
-
-  res_service.get_resource_by_name("chris", callback);
-  res.type('text/plain');
-  res.send('YOU ARE LOGGED IN');
+  name = req.query['name'];
+  if (name == null){
+    res.sendStatus(401);
+  }
+  else{
+    res_service.get_resource_by_name(name, callback);
+  }
 });
 
 router.put('/', function(req, res, next){
   //create user
+
+  var callback = function(err, result){
+    res.send(result);
+    //Maybe just send a json true or false?
+  }
   create_resource();
 
 });
