@@ -3,11 +3,10 @@ var router = express.Router();
 var app = express();
 
 // sendFile needs full path
-app.set('/styles', '/home/bitnami/ResourceTracker/client/app/styles/');
-var basePath = app.settings['/styles'];
+var basePath =  '/home/bitnami/ResourceTracker/client/styles';
 
-router.get('/main.css', function(req, res, next){
-  res.sendFile(basePath + 'main.css');
+router.get('/*.css', function(req, res, next){
+  res.sendFile(basePath + req.path);
 });
 
 module.exports = router;

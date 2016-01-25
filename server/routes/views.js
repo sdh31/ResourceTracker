@@ -2,23 +2,14 @@ var express = require('express');
 var router = express.Router();
 var app = express();
 
-app.set('/views', '../../client/app/views/');
-var basePath = app.settings['/views'];
+var basePath =  '/home/bitnami/ResourceTracker/client';
 
 router.get('/', function(req, res, next){
-	res.render(basePath + 'index.html');
+	res.render(basePath + '/views/index.html');
 });
 
-router.get('/login.html', function(req, res, next){
-	res.render(basePath + 'login.html');
-});
-
-router.get('/register.html', function(req, res, next){
-	res.render(basePath + 'register.html');
-});
-
-router.get('/contact.html', function(req, res, next){
-	res.render(basePath + 'contact.html');
+router.get('/views/*.html', function(req, res, next){
+	res.render(basePath + req.path);
 });
 
 module.exports = router;
