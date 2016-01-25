@@ -28,6 +28,8 @@ router.put('/', function(req, res, next){
     res.send(result);
     //Maybe just send a json true or false?
   }
+  
+
   create_resource();
 
 });

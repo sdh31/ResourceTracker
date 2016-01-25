@@ -17,7 +17,6 @@ function create_user(username, password, permission_level, callback){
 
 function validate_user(username, password, permission_level, callback){
 	//Check if user is valid 
-	create_user(username, password, "admin", callback);
 	var query = squel.select().from("user")
 	
 	if (username != null){
@@ -25,7 +24,7 @@ function validate_user(username, password, permission_level, callback){
 	}
 
 	if (password != null){
-		query=query.where("password = '" + password + "'");
+		query = query.where("password = '" + password + "'");
 	}
 
 	if (permission_level != null){
@@ -40,6 +39,7 @@ function validate_user(username, password, permission_level, callback){
 		callback(err, JSON.stringify(rows));
 	});
 }
+
 
 module.exports = {
 	create_user: create_user,
