@@ -9,16 +9,17 @@ angular.module('resourceTracker')
 
          $scope.login = function() {
             console.log('calling login...');
-            var loginQueryString = '/user?username=' +  $scope.user.username + '&password=' + $scope.user.password;
+            var loginQueryString = '/user/signin?username=' +  $scope.user.username + '&password=' + $scope.user.password;
             $http.get(loginQueryString).then(function(response) {
                 console.log(response);
                 var permission_level = response.data.permission_level;
                 if(permission_level == "admin"){
                     $location.url('/register');
                 } else {
-                    $location.url('/contact')
+                    $location.url('/register')
                 }
             }, function(error) {
+                console.log('there is an error');
                 console.log(error);
         });
   	};
