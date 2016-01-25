@@ -31,5 +31,4 @@ http://colab-sbx-123.oit.duke.edu (aliased by http://resource-tracker-prod.colab
 
 MySQL Database Password: db
 
-
-
+Database Schema: https://docs.google.com/document/d/109pIj377dgMmYcTE61wDp8kBut4UyG9Q0pKHqRn_Pwc/edit
