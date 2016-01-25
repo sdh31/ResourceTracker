@@ -6,9 +6,13 @@ angular.module('resourceTracker')
       firstName: '',
       lastName: '',
   		username: '',
+      email: '',
+      role: '',
   		password: '',
       confirmPassword: '',
   	};
+
+    $scope.roles = ['admin', 'user'];
 
   	$scope.register = function() {
   		console.log($scope.newUser.firstName);
