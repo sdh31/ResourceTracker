@@ -7,7 +7,8 @@ var resource_routes = require('./routes/resources');
 var reservation_routes = require('./routes/reservations');
 var script_routes = require('./routes/scripts');
 var style_routes = require('./routes/styles');
-var db_modules = require('./database_modules');
+var initialize_tables = require('./services/initialize_tables');
+var user_db_functions = require('./services/users');
 
 app.use('/', views);
 app.use('/views', views);
@@ -19,7 +20,7 @@ app.use('/styles', style_routes);
 
 app.engine('html', require('ejs').renderFile);
 
-db_modules.initializeDB(null);
+initialize_tables.initializeDB(function callback(){});
 
 app.listen(80, function () {
   console.log('Example app listening on port 80!');
