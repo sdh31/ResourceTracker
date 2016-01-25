@@ -6,7 +6,7 @@ angular
 	])
 	.config(function ($routeProvider) {
     	$routeProvider
-    		.when('/', {
+    		.when('/login', {
         		templateUrl: '/views/login.html',
         		controller: 'LoginCtrl'
       		})
@@ -18,6 +18,6 @@ angular
           templateUrl: '/views/contact.html'
         })
       	.otherwise({
-      		redirectTo: '/'
+      		redirectTo: '/login'
       	});
      });
