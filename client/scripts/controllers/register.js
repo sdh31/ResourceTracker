@@ -1,27 +1,25 @@
 'use strict';
 
 angular.module('resourceTracker')
-  .controller('RegisterCtrl', function ($scope, $http) {
-  	$scope.newUser =  {
-      firstName: '',
-      lastName: '',
-  		username: '',
-      email: '',
-      role: '',
-  		password: '',
-      confirmPassword: '',
-  	};
+    .controller('RegisterCtrl', function ($scope, $http) {
+        $scope.newUser =  {
+            firstName: '',
+            lastName: '',
+  		    username: '',
+            email: '',
+            permission_level: '',
+  		    password: '',
+            confirmPassword: '',
+  	     };
 
-    $scope.roles = ['admin', 'user'];
+        $scope.roles = ['admin', 'user'];
 
-  	$scope.register = function() {
-  		console.log($scope.newUser.firstName);
-  		console.log($scope.newUser.lastName);
-      console.log($scope.newUser.username);
-      console.log($scope.newUser.email);
-      console.log($scope.newUser.role);
-      console.log($scope.newUser.password);
-      console.log($scope.newUser.confirmPassword);
-  	};
+        $scope.register = function() {
+            $http.put('/user', $scope.newUser).then(function(response) {
+                console.log(response);
+            }, function(error) {
+                console.log(error);
+            });
 
-  });
+  	     };
+     });
