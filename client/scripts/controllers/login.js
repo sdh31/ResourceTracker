@@ -12,7 +12,12 @@ angular.module('resourceTracker')
             var loginQueryString = '/user?username=' +  $scope.user.username + '&password=' + $scope.user.password;
             $http.get(loginQueryString).then(function(response) {
                 console.log(response);
-                $location.url('/contact');
+                var permission_level = response.data.permission_level;
+                if(permission_level == "admin"){
+                    $location.url('/register');
+                } else {
+                    $location.url('/contact')
+                }
             }, function(error) {
                 console.log(error);
         });
