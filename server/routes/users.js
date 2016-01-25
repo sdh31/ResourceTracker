@@ -37,10 +37,41 @@ router.put('/', function(req, res, next){
 
 router.post('/', function(req, res, next){
 	//update user
+	
+	var username = req.query["username"];
+	var user = {newUsername: req.query['newUsername'],
+				password: req.query['password'],
+				permission_level: req.query['permission_level']}
+	var updateUserCallback = function(result) {
+
+		if (result.error == true) {
+			res.sendStatus(401);
+		} else {
+			// send updated user info too?
+			res.sendStatus(200);
+		}
+	}
+
+	user_service.update_user(username, user, updateUserCallback);
 });
 
 router.delete('/', function(req, res, next){
-	//delete user
+	var deleteUserCallback = function(err) {
+		if (err.error == false) {
+			res.sendStatus(200);
+		} else {
+			// not sure of correct error code to send in this case
+			res.sendStatus(403);
+		}
+	}
+
+	var username = req.query["username"];
+	if (username == null || username == "") {
+		res.sendStatus(403);
+	} else {
+
+		user_service.delete_user(username, deleteUserCallback);
+	}
 });
 
 router.get('/signin', function(req, res, next){
