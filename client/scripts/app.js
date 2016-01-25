@@ -17,9 +17,6 @@ angular
             .when('/contact', {
                 templateUrl: '/views/contact.html'
             })
-            .when('/welcome', {
-                templateUrl: '/views/welcome.html'
-            })
             .otherwise({
       		    redirectTo: '/login'
       	     });

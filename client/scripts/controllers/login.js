@@ -9,11 +9,10 @@ angular.module('resourceTracker')
 
          $scope.login = function() {
             console.log('calling login...');
-            var loginQueryString = '/user?username=' +  $scope.user.username
-                + '&password=' + $scope.user.password;
+            var loginQueryString = '/user?username=' +  $scope.user.username + '&password=' + $scope.user.password;
             $http.get(loginQueryString).then(function(response) {
                 console.log(response);
-                $location.url('/welcome');
+                $location.url('/contact');
             }, function(error) {
                 console.log(error);
         });
