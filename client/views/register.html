@@ -2,6 +2,10 @@
 	<input type="text" class="form-control" placeholder="first name" ng-model="newUser.firstName"><br>
 	<input type="text" class="form-control" placeholder="last name" ng-model="newUser.lastName"><br>
 	<input type="text" class="form-control" placeholder="username" ng-model="newUser.username"><br>
+	<input type="text" class="form-control" placeholder="email address" ng-model="newUser.email"><br>
+	<label ng-repeat="role in roles"> {{role}}
+       <input type="radio" ng-model="newUser.role" value="{{role}}">
+    </label>
 	<input type="password" class="form-control" placeholder="password" ng-model="newUser.password"><br>
 	<input type="password" class="form-control" placeholder="confirm password" ng-model="newUser.confirmPassword"><br>
 	<button type="button" class="btn btn-default btn-sm" ng-click="register()">Register</button>
