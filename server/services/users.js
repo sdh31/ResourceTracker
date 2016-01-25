@@ -1,26 +1,32 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel');
+var bcrypt = require('bcrypt');
 
 function create_user(username, password, permission_level, callback){
 	//Creates user given all parameters
-	var query = squel.insert().into("user")
-		.set("username", username)
-		.set("password", password)
-		.set("permission_level", permission_level)
-		.toString();
+    bcrypt.genSalt(10, function(err, salt) {
+		bcrypt.hash(password, salt, function(err, hash) {
+            // Store hash in your password DB.
+			var query = squel.insert().into("user")
+	        .set("username", username)
+	        .set("password", hash)
+	        .set("permission_level", permission_level)
+	        .toString();
 
-	db_sql.connection.query(query)
-		.on('result', function (row) {
-      callback(JSON.stringify(row));
-     })
-    .on('error', function (err) {
-      console.log(err);
-      callback({error: true, err: err});
-     });
-	
+            db_sql.connection.query(query)
+	            .on('result', function (row) {
+                    row.password = "";
+                    callback(row);
+                })
+                .on('error', function (err) {
+                    callback({error: true, err: err});
+                 }
+            );
+		});
+	});
 }
 
-function validate_user(username, password, callback){
+function get_user(username, callback){
 	//Check if user is valid 
 	var query = squel.select().from("user")
 	
@@ -28,22 +34,32 @@ function validate_user(username, password, callback){
 		query = query.where("username = '" + username + "'");
 	}
 
-	if (password != null){
-		query = query.where("password = '" + password + "'");
-	}
-
 	query = query.toString();
-
+    var rowCount = 0;
 	db_sql.connection.query(query)
 		.on('result', function (row) {
-      callback(JSON.stringify(row));
-     })
-    .on('error', function (err) {
-      callback({error: true, err: err});
-     });
+            rowCount++;
+            callback(row);
+        })
+        .on('error', function (err) {
+            callback({error: true, err: err});
+         })
+        .on('end', function () {
+            if (rowCount == 0) {
+                callback({error: true});
+            }
+         }
+    );
+}
+
+function compare_passwords(password, hash, callback) {
+    bcrypt.compare(password, hash, function(err, res) {
+        callback(res);
+    });
 }
 
 module.exports = {
 	create_user: create_user,
-	validate_user: validate_user
+	get_user: get_user,
+    compare_passwords: compare_passwords
 }

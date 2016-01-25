@@ -4,34 +4,35 @@ var user_service = require('../services/users');
 
 router.get('/', function(req, res, next){
 	//read user
-	var callback = function(result){
-  		res.send(result);
+	var getUserCallback = function(result){
+		result.password = "";
+  		res.send(JSON.stringify(result));
     	//need to add json response
 	}
 	var username=req.query["username"];
-	var password=req.query["password"];
 	
-	user_service.validate_user(username, password, callback);
+	user_service.get_user(username, getUserCallback);
 });
 
 router.put('/', function(req, res, next){
 	//create user
-  	var callback = function(result){
-  		//if !Object.keys(obj).length{
-
-  		//}
+  	var createUserCallback = function(result){
+  		if (result.error == true) {
+			res.sendStatus(401);
+		} else {
+			res.sendStatus(200);
+		}
   	}
   	//These might need to be changed to json body fields
-  	username = req.query["username"];
-  	password = req.query["password"];
-	  permission_level = req.query["permission_level"];
+  	var username = req.query["username"];
+	var permission_level = req.query["permission_level"];
+	var password = req.query["password"];
 
-  	if(username == null || password == null || permission_level == null){
+	if(username == null || password == null || permission_level == null){
 	  	res.sendStatus(401);
-  	}
-  	else{
-  		user_service.create_user(username, password, permission_level, callback);
-  	}
+  	} else {
+		user_service.create_user(username, password, permission_level, createUserCallback);
+	}
 });
 
 router.post('/', function(req, res, next){
@@ -42,10 +43,30 @@ router.delete('/', function(req, res, next){
 	//delete user
 });
 
-router.get('/signinn', function(req, res, next){
+router.get('/signin', function(req, res, next){
 	//login user
-	res.type('text/plain');
-	res.write('YOU ARE LOGGED IN');
+
+	var username = req.query["username"];
+	var password = req.query["password"];
+
+	var comparePasswordsCallback = function(result) {
+		if (result == true) {
+			// might needa change this for redirects?
+			res.sendStatus(200);
+		} else {
+			res.sendStatus(403);
+		}
+	}
+
+	var getUserCallback = function(result){
+		if (result.error == true) {
+			res.sendStatus(403);
+		} else {
+			user_service.compare_passwords(password, result.password, comparePasswordsCallback);
+		}
+	}
+
+	user_service.get_user(username, getUserCallback);
 });
 
 router.get('/signout', function(req, res, next){
