@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('resourceTracker')
-    .controller('LoginCtrl', function ($scope, $http) {
+    .controller('LoginCtrl', function ($scope, $http, $location) {
         $scope.user =  {
   		    username: '',
   		    password: ''
@@ -13,6 +13,7 @@ angular.module('resourceTracker')
                 + '&password=' + $scope.user.password;
             $http.get(loginQueryString).then(function(response) {
                 console.log(response);
+                $location.url('/welcome');
             }, function(error) {
                 console.log(error);
         });
