@@ -10,10 +10,10 @@ router.get('/', function(req, res, next){
   		res.send(result);
     	//need to add json response
 	}
-	username=req.query["username"];
-	password=req.query["password"];
-	permission_level=req.query["permission_level"];
-	user_service.validate_user(username, password, callback);
+	username=req.params["username"];
+	password=req.params["password"];
+	permission_level=req.params["permission_level"];
+	user_service.validate_user(username, password, permission_level, callback);
 });
 
 router.put('/', function(req, res, next){
