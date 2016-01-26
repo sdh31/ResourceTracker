@@ -16,10 +16,14 @@ router.get('/', function(req, res, next){
 
 router.put('/', function(req, res, next){
 	//create user
+	console.log(req.body);
+	console.log(req.data);
+	console.log(req.params);
   	var createUserCallback = function(result){
   		if (result.error == true) {
 			res.sendStatus(401);
 		} else {
+
 			res.sendStatus(200);
 		}
   	}
@@ -84,6 +88,17 @@ router.get('/signin', function(req, res, next){
 		if (result == true) {
 			// might needa change this for redirects?
 			res.sendStatus(200);
+
+			if (req.session.isValid) {
+			    console.log("There is an existing session.");
+			}
+		  	else {
+				req.session.isValid = true;
+				console.log("New session.");
+				console.log('Old session ID: ' + req.header('Cookie'));
+				console.log('New session ID: ' + req.session.id);
+		  	}
+
 		} else {
 			res.sendStatus(403);
 		}
