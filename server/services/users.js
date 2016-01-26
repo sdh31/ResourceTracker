@@ -102,7 +102,6 @@ function update_user(username, user, callback) {
 		    });
 	    });
     } else {
-
         query = query.toString();
         db_sql.connection.query(query)
             .on('end', function (row) {
