@@ -16,7 +16,7 @@ var style_routes = require('./routes/styles');
 var initialize_tables = require('./services/initialize_tables');
 var user_db_functions = require('./services/users');
 
-app.use(body_parser.urlencoded({extended: true}));
+app.use(body_parser.json());
 app.use(cookie_parser());
 app.use(session({
     secret: 'ssshhhhh',

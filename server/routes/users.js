@@ -16,36 +16,25 @@ router.get('/', function(req, res, next){
 
 router.put('/', function(req, res, next){
 	//create user
-	console.log(req.body);
-	console.log(req.data);
-	console.log(req.params);
   	var createUserCallback = function(result){
   		if (result.error == true) {
 			res.sendStatus(401);
 		} else {
-
 			res.sendStatus(200);
 		}
   	}
   	//These might need to be changed to json body fields
-  	var username = req.query["username"];
-	var permission_level = req.query["permission_level"];
-	var password = req.query["password"];
 
-	if(username == null || password == null || permission_level == null){
+	if(req.body.username == null || req.body.password == null || req.body.permission_level == null){
 	  	res.sendStatus(401);
   	} else {
-		user_service.create_user(username, password, permission_level, createUserCallback);
+		user_service.create_user(req.body, createUserCallback);
 	}
 });
 
 router.post('/', function(req, res, next){
 	//update user
-	
-	var username = req.query["username"];
-	var user = {newUsername: req.query['newUsername'],
-				password: req.query['password'],
-				permission_level: req.query['permission_level']}
+
 	var updateUserCallback = function(result) {
 
 		if (result.error == true) {
@@ -56,7 +45,7 @@ router.post('/', function(req, res, next){
 		}
 	}
 
-	user_service.update_user(username, user, updateUserCallback);
+	user_service.update_user(req.body, updateUserCallback);
 });
 
 router.delete('/', function(req, res, next){
@@ -69,7 +58,7 @@ router.delete('/', function(req, res, next){
 		}
 	}
 
-	var username = req.query["username"];
+	var username = req.body.username;
 	if (username == null || username == "") {
 		res.sendStatus(403);
 	} else {
@@ -81,8 +70,8 @@ router.delete('/', function(req, res, next){
 router.get('/signin', function(req, res, next){
 	//login user
 
-	var username = req.query["username"];
-	var password = req.query["password"];
+	var username = req.body.username;
+	var password = req.body.password;
 
 	var comparePasswordsCallback = function(result) {
 		if (result == true) {
