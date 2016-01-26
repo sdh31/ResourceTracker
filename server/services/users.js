@@ -2,15 +2,15 @@ var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var bcrypt = require('bcrypt');
 
-function create_user(username, password, permission_level, callback){
+function create_user(user, callback){
 	//Creates user given all parameters
     bcrypt.genSalt(10, function(err, salt) {
-		bcrypt.hash(password, salt, function(err, hash) {
+		bcrypt.hash(user.password, salt, function(err, hash) {
             // Store hash in your password DB.
 			var query = squel.insert().into("user")
-	        .set("username", username)
+	        .set("username", user.username)
 	        .set("password", hash)
-	        .set("permission_level", permission_level)
+	        .set("permission_level", user.permission_level)
 	        .toString();
 
             db_sql.connection.query(query)
@@ -69,11 +69,12 @@ function delete_user(username, callback) {
     );
 }
 
-function update_user(username, user, callback) {
+function update_user(body, callback) {
 
-    var newUsername = user.newUsername;
-    var password = user.password;
-    var permission_level = user.permission_level;
+	var username = body.username;
+    var newUsername = body.newUsername;
+    var password = body.password;
+    var permission_level = body.permission_level;
 
     var query = squel.update().table("user").where("username = '" + username + "'");
 
