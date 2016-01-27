@@ -2,7 +2,7 @@ import requests
 import json
 
 url = 'http://colab-sbx-202.oit.duke.edu/resource'
-method = "PUT"
+method = "DELETE"
 query = {}
 headers = {
 	"Content-Type:":'application/json'
@@ -14,18 +14,19 @@ user_params = {
 	'permission_level':'admin'
 }
 resource_params = {
-	'name': 'dresource',
-	'description': 'it',
+	'id' : 15,
+	'name': 'daresource',
+	'description': 'huh',
 	'max_users': 1,
-	'tag':'hi'
+	'tag':'that'
 }
 
 response = requests.request(
 	method,
 	url = url,
 	#query = query,
-	json = resource_params,
-	#params = resource_params,
+	#json = resource_params,
+	params = resource_params,
 	#headers = headers
 	)
 

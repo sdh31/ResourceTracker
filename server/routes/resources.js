@@ -6,7 +6,12 @@ var tag_service = require('../services/tags');
 router.get('/', function(req, res, next){
   //read user from name in URL queries
   var getResourceCallback = function (result) {
-      res.send(JSON.stringify(result));
+      if (result.error == true){
+        res.sendStatus(400)
+      }
+      else{
+        res.send(JSON.stringify(result));
+      }
   };
 
   name = req.query['name'];
@@ -21,31 +26,28 @@ else{
 router.put('/', function(req, res, next){
   //create user
  var create_tag_resource_callback = function(result){
+        console.log(result.error)
         if(result.error == true){
+          console.log('etf')
             res.sendStatus(400);
         }
         else{
             //res.write(JSON.stringify(result));
-            res.status(200);
-            res.send();
+            res.sendStatus(200);
         }
     }
   var create_resource_callback = function(result){
-
+    console.log('here')
     if(result.error == true){
       res.sendStatus(400);
   }
     else{
-        console.log("yay")
-        var res_id = JSON.parse(result).insertId;
-        console.log("yo"+JSON.parse(result).insertId)
-        tag_service.create_tag(res_id, req.body.tag, create_tag_resource_callback, tag_service.create_resource_tag);
+        var res_id = result.insertId;//JSON.parse(result).insertId;
+        //console.log("yo"+JSON.parse(result).insertId)
+        tag_service.create_tag(res_id, req.body.tag, create_tag_resource_callback, tag_service.create_resource_tag_link);
   }
 }
-var username = "chris";
-console.log(req.body)
-res_service.create_resource(username, req.body, createResourceCallback);
-
+res_service.create_resource(req.body, create_resource_callback);
 });
 
 router.post('/', function(req, res, next){
@@ -55,7 +57,7 @@ router.post('/', function(req, res, next){
             res.sendStatus(400);
         }
         else{
-            res.write(JSON.stringify(result));
+            //res.write(JSON.stringify(result));
             res.sendStatus(200);
         }
     }
@@ -66,12 +68,16 @@ router.post('/', function(req, res, next){
 router.delete('/', function(req, res, next){
   //delete resource
   var delete_resource_callback = function(result){
-    res.write(JSON.stringify(result));
+    if (result.error == true){
+      console.log("err" + " "+result.err)
+      res.sendStatus(400);
+    }
+    //res.write(JSON.stringify(result));
     res.sendStatus(200);
   }
 
   id = req.query["id"];
-  res_service.delete_resource_by_id(id,delete_resource_callback);
+  res_service.delete_resource_tag_pair_by_resource(id,delete_resource_callback);
 });
 
 module.exports = router;
