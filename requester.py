@@ -5,25 +5,31 @@ url = 'http://colab-sbx-202.oit.duke.edu/resource'
 method = "PUT"
 query = {}
 headers = {
-	"content-type:":'application/json'
+	"Content-Type:":'application/json'
 }
 
-params = {
-	'name':'resource!',
-	'description':'a resource',
-	'max-users':1
+user_params = {
+	'username':'chris',
+	'password':'pass',
+	'permission_level':'admin'
 }
-print(params)
+resource_params = {
+	'name': 'dresource',
+	'description': 'it',
+	'max_users': 1
+}
+
 response = requests.request(
 	method,
 	url = url,
 	#query = query,
-	data = params,
-	#params = params,
-	headers = headers
+	json = resource_params,
+	#params = resource_params,
+	#headers = headers
 	)
 
 response_json = response.content
 print response.content
+print response.status_code
 #content = json.loads(response.json)
 #print(content)

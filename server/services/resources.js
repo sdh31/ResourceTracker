@@ -39,15 +39,22 @@ function create_resource(username, resource, callback){
 		.set("name", resource.name)
 		.set("description", resource.description)
 		.set("max_users", resource.max_users)
-        .set("created_by", username)
 		.toString();
 
+        var rowCount = 0;
 	db_sql.connection.query(query)
 		.on('result', function (row) {
+            rowCount++;
+            console.log('This got sent!')
             callback(JSON.stringify(row));
         })
         .on('error', function (err) {
             callback({error: true, err: err});
+        })
+        .on('end', function (err) {
+            if (rowCount == 0){
+                callback({error: true, err: err});
+            }
         });
 }
 

@@ -25,11 +25,12 @@ router.put('/', function(req, res, next){
       res.sendStatus(400);
   }
   else{
-      res.sendStatus(200);
-      res.send(JSON.stringify(result));
+        res.write(JSON.stringify(result));
+        res.status(200);
+        res.send()
   }
 }
-username = "chris";
+var username = "chris";
 console.log(req.body)
 res_service.create_resource(username, req.body, createResourceCallback);
 });
