@@ -7,9 +7,9 @@ angular
 	.config(function ($routeProvider) {
     	$routeProvider
             .when('/login', {
-        		templateUrl: '/views/login.html',
-        		controller: 'LoginCtrl'
-      		})
+        		    templateUrl: '/views/login.html'
+                // NOTE: do not include controller for this templateUrl so it can default to the same main_controller as index.html
+            })
             .when('/register', {
                 templateUrl: '/views/register.html',
                 controller: 'RegisterCtrl'
@@ -19,5 +19,5 @@ angular
             })
             .otherwise({
       		    redirectTo: '/login'
-      	     });
+      	   });
      });
