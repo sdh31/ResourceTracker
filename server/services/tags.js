@@ -44,11 +44,10 @@ function select_tag_id(res_id, tag_name, response_callback, tag_callback){
                 .toString()
             db_sql.connection.query(select_query)
                 .on('result', function (row) {
-                    console.log(row);
                     tag_callback(res_id, row.tag_id, response_callback);
                 })
                 .on('error', function (err) {
-                    console.log('errors')
+                    console.log(err)
                     response_callback({error: true, err: err});
                 })
                 .on('end', function () {
@@ -56,32 +55,37 @@ function select_tag_id(res_id, tag_name, response_callback, tag_callback){
 }
 
 function filter_by_tag(tags, callback){
+    var tag_filter = squel.expr()
+    for (var i = 0; i < tags.length; i++){
+        tag_filter.or("tag_name = '" + tags[i] + "'")
+    }
     var query = squel.select()
         .from("resource_tag")
-        .field("resource_id")
-        .join("tags")
-        .on("tag_id")
-    for (var i = 0; i < tags.length; i++){
-        query.where("tag_name" = tags[i])
-    }
-    query.toString()
+        
+        //can add more joins (i.e. reservations, resources if more info is needed in return)
+        .join("tag", null, "resource_tag.tag_id = tag.tag_id")
+        .where(tag_filter)
+    query = query.toString()
+    console.log(query)
+    var resources = []
 
     db_sql.connection.query(query)
                 .on('result', function (row) {
-                    console.log(row);
-                    callback(row);
+                    resources.push(row.resource_id)
                 })
                 .on('error', function (err) {
-                    response_callback({error: true, err: err});
+                    console.log(err)
+                    callback({error: true, err: err});
                 })
                 .on('end', function () {
+                    callback({resource_id:resources})
                 });
 
 }
 
-function remove_tag_from_resource(res_id, tag_name){}
 
 module.exports = {
     create_tag:create_tag,
-    create_resource_tag_link:create_resource_tag_link
+    create_resource_tag_link:create_resource_tag_link,
+    filter_by_tag:filter_by_tag
 }

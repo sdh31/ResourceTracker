@@ -80,4 +80,21 @@ router.delete('/', function(req, res, next){
   res_service.delete_resource_tag_pair_by_resource(id,delete_resource_callback);
 });
 
+router.get('/filter', function(req, res, next){
+  var filter_callback = function(result){
+    if (result.error == true){
+      console.log("err" + " "+result.err)
+      res.sendStatus(400);
+    }
+    res.send(JSON.stringify(result));
+  }
+
+  var tags = [].concat(req.query['tags'])
+  //This is due to weird js string behavior 
+  //-- if list is only one string long, it reads characters instead of words
+  tags.push('')
+
+  tag_service.filter_by_tag(tags, filter_callback)
+});
+
 module.exports = router;
