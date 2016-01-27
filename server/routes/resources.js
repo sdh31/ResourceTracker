@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var res_service = require('../services/resources');
+var tag_service = require('../services/tags');
 
 router.get('/', function(req, res, next){
   //read user from name in URL queries
@@ -19,20 +20,32 @@ else{
 
 router.put('/', function(req, res, next){
   //create user
-
+ var create_tag_resource_callback = function(result){
+        if(result.error == true){
+            res.sendStatus(400);
+        }
+        else{
+            //res.write(JSON.stringify(result));
+            res.status(200);
+            res.send();
+        }
+    }
   var createResourceCallback = function(result){
+
     if(result.error == true){
       res.sendStatus(400);
   }
   else{
-        res.write(JSON.stringify(result));
-        res.status(200);
-        res.send()
+        console.log("yay")
+        var res_id = JSON.parse(result).insertId;
+        console.log("yo"+JSON.parse(result).insertId)
+        tag_service.create_tag(res_id, req.body.tag, create_tag_resource_callback, tag_service.create_resource_tag);
   }
 }
 var username = "chris";
 console.log(req.body)
 res_service.create_resource(username, req.body, createResourceCallback);
+
 });
 
 router.post('/', function(req, res, next){

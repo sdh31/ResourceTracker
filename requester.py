@@ -16,7 +16,8 @@ user_params = {
 resource_params = {
 	'name': 'dresource',
 	'description': 'it',
-	'max_users': 1
+	'max_users': 1,
+	'tag':'hi'
 }
 
 response = requests.request(
