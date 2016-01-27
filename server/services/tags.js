@@ -49,6 +49,8 @@ function select_tag_id(res_id, tag, response_callback, tag_callback){
                 });
 }
 
+function remove_tag_from_resource()
+
 module.exports = {
     create_tag:create_tag,
     create_resource_tag:create_resource_tag

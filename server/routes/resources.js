@@ -30,12 +30,12 @@ router.put('/', function(req, res, next){
             res.send();
         }
     }
-  var createResourceCallback = function(result){
+  var create_resource_callback = function(result){
 
     if(result.error == true){
       res.sendStatus(400);
   }
-  else{
+    else{
         console.log("yay")
         var res_id = JSON.parse(result).insertId;
         console.log("yo"+JSON.parse(result).insertId)
