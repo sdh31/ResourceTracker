@@ -69,9 +69,8 @@ router.delete('/', function(req, res, next){
 
 router.get('/signin', function(req, res, next){
 	//login user
-
-	var username = req.body.username;
-	var password = req.body.password;
+	var username = req.query.username;
+	var password = req.query.password;
 
 	var comparePasswordsCallback = function(result) {
 		if (result == true) {
