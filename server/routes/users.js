@@ -98,9 +98,10 @@ router.get('/signin', function(req, res, next){
 
 router.get('/signout', function(req, res, next){
 
-	req.session = null;
-	res.type('text/plain');
-	res.send('YOU ARE LOGGED OUT');
+	req.session.destroy(function() {
+		res.type('text/plain');
+		res.send('YOU ARE LOGGED OUT');
+	});
 })
 
 module.exports = router;
