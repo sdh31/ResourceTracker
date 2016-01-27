@@ -117,9 +117,9 @@ function update_user(body, callback) {
     }
 }
 
-function compare_passwords(password, hash, callback) {
-    bcrypt.compare(password, hash, function(err, res) {
-        callback(res);
+function compare_passwords(password, user, callback) {
+    bcrypt.compare(password, user.password, function(err, res) {
+        callback(res, user);
     });
 }
 

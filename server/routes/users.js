@@ -25,7 +25,7 @@ router.put('/', function(req, res, next){
   	}
   	//These might need to be changed to json body fields
 
-	if(req.body.username == null || req.body.password == null || req.body.permission_level == null){
+	if(!req.session || !req.session.user || !(req.session.user.permission_level == 'admin') || req.body.username == null || req.body.password == null || req.body.permission_level == null){
 	  	res.sendStatus(401);
   	} else {
 		user_service.create_user(req.body, createUserCallback);
@@ -72,20 +72,13 @@ router.get('/signin', function(req, res, next){
 	var username = req.query.username;
 	var password = req.query.password;
 
-	var comparePasswordsCallback = function(result) {
+	var comparePasswordsCallback = function(result, user) {
 		if (result == true) {
 			// might needa change this for redirects?
-			res.sendStatus(200);
 
-			if (req.session.isValid) {
-			    console.log("There is an existing session.");
-			}
-		  	else {
-				req.session.isValid = true;
-				console.log("New session.");
-				console.log('Old session ID: ' + req.header('Cookie'));
-				console.log('New session ID: ' + req.session.id);
-		  	}
+			req.session.isValid = true;
+			req.session.user = user;
+			res.sendStatus(200);
 
 		} else {
 			res.sendStatus(403);
@@ -96,7 +89,7 @@ router.get('/signin', function(req, res, next){
 		if (result.error == true) {
 			res.sendStatus(403);
 		} else {
-			user_service.compare_passwords(password, result.password, comparePasswordsCallback);
+			user_service.compare_passwords(password, result, comparePasswordsCallback);
 		}
 	}
 
@@ -104,6 +97,8 @@ router.get('/signin', function(req, res, next){
 });
 
 router.get('/signout', function(req, res, next){
+
+	req.session = null;
 	res.type('text/plain');
 	res.send('YOU ARE LOGGED OUT');
 })
