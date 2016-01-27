@@ -16,10 +16,13 @@ function get_resource_by_name(name, callback){
             callback(JSON.stringify(row));
      })
     .on('error', function (err) {
-        if(rowCount == 0){
+            callback({error: true, err: err});
+     })
+    .on('end', function (err){
+        if (rowCount == 0){
             callback({error: true, err: err});
         }
-     });
+    });
 }
 
 function find_resources_by_tag(tag){
@@ -56,7 +59,7 @@ function update_resource_by_id(resource,callback){
         if (resource.name == null || resource.name == ""){
 		  query.set("name", resource.name);
         }
-		if resource.description == null || resource.name == ""){
+		if (resource.description == null || resource.name == ""){
             query.set("description", resource.description);
         }
         if (resource.max_users == null || resource.name == ""){
@@ -83,13 +86,13 @@ function delete_resource_by_id(id, callback){
         .on('result', function (row) {
             rowCount ++;
             callback(JSON.stringify(row));
-        });
+        })
         .on('error', function (err) {
             callback({error: true, err: err});
-        });
+        })
         .on('end', function (err){
             if (row_count == 0){
-                res.sendStatusCode(401);
+                callback({error: true, err: err});
             }
         });
 }

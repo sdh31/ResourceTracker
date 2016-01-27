@@ -13,7 +13,7 @@ router.get('/', function(req, res, next){
     res.sendStatus(401);
 }
 else{
-    res_service.get_resource_by_name(name, getResourceCallBack);
+    res_service.get_resource_by_name(name, getResourceCallback);
 }
 });
 
@@ -22,26 +22,27 @@ router.put('/', function(req, res, next){
 
   var createResourceCallback = function(result){
     if(result.error == true){
-      res.sendStatusCode(401);
+      res.sendStatus(400);
   }
   else{
-      res.sendStatusCode(200);
+      res.sendStatus(200);
       res.send(JSON.stringify(result));
   }
 }
-create_resource(username, req.body, createResourceCallback);
-
+username = "chris";
+console.log(req.body)
+res_service.create_resource(username, req.body, createResourceCallback);
 });
 
 router.post('/', function(req, res, next){
   //update user
     var update_resource_callback = function(result){
         if(result.error == true){
-            res.sendStatusCode(401);
+            res.sendStatus(400);
         }
         else{
             res.write(JSON.stringify(result));
-            res.sendStatusCode(200);
+            res.sendStatus(200);
         }
     }
 
@@ -50,9 +51,9 @@ router.post('/', function(req, res, next){
 
 router.delete('/', function(req, res, next){
   //delete resource
-  var delete_resource_callback(result){
+  var delete_resource_callback = function(result){
     res.write(JSON.stringify(result));
-    res.sendStatusCode(200);
+    res.sendStatus(200);
   }
 
   id = req.query["id"];
