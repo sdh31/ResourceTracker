@@ -29,42 +29,69 @@ function find_resources_by_tag(tag){
 		.from('');
 }
 
-function create_resource(resource, callback){
+function create_resource(username, resource, callback){
 //Create a resource, given all parameters
 	var query = squel.insert()
 		.into('resource')
 		.set("name", resource.name)
 		.set("description", resource.description)
 		.set("max_users", resource.max_users)
+        .set("created_by", username)
 		.toString();
 
 	db_sql.connection.query(query)
 		.on('result', function (row) {
             callback(JSON.stringify(row));
-     })
-    .on('error', function (err) {
-        callback({error: true, err: err});
-     });
+        })
+        .on('error', function (err) {
+            callback({error: true, err: err});
+        });
 }
 
-function create_user_resource_relationship(user, callback){}
-
-function update_resource_by_id(id, name, description, max_users, callback){
+function update_resource_by_id(resource,callback){
 //Update a resource given its id and all params
 	var query = squel.update()
 		.table('resource')
-		.where("id = " + id)
-		.set("name", name)
-		.set("description", description)
-		.set("max_users", max_users)
+		.where("id=" + resource.id);
+        if (resource.name == null || resource.name == ""){
+		  query.set("name", resource.name);
+        }
+		if resource.description == null || resource.name == ""){
+            query.set("description", resource.description);
+        }
+        if (resource.max_users == null || resource.name == ""){
+            query.set("max_users", resource.max_users);
+        }
+        query.toString();
 
 	db_sql.connection.query(query)
 		.on('result', function (row) {
-      callback(JSON.stringify(row));
-     })
-    .on('error', function (err) {
-      callback({error: true, err: err});
-     });
+            callback(JSON.stringify(row));
+        })
+        .on('error', function (err) {
+            callback({error: true, err: err});
+        });
+}
+
+function delete_resource_by_id(id, callback){
+    squel.delete()
+        .from("resource")
+        .where("id = '" + id + "'")
+        .toString();
+        var row_count = 0;
+    db_sql.connection.query(query)
+        .on('result', function (row) {
+            rowCount ++;
+            callback(JSON.stringify(row));
+        });
+        .on('error', function (err) {
+            callback({error: true, err: err});
+        });
+        .on('end', function (err){
+            if (row_count == 0){
+                res.sendStatusCode(401);
+            }
+        });
 }
 
 module.exports = {

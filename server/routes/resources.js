@@ -11,10 +11,10 @@ router.get('/', function(req, res, next){
   name = req.query['name'];
   if (name == null){
     res.sendStatus(401);
-  }
-  else{
+}
+else{
     res_service.get_resource_by_name(name, getResourceCallBack);
-  }
+}
 });
 
 router.put('/', function(req, res, next){
@@ -23,24 +23,40 @@ router.put('/', function(req, res, next){
   var createResourceCallback = function(result){
     if(result.error == true){
       res.sendStatusCode(401);
-    }
-    else{
+  }
+  else{
       res.sendStatusCode(200);
       res.send(JSON.stringify(result));
-    }
   }
-  
-
-  create_resource(req.body, createResourceCallback);
+}
+create_resource(username, req.body, createResourceCallback);
 
 });
 
 router.post('/', function(req, res, next){
   //update user
+    var update_resource_callback = function(result){
+        if(result.error == true){
+            res.sendStatusCode(401);
+        }
+        else{
+            res.write(JSON.stringify(result));
+            res.sendStatusCode(200);
+        }
+    }
+
+    res_service.update_resource_by_id(req.body, update_resource_callback);
 });
 
 router.delete('/', function(req, res, next){
-  //delete user
+  //delete resource
+  var delete_resource_callback(result){
+    res.write(JSON.stringify(result));
+    res.sendStatusCode(200);
+  }
+
+  id = req.query["id"];
+  res_service.delete_resource_by_id(id,delete_resource_callback);
 });
 
 module.exports = router;
