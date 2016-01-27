@@ -24,35 +24,62 @@ router.put('/', function(req, res, next){
 		}
   	}
   	//These might need to be changed to json body fields
-  	var username = req.query["username"];
-	var permission_level = req.query["permission_level"];
-	var password = req.query["password"];
 
-	if(username == null || password == null || permission_level == null){
+	if(!req.session || !req.session.user || !(req.session.user.permission_level == 'admin') || req.body.username == null || req.body.password == null || req.body.permission_level == null){
 	  	res.sendStatus(401);
   	} else {
-		user_service.create_user(username, password, permission_level, createUserCallback);
+		user_service.create_user(req.body, createUserCallback);
 	}
 });
 
 router.post('/', function(req, res, next){
 	//update user
+
+	var updateUserCallback = function(result) {
+
+		if (result.error == true) {
+			res.sendStatus(401);
+		} else {
+			// send updated user info too?
+			res.sendStatus(200);
+		}
+	}
+
+	user_service.update_user(req.body, updateUserCallback);
 });
 
 router.delete('/', function(req, res, next){
-	//delete user
+	var deleteUserCallback = function(err) {
+		if (err.error == false) {
+			res.sendStatus(200);
+		} else {
+			// not sure of correct error code to send in this case
+			res.sendStatus(403);
+		}
+	}
+
+	var username = req.body.username;
+	if (username == null || username == "") {
+		res.sendStatus(403);
+	} else {
+
+		user_service.delete_user(username, deleteUserCallback);
+	}
 });
 
 router.get('/signin', function(req, res, next){
 	//login user
+	var username = req.query.username;
+	var password = req.query.password;
 
-	var username = req.query["username"];
-	var password = req.query["password"];
-
-	var comparePasswordsCallback = function(result) {
+	var comparePasswordsCallback = function(result, user) {
 		if (result == true) {
 			// might needa change this for redirects?
+
+			req.session.isValid = true;
+			req.session.user = user;
 			res.sendStatus(200);
+
 		} else {
 			res.sendStatus(403);
 		}
@@ -62,7 +89,7 @@ router.get('/signin', function(req, res, next){
 		if (result.error == true) {
 			res.sendStatus(403);
 		} else {
-			user_service.compare_passwords(password, result.password, comparePasswordsCallback);
+			user_service.compare_passwords(password, result, comparePasswordsCallback);
 		}
 	}
 
@@ -70,8 +97,11 @@ router.get('/signin', function(req, res, next){
 });
 
 router.get('/signout', function(req, res, next){
-	res.type('text/plain');
-	res.send('YOU ARE LOGGED OUT');
+
+	req.session.destroy(function() {
+		res.type('text/plain');
+		res.send('YOU ARE LOGGED OUT');
+	});
 })
 
 module.exports = router;
