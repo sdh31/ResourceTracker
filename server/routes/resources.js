@@ -89,10 +89,9 @@ router.get('/filter', function(req, res, next){
     res.send(JSON.stringify(result));
   }
 
-  var tags = [].concat(req.query['tags'])
-  //This is due to weird js string behavior 
+  //This is due to weird json behavior -- if there is only one string it isn't recognized as a list
   //-- if list is only one string long, it reads characters instead of words
-  tags.push('')
+  var tags = [].concat(req.query['tags'])
 
   tag_service.filter_by_tag(tags, filter_callback)
 });

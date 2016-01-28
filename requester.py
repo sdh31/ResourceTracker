@@ -14,14 +14,14 @@ user_params = {
 }
 resource_params = {
 	'id' : 13,
-	'name': 'daresource',
+	'name': 'test_resource',
 	'description': 'huh',
 	'max_users': 1,
-	'tag':'what'
+	'tag':['anteater']
 }
 
 filter_params = {
-	'tags': ['what', 'hi']
+	'tags': ['anteater']
 }
 
 response = requests.request(
