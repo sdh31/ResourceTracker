@@ -60,7 +60,10 @@ Steps to Generate SSL Certificate for Server
 
 6) Go to /opt/bitnami/apache2/conf/extra and open the httpd-ssl.conf file. Update the ServerName variable to the domain name, such as colab-sbx-212.oit.duke.edu
 
-7) Upon receiving the actual certificate, only include the certificate (and not chain of intermediate certificates) in the file server.crt in /opt/bitnami/apache2/conf
+7) Upon receiving the actual certificate, only include the certificate (and not chain of intermediate certificates) in the file server.crt in /opt/bitnami/apache2/conf.
+
+        Then, restart apache with the command 'sudo /opt/bitnami/ctlscript.sh restart apache'. 
+        Lastly, stop apache using the command 'sudo /opt/bitnami/ctlscript.sh stop apache'
 
 
 
