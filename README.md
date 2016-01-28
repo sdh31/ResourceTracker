@@ -15,23 +15,19 @@ Node Modules:
 
 - express
 
-Local Development Servers
+Servers
 
-Ashwin -> http://colab-sbx-366.oit.duke.edu
+        Development Servers
+            Ashwin -> http://colab-sbx-366.oit.duke.edu
+            Chris -> http://colab-sbx-202.oit.duke.edu
+        Test Server
+            Rahul -> http://colab-sbx-212.oit.duke.edu
+            Stephen -> http://colab-sbx-123.oit.duke.edu
 
-Chris -> http://colab-sbx-202.oit.duke.edu
+Database Structure
 
-Test Server
-
-http://colab-sbx-212.oit.duke.edu (aliased by http://resource-tracker-test.colab.duke.edu)
-
-Production Server
-
-http://colab-sbx-123.oit.duke.edu (aliased by http://resource-tracker-prod.colab.duke.edu)
-
-MySQL Database Password: db
-
-Database Schema: https://docs.google.com/document/d/109pIj377dgMmYcTE61wDp8kBut4UyG9Q0pKHqRn_Pwc/edit
+        MySQL Database Password: db
+        Schema: https://docs.google.com/document/d/109pIj377dgMmYcTE61wDp8kBut4UyG9Q0pKHqRn_Pwc/edit
 
 Steps to Generate SSL Certificate for Server
 
