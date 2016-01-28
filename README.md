@@ -32,3 +32,31 @@ http://colab-sbx-123.oit.duke.edu (aliased by http://resource-tracker-prod.colab
 MySQL Database Password: db
 
 Database Schema: https://docs.google.com/document/d/109pIj377dgMmYcTE61wDp8kBut4UyG9Q0pKHqRn_Pwc/edit
+
+Steps to Generate SSL Certificate for Server
+1) Go to /opt/bitnami/apache2/conf
+2) Remove server.csr and server.crt
+3) Issue command 'openssl req -new -newkey rsa:4096 -nodes -keyout server.key -out server.csr' , which generates a certificate signing request. Info given should be
+
+    Country Name (2 letter code) [AU]:US
+    State or Province Name (full name) [Some-State]:North Carolina
+    Locality Name (eg, city) []:Durham
+    Organization Name (eg, company) [Internet Widgits Pty Ltd]:Dev
+    Organizational Unit Name (eg, section) []:Dev
+    Common Name (e.g. server FQDN or YOUR name) []: *** NAME OF SERVER MUST BE USED HERE***, an example would be       colab-sbx-212.oit.duke.edu
+    Email Address []:rs268@duke.edu
+    
+4) Make sure server.key and server.csr have the same modulus, so issue the commands 
+    openssl rsa -noout -modulus -in server.key | openssl md5
+    openssl req -noout -modulus -in server.csr | openssl md5
+    
+    and make sure that the hashes match. 
+
+5) Go to https://oit.duke.edu/net-security/security/certs.php to submit the CSR
+
+6) Go to /opt/bitnami/apache2/conf/extra and open the httpd-ssl.conf file. Update the ServerName variable to the domain name, such as colab-sbx-212.oit.duke.edu
+
+7) Upon receiving the actual certificate, only include the certificate (and not chain of intermediate certificates) in the file server.crt in /opt/bitnami/apache2/conf
+
+
+
