@@ -28,7 +28,7 @@ router.put('/', function(req, res, next){
  var create_tag_resource_callback = function(result){
         console.log(result.error)
         if(result.error == true){
-          console.log('etf')
+          console.log(result.err)
             res.sendStatus(400);
         }
         else{

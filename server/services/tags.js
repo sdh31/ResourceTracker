@@ -2,6 +2,11 @@ var db_sql = require('./db_wrapper');
 var squel = require('squel');
 
 function create_resource_tag_link(res_id, tag_id, callback){
+    /*
+    Creates entries in Resource-Tag table: SQL query inserts appropriate tag_id to resource_id
+    res_id: id of resource being added to
+    tag_id: lis of ids' of tags being added
+    */
     console.log(tag_id)
     var rows_to_add = [];
      for(var i = 0; i < tag_id.length; i++){
@@ -24,15 +29,22 @@ function create_resource_tag_link(res_id, tag_id, callback){
             });
 }
 
+
 function create_tag (res_id, tag, response_callback, tag_callback){
+    /*
+    Create tag object from tag name
+    res_id: resource id when creating a link b/w tag and resource
+    tag: list of tag names to be used
+    response_callback: callback that sends final responses (status codes)
+    tag_callback: calback that continues the process of adding a tag (getting ids)
+    */
     var rows_to_add = []
-    console.log('create_tag');
     for(var i = 0; i < tag.length; i++){
         var row = {"tag_name": tag[i]};
         rows_to_add.push(row);
         console.log(rows_to_add);
     }
-    console.log('create tag II')
+
     var query = squel.insert()
         .into('tag')
         .setFieldsRows(rows_to_add)
@@ -53,6 +65,14 @@ function create_tag (res_id, tag, response_callback, tag_callback){
 }
 
 function select_tag_id(res_id, tags, response_callback, tag_callback){
+    /*
+    Given series of tag names, find tag ids to match the names
+    (necessary since we don't want duplicate tag names)
+    res_id: id of resource
+    tags: list of tag names
+    response_callback: callback to send responses (status codes)
+    tag_callback: continues process of adding tags with newfound tag_ids
+    */
     var select_expression = squel.expr();
     for (var i = 0; i < tags.length; i++){
         select_expression.or("tag_name = '" + tags[i] + "'")
@@ -63,6 +83,7 @@ function select_tag_id(res_id, tags, response_callback, tag_callback){
                 .where(select_expression)
                 .toString()
     var tag_ids = [];
+
     db_sql.connection.query(select_query)
         .on('result', function (row) {
             tag_ids.push(row.tag_id);

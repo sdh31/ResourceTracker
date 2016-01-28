@@ -2,14 +2,17 @@ var db_sql = require('./db_wrapper');
 var squel = require('squel');
 
 function get_resource_by_name(name, callback){
-//Gets resource by name
-	//Generate query String
+    /*
+    return resource specified by name (might have to change to id if names aren't unique)
+    name: resource name
+    */
 	var query = squel.select()
 		.from("resource")
 		.where("name = '" + name + "'")
 		.toString();
 		//Query the database, return all resources with given name
     var rowCount = 0;
+
 	db_sql.connection.query(query)
 		.on('result', function (row) {
             rowCount ++;
@@ -26,7 +29,10 @@ function get_resource_by_name(name, callback){
 }
 
 function create_resource(resource, callback){
-//Create a resource, given all parameters
+    /*
+    Create a resource, given all parameters 
+    resource: dictionary of all parameters, as stored in the json body of a request    
+    */
 	var query = squel.insert()
 		.into('resource')
 		.set("name", resource.name)
@@ -52,8 +58,10 @@ function create_resource(resource, callback){
 }
 
 function update_resource_by_id(resource,callback){
-//Update a resource given its id and all params
-//can be easily changed to name, depending on what front end wants
+/*
+Update specified fields of specified resource
+resource: dictionary of fields TO UPDATE, and the id of specified resource
+*/
 	var query = squel.update()
 		.table('resource')
 		.where("resource_id=" + resource.id);
@@ -77,7 +85,13 @@ function update_resource_by_id(resource,callback){
             callback({error: true, err: err});
         });
 }
+
 function delete_resource_tag_pair_by_resource(id, callback){
+    /*
+    deletes resource tag pair given a resource id
+    useful when resource is being deleted
+    id: id of resource to delete
+    */
     var query = squel.delete()
         .from("resource_tag")
         .where("resource_id = '" + id + "'")
@@ -100,7 +114,12 @@ function delete_resource_tag_pair_by_resource(id, callback){
 }
 
 function delete_resource_by_id(id, callback){
-    //can be easily changed to name depending on wht front-end wants
+/*
+deletes resource row given id of the resource
+id:id of resource to delete
+
+*/
+
     var query = squel.delete()
         .from("resource")
         .where("resource_id = '" + id + "'")
