@@ -37,7 +37,6 @@ router.put('/', function(req, res, next){
         }
     }
   var create_resource_callback = function(result){
-    console.log('here')
     if(result.error == true){
       res.sendStatus(400);
   }
@@ -80,7 +79,7 @@ router.delete('/', function(req, res, next){
   res_service.delete_resource_tag_pair_by_resource(id,delete_resource_callback);
 });
 
-router.get('/filter', function(req, res, next){
+router.get('/tag', function(req, res, next){
   var filter_callback = function(result){
     if (result.error == true){
       console.log("err" + " "+result.err)
@@ -95,5 +94,13 @@ router.get('/filter', function(req, res, next){
 
   tag_service.filter_by_tag(tags, filter_callback)
 });
+
+router.put('/tag', function(req, res, next){
+
+})
+
+router.delete('/tag', function(req, res, next){
+  
+})
 
 module.exports = router;
