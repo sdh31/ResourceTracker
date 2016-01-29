@@ -18,7 +18,7 @@ angular
                 templateUrl: '/views/contact.html'
             })
             .when('/resource', {
-                templateUrl: '/views/resource.html'
+                templateUrl: '/views/resource.html',
                 controller: 'ResourceCtrl'
             })
             .otherwise({
