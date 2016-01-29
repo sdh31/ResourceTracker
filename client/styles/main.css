@@ -11,7 +11,22 @@
   margin-bottom: auto;
 }
 
-#startDate, #endDate {
-    width: 50%;  
-    float: left;
+.tags .tag {
+    border-radius: 6px;
+    background-color: #EFEFEF;
+    border: 1px solid #DDD;
+    padding: 5px;
+    margin-right: 10px;
+}
+
+.tags .tag:hover {
+    color: red;
+    text-decoration: none;
+}
+
+textarea {
+  resize: none;
+  height: 150px;
+  width: 450px;
+
 }
