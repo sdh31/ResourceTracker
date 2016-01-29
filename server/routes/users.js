@@ -104,6 +104,6 @@ router.post('/signout', function(req, res, next){
 		res.type('text/plain');
 		res.send('YOU ARE LOGGED OUT');
 	});
-})
+});
 
 module.exports = router;
