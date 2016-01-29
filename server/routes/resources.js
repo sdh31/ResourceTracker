@@ -76,7 +76,7 @@ router.delete('/', function(req, res, next){
   }
 
   id = req.query["id"];
-  res_service.delete_resource_tag_pair_by_resource(id,delete_resource_callback);
+  tag_service.delete_resource_tag_pairs_by_resource(id,delete_resource_callback);
 });
 
 router.get('/tag', function(req, res, next){

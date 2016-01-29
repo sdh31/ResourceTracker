@@ -1,5 +1,5 @@
 var db_sql = require('./db_wrapper');
-var squel = require('squel');
+var squel = require('squel').useFlavour('mysql');
 
 function create_resource_tag_link(res_id, tag_id, callback){
     /*
@@ -30,7 +30,7 @@ function create_resource_tag_link(res_id, tag_id, callback){
 }
 
 
-function create_tag (res_id, tag, response_callback, tag_callback){
+function create_tag (tag_info, response_callback, tag_callback){
     /*
     Create tag object from tag name
     res_id: resource id when creating a link b/w tag and resource
@@ -38,11 +38,12 @@ function create_tag (res_id, tag, response_callback, tag_callback){
     response_callback: callback that sends final responses (status codes)
     tag_callback: calback that continues the process of adding a tag (getting ids)
     */
-    var rows_to_add = []
-    for(var i = 0; i < tag.length; i++){
-        var row = {"tag_name": tag[i]};
+    var resource_id = tag_info.resource_id;
+    var tags = tag_info.tags;
+    var rows_to_add = [];
+    for(var i = 0; i < tags.length; i++){
+        var row = {"tag_name": tags[i]};
         rows_to_add.push(row);
-        console.log(rows_to_add);
     }
 
     var query = squel.insert()
@@ -60,11 +61,11 @@ function create_tag (res_id, tag, response_callback, tag_callback){
          })
         .on('end', function () {
             console.log('finished!')
-            select_tag_id(res_id, tag, response_callback, tag_callback);
+            select_tag_id(resource_id, tags, response_callback, tag_callback);
         });
 }
 
-function select_tag_id(res_id, tags, response_callback, tag_callback){
+function select_tag_id(resource_id, tags, response_callback, tag_callback){
     /*
     Given series of tag names, find tag ids to match the names
     (necessary since we don't want duplicate tag names)
@@ -95,7 +96,7 @@ function select_tag_id(res_id, tags, response_callback, tag_callback){
         })
         .on('end', function () {
             console.log(tag_ids)
-            tag_callback(res_id, tag_ids, response_callback);
+            tag_callback(resource_id, tag_ids, response_callback);
         });
 }
 
@@ -127,6 +128,60 @@ function filter_by_tag(tags, callback){
                 .on('end', function () {
                     callback({resource_id:resources})
                 });
+}
+
+function delete_resource_tag_pairs_by_resource(id, callback){
+    /*
+    deletes resource tag pair given a resource id
+    useful when resource is being deleted
+    id: id of resource to delete
+    */
+    var query = squel.delete()
+        .from("resource_tag")
+        .where("resource_id = '" + id + "'")
+        .toString();
+        console.log(query)
+        var row_count = 0;
+    db_sql.connection.query(query)
+        .on('result', function (row) {
+            row_count ++;
+            delete_resource_by_id(id, callback)
+        })
+        .on('error', function (err) {
+            callback({error: true, err: err});
+        })
+        .on('end', function (err){
+            if (row_count == 0){
+                delete_resource_by_id(id, callback)
+            }
+        });
+}
+
+function remove_tag_from_object(tag_info, callback){
+    var tags = tag_info.tags;
+    console.log(tags)
+    var resource_id = tag_info.resource_id;
+    var tag_filter = squel.expr();
+    for (var i = 0; i < tags.length; i++){
+        tag_filter.or("tag_name = '" + tags[i] + "'")
+    }
+    tag_filter.and("resource_id = '" + resource_id + "'");
+ 
+    var query = squel.delete()
+        .target("resource_tag")
+        .from("resource_tag")
+        .join("tag", null, "tag.tag_id = resource_tag.tag_id")
+        .where(tag_filter)
+        .toString()
+
+    db_sql.connection.query(query)
+        
+        .on('error', function (err) {
+            callback({error: true, err: err});
+        })
+        .on('end', function (){
+            callback({error: false});
+        });
 
 }
 
@@ -134,5 +189,6 @@ function filter_by_tag(tags, callback){
 module.exports = {
     create_tag:create_tag,
     create_resource_tag_link:create_resource_tag_link,
-    filter_by_tag:filter_by_tag
+    filter_by_tag:filter_by_tag,
+    remove_tag_from_object:remove_tag_from_object
 }

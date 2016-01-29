@@ -86,32 +86,7 @@ resource: dictionary of fields TO UPDATE, and the id of specified resource
         });
 }
 
-function delete_resource_tag_pair_by_resource(id, callback){
-    /*
-    deletes resource tag pair given a resource id
-    useful when resource is being deleted
-    id: id of resource to delete
-    */
-    var query = squel.delete()
-        .from("resource_tag")
-        .where("resource_id = '" + id + "'")
-        .toString();
-        console.log(query)
-        var row_count = 0;
-    db_sql.connection.query(query)
-        .on('result', function (row) {
-            row_count ++;
-            delete_resource_by_id(id, callback)
-        })
-        .on('error', function (err) {
-            callback({error: true, err: err});
-        })
-        .on('end', function (err){
-            if (row_count == 0){
-                delete_resource_by_id(id, callback)
-            }
-        });
-}
+
 
 function delete_resource_by_id(id, callback){
 /*
@@ -140,6 +115,5 @@ id:id of resource to delete
 module.exports = {
 	get_resource_by_name: get_resource_by_name,
 	create_resource: create_resource,
-    update_resource_by_id: update_resource_by_id,
-    delete_resource_tag_pair_by_resource:delete_resource_tag_pair_by_resource
+    update_resource_by_id: update_resource_by_id
 };

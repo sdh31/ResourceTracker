@@ -1,8 +1,8 @@
 import requests
 import json
 
-url = 'http://colab-sbx-202.oit.duke.edu/resource/filter'
-method = "GET"
+url = 'http://colab-sbx-202.oit.duke.edu/tag'
+method = "DELETE"
 headers = {
 	"Content-Type:":'application/json'
 }
@@ -17,20 +17,19 @@ resource_params = {
 	'name': 'test_resource',
 	'description': 'huh',
 	'max_users': 1,
-	'tag':['anteater']
+	'tags':['anteater']
 }
 
-filter_params = {
-	'tags': ['anteater']
+tag_params = {
+	'resource_id': 500,
+	'tags': ['a', 'b']
 }
 
 response = requests.request(
 	method,
 	url = url,
-	#query = query,
-	#json = resource_params,
-	params = filter_params,
-	#headers = headers
+	#json = tag_params,
+	params = tag_params,
 	)
 
 response_json = response.content
