@@ -36,7 +36,7 @@ angular.module('resourceTracker')
             });
         };
 
-        $scope.showRegisterButton = function() {
+        $scope.isAdmin = function() {
             return $scope.user.permission_level == 'admin';
         };
 
