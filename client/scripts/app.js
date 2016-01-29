@@ -2,7 +2,7 @@
 
 angular
 	.module('resourceTracker',[
-		'ngRoute'
+		'ngRoute', 'ui.bootstrap', 'ui.bootstrap.datetimepicker'
 	])
 	.config(function ($routeProvider) {
     	$routeProvider
@@ -29,3 +29,4 @@ angular
       		    redirectTo: '/login'
       	   });
      });
+
