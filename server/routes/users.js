@@ -78,7 +78,6 @@ router.get('/signin', function(req, res, next){
 
 			req.session.isValid = true;
 			req.session.user = user;
-			res.setStatus(200);
 			res.send(user.permission_level);
 
 		} else {
