@@ -19,6 +19,7 @@ angular
             })
             .when('/resource', {
                 templateUrl: '/views/resource.html'
+                controller: 'ResourceCtrl'
             })
             .otherwise({
       		    redirectTo: '/login'
