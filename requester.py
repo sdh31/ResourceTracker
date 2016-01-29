@@ -1,7 +1,7 @@
 import requests
 import json
 
-url = 'http://colab-sbx-202.oit.duke.edu/tag'
+url = 'http://colab-sbx-202.oit.duke.edu/resource'
 method = "DELETE"
 headers = {
 	"Content-Type:":'application/json'
@@ -29,7 +29,7 @@ response = requests.request(
 	method,
 	url = url,
 	#json = tag_params,
-	params = tag_params,
+	params = resource_params,
 	)
 
 response_json = response.content

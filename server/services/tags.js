@@ -130,7 +130,7 @@ function filter_by_tag(tags, callback){
                 });
 }
 
-function delete_resource_tag_pairs_by_resource(id, callback){
+function delete_resource_tag_pairs_by_resource(id, callback, success_callback){
     /*
     deletes resource tag pair given a resource id
     useful when resource is being deleted
@@ -144,16 +144,18 @@ function delete_resource_tag_pairs_by_resource(id, callback){
         var row_count = 0;
     db_sql.connection.query(query)
         .on('result', function (row) {
+            console.log('sdf')
             row_count ++;
-            delete_resource_by_id(id, callback)
+            //success_callback(id, callback)
         })
         .on('error', function (err) {
             callback({error: true, err: err});
         })
         .on('end', function (err){
-            if (row_count == 0){
-                delete_resource_by_id(id, callback)
-            }
+            console.log('sadf')
+            //if (row_count == 0){
+                success_callback(id, callback)
+           // }
         });
 }
 
@@ -190,5 +192,6 @@ module.exports = {
     create_tag:create_tag,
     create_resource_tag_link:create_resource_tag_link,
     filter_by_tag:filter_by_tag,
-    remove_tag_from_object:remove_tag_from_object
+    remove_tag_from_object:remove_tag_from_object,
+    delete_resource_tag_pairs_by_resource:delete_resource_tag_pairs_by_resource
 }

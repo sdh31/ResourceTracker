@@ -41,8 +41,8 @@ router.delete('/', function(req, res, next){
           console.log("err" + " "+result.err)
           res.sendStatus(400);
         }
-        res.sendStatus(200);
-      }
+            res.sendStatus(200);
+        }
         tag_service.remove_tag_from_object(req.query, delete_callback)
     })
 

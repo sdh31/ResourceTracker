@@ -94,7 +94,7 @@ deletes resource row given id of the resource
 id:id of resource to delete
 
 */
-
+    console.log('drbi');
     var query = squel.delete()
         .from("resource")
         .where("resource_id = '" + id + "'")
@@ -115,5 +115,6 @@ id:id of resource to delete
 module.exports = {
 	get_resource_by_name: get_resource_by_name,
 	create_resource: create_resource,
-    update_resource_by_id: update_resource_by_id
+    update_resource_by_id: update_resource_by_id,
+    delete_resource_by_id:delete_resource_by_id
 };
