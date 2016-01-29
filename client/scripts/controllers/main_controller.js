@@ -17,7 +17,9 @@ angular.module('resourceTracker')
         $scope.login = function() {
             var loginQueryString = '/user/signin?username=' +  $scope.user.username + '&password=' + $scope.user.password;
             $http.get(loginQueryString).then(function(response) {
+                console.log(response);
                 $scope.user.loggedIn = true;
+                $scope.user.permission_level = response.data.permission_level;
                 $scope.goToRegisterPage();
             }, function(error) {
                 console.log(error);
@@ -34,6 +36,9 @@ angular.module('resourceTracker')
             });
         };
 
+        $scope.isAdmin = function() {
+            return $scope.user.permission_level == 'admin';
+        };
 
         $scope.goToRegisterPage = function() {
             $location.url('/register')
@@ -43,6 +48,12 @@ angular.module('resourceTracker')
             $location.url('/contact')
         };
 
+        $scope.goToResourcePage = function() {
+            $location.url('/resource');
+        };
 
+        $scope.goToReservationPage = function() {
+            $location.url('/reservation');
+        };
 
 });
