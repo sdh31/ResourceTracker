@@ -10,3 +10,8 @@
   margin-top: auto;
   margin-bottom: auto;
 }
+
+#startDate, #endDate {
+    width: 50%;  
+    float: left;
+}
