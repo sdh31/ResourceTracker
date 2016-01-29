@@ -52,6 +52,8 @@ angular.module('resourceTracker')
             $location.url('/resource');
         };
 
-
+        $scope.goToReservationPage = function() {
+            $location.url('/reservation');
+        };
 
 });

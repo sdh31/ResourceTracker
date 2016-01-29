@@ -21,6 +21,10 @@ angular
                 templateUrl: '/views/resource.html',
                 controller: 'ResourceCtrl'
             })
+            .when('/reservation', {
+                templateUrl: '/views/reservation.html',
+                controller: 'ReservationCtrl'
+            })
             .otherwise({
       		    redirectTo: '/login'
       	   });
