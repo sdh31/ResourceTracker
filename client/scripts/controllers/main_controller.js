@@ -48,6 +48,10 @@ angular.module('resourceTracker')
             $location.url('/contact')
         };
 
+        $scope.goToResourcePage = function() {
+            $location.url('/resource');
+        };
+
 
 
 });

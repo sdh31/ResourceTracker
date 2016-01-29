@@ -17,6 +17,9 @@ angular
             .when('/contact', {
                 templateUrl: '/views/contact.html'
             })
+            .when('/resource', {
+                templateUrl: '/views/resource.html'
+            })
             .otherwise({
       		    redirectTo: '/login'
       	   });
