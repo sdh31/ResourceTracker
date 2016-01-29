@@ -1,9 +1,7 @@
 'use strict';
 
 angular
-	.module('resourceTracker',[
-		'ngRoute'
-	])
+	.module('resourceTracker', ['ngRoute', 'ngMaterial', 'ngMessages'])
 	.config(function ($routeProvider) {
     	$routeProvider
             .when('/login', {
