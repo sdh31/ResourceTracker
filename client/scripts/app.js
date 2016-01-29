@@ -2,7 +2,7 @@
 
 angular
 	.module('resourceTracker',[
-		'ngRoute', 'ui.bootstrap', 'ui.bootstrap.datetimepicker'
+		'ngRoute'
 	])
 	.config(function ($routeProvider) {
     	$routeProvider
