@@ -5,8 +5,8 @@
 	<input type="text" class="form-control" placeholder="email address" ng-model="newUser.email"><br>
 
      <select class="form-control" ng-model="user.role">
-         <option value="" ng-selected="true"> -- User Role -- </option>
-         <option ng-repeat="role in roles" value="{{role}}"
+         <option value="" ng-selected="true"> -- Permission Level -- </option>
+         <option ng-repeat="role in roles" value="Permission Level: {{role}}"
           			ng-selected="{{user.role === role}}">{{role}}</option>
     </select>
 
