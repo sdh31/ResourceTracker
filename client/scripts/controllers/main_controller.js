@@ -17,6 +17,7 @@ angular.module('resourceTracker')
         $scope.login = function() {
             var loginQueryString = '/user/signin?username=' +  $scope.user.username + '&password=' + $scope.user.password;
             $http.get(loginQueryString).then(function(response) {
+                console.log(response);
                 $scope.user.loggedIn = true;
                 $scope.user.permission_level = response.data.permission_level;
                 $scope.goToRegisterPage();
