@@ -19,6 +19,8 @@
     <div class="container">
         <div class="header">
             <ul class="nav nav-pills pull-right">
+                <li><button class="btn btn-default btn-sm" ng-show="user.permission_level == 'admin'"
+                            ng-click="">Register User</button></li>
                 <li><button class="btn btn-default btn-sm" ng-click="goToContactPage()">Contact</button></li>
                 <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="logout()">Logout</button><li>
             </ul>

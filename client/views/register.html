@@ -7,7 +7,7 @@
      <select class="form-control" ng-model="user.role">
          <option value="" ng-selected="true"> -- Permission Level -- </option>
          <option ng-repeat="role in roles" value="{{role}}"
-          			ng-selected="{{user.role === role}}">Permission Level: {{role}}</option>
+          		 ng-selected="{{user.role === role}}">{{role}}</option>
     </select>
 
 	<input type="password" class="form-control" placeholder="password" ng-model="newUser.password"><br>
