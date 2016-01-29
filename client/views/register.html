@@ -4,10 +4,14 @@
 	<input type="text" class="form-control" placeholder="username" ng-model="newUser.username"><br>
 	<input type="text" class="form-control" placeholder="email address" ng-model="newUser.email"><br>
 
-    <select ng-model="newUser.permission_level" ng-options="roles">
-
-    </select><br>
-
+    <div class="col-sm-4 form-group">
+    	<label class="control-label">Role</label>
+     	<select class="form-control" ng-model="user.role">
+         	<option value="" ng-selected="true">-- Select One --</option>
+         	<option ng-repeat="role in roles" value="{{role}}"
+          			ng-selected="{{user.role === role}}">{{role}}</option>
+    	</select>
+	</div>
 
 	<input type="password" class="form-control" placeholder="password" ng-model="newUser.password"><br>
 	<input type="password" class="form-control" placeholder="confirm password" ng-model="newUser.confirmPassword"><br>
