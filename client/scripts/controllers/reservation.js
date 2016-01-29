@@ -2,5 +2,6 @@
 
 angular.module('resourceTracker')
     .controller('ReservationCtrl', function ($scope, $http) {
-    	$scope.myDate = new Date();
+    	$scope.startDate = new Date();
+    	$scope.endDate = new Date();
      });
