@@ -1,2 +1,7 @@
- Reservation Page!
-<datetimepicker></datetimepicker>
+Selected Date: 
+<div class="dropdown">
+    <a  class="dropdown-toggle" id="dropdown1" role="button" data-toggle="dropdown" data-target="#" href="#">Click here to show calendar</a>
+    <ul class="dropdown-menu" role="menu">
+        <datetimepicker ng-model="myDate" data-datetimepicker-config="{ dropdownSelector: '#dropdown1' }"/>
+    </ul>
+</div>
