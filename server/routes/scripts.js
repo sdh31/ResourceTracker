@@ -13,6 +13,10 @@ router.get('/controllers/*.js', function(req, res, next){
   res.sendFile(basePath + req.path);
 });
 
+router.get('/controllers/*.js', function(req, res, next){
+  res.sendFile(basePath + req.path);
+});
+
 
 module.exports = router;
 

@@ -1,7 +1,7 @@
 'use strict';
 
 angular
-	.module('resourceTracker', ['ngRoute', 'ngMaterial', 'ngMessages'])
+	.module('resourceTracker', ['ngRoute', 'ui.bootstrap.datetimepicker'])
 	.config(function ($routeProvider) {
     	$routeProvider
             .when('/login', {
