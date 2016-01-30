@@ -1,6 +1,11 @@
 <div class="input-group" id="login" aria-describedby="sizing-addon3">
 	<input type="text" class="form-control" placeholder="name" ng-model="newResource.name"><br>
 	<input type="text" class="form-control" placeholder="description" ng-model="newResource.description"><br>
+	<span>
+		<input type="text" class="form-control" placeholder="description" ng-model="newResource.description">
+		<button type="button" class="btn btn-default btn-sm" ng-click="addTage()">Add Tag</button>
+	<span>
+	<button type="button" class="btn btn-default btn-sm" ng-click="createResource()">Create Resource</button>
 </div>
 
 

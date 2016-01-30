@@ -8,6 +8,11 @@ angular.module('resourceTracker')
             tags: []
         };
 
+        $scope.addTag = function() {
+        	
+
+  	     };
+
         $scope.createResource = function() {
 
 
