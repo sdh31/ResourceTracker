@@ -75,10 +75,12 @@ router.get('/signin', function(req, res, next){
 	var comparePasswordsCallback = function(result, user) {
 		if (result == true) {
 			// might needa change this for redirects?
-
 			req.session.isValid = true;
 			req.session.user = user;
-			res.sendStatus(200);
+
+			var signInResponse = {};
+			signInResponse.permission_level = user.permission_level;
+			res.send(signInResponse);
 
 		} else {
 			res.sendStatus(403);

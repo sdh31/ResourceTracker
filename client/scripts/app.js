@@ -1,9 +1,7 @@
 'use strict';
 
 angular
-	.module('resourceTracker',[
-		'ngRoute'
-	])
+	.module('resourceTracker', ['ngRoute', 'ui.bootstrap.datetimepicker'])
 	.config(function ($routeProvider) {
     	$routeProvider
             .when('/login', {
@@ -17,7 +15,16 @@ angular
             .when('/contact', {
                 templateUrl: '/views/contact.html'
             })
+            .when('/resource', {
+                templateUrl: '/views/resource.html',
+                controller: 'ResourceCtrl'
+            })
+            .when('/reservation', {
+                templateUrl: '/views/reservation.html',
+                controller: 'ReservationCtrl'
+            })
             .otherwise({
       		    redirectTo: '/login'
       	   });
      });
+
