@@ -33,11 +33,13 @@
     <div class="container">
         <div class="header">
             <ul class="nav nav-pills pull-right">
+
                 <li><button class="btn btn-default btn-sm" ng-show="isAdmin()" ng-click="goToRegisterPage()">Register User</button></li>
                 <li><button class="btn btn-default btn-sm" ng-show="isAdmin()" ng-click="goToResourcePage()">Resources</button></li>
                 <li><button class="btn btn-default btn-sm" ng-show="isAdmin()" ng-click="goToReservationPage()">Reservation</button></li>
                 <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="logout()">Logout</button><li>
                 <li><button class="btn btn-default btn-sm" ng-click="goToContactPage()">Contact</button></li>
+
             </ul>
             <h3 class="text-muted">Resource Tracker - Hypotheticorp, LLC </h3>
         </div>

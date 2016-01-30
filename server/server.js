@@ -1,3 +1,4 @@
+var body_parser = require('body-parser');
 var express = require('express');
 var app = express();
 
@@ -7,7 +8,9 @@ var session = require('express-session');
 var redis = require('redis');
 var redis_store = require('connect-redis')(session);
 var client = redis.createClient();
+
 var views = require('./routes/views');
+var tag_routes = require('./routes/tags');
 var user_routes = require('./routes/users');
 var resource_routes = require('./routes/resources');
 var reservation_routes = require('./routes/reservations');
@@ -26,8 +29,10 @@ app.use(session({
     resave: false,
 	key: 'sid'
 }));
+
 app.use('/', views);
 app.use('/views', views);
+app.use('/tag', tag_routes);
 app.use('/user', user_routes);
 app.use('/resource', resource_routes);
 app.use('/reservations', reservation_routes);
