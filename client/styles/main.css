@@ -11,17 +11,4 @@
   margin-bottom: auto;
 }
 
-.reservation-datepicker .table {
-    height: 50%;
-    width: 50%;
-}
 
-.reservation-datepicker.hour {
-    height: 100%;
-    width: 100%;
-}
-
-.reservation-datepicker.minute {
-    height: 100%;
-    width: 100%;
-}
