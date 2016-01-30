@@ -1,6 +1,6 @@
 <div>
-	<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceCreatePanel()'>Create Resource</button>
-	<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceUpdatePanel()'>Modify Resources</button>
+	<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceCreatePanel()'>Create Resource</button><br>
+	<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceUpdatePanel()'>Modify Resources</button><br>
 	<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceViewPanel()'>View Resources</button>
 </div>
 
@@ -9,10 +9,21 @@
 	<textarea class="form-control" placeholder="description of resource" ng-model="newResource.description"></textarea><br>
 	<input type="text" class="form-control" placeholder="tag" ng-model="activeTag">
 	<div class="tags">
-		<a ng-repeat="(index, tag) in newResource.tags" class="tag" ng-click="removeTag(index)">{{tag}}</a>
+		<span ng-repeat="(index, tag) in newResource.tags" class="tag">{{tag}}
+			<a class="glyphicon glyphicon-remove glyph_top" aria-hidden="true" ng-click="removeTag(index)"></a>
+		</span>
 	</div>
 	<button type="button" class="btn btn-default btn-sm" ng-click="addTag()">Add Tag</button>
 	<button type="button" class="btn btn-default btn-sm" ng-click="createResource()">Create</button>
+
+	<div class="alert alert-danger" ng-show="hasError">
+		<strong>Warning:</strong> {{alertMessage}}
+		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="turnOffError()"></a>
+	</div>
+	<div class="alert alert-success" ng-show="success">
+		<strong>Success:</strong> created resource!
+		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
+	</div>
 </div>
 
 <div ng-show="activeResourceUpdatePanel">
@@ -23,6 +34,4 @@
 <div ng-show="activeResourceViewPanel">
 	VIEW RESOURCES
 </div>
-
-
 

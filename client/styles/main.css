@@ -19,14 +19,16 @@
     margin-right: 10px;
 }
 
-.tags .tag:hover {
-    color: red;
-    text-decoration: none;
+.tags .glyph_top {
+	top: 2px
+}
+
+.dropdown {
+  width: 350px;
 }
 
 textarea {
   resize: none;
   height: 150px;
   width: 450px;
-
 }
