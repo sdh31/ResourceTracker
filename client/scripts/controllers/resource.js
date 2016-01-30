@@ -9,7 +9,9 @@ angular.module('resourceTracker')
         };
 
         $scope.activeTag = '';
-        $scope.isResourceCreatePanel = false;
+        $scope.activeResourceCreatePanel = false;
+        $scope.activeResourceUpdatePanel = false;
+        $scope.activeResourceViewPanel = true;
 
         $scope.addTag = function() {
         	$scope.newResource.tags.push($scope.activeTag);
@@ -24,6 +26,27 @@ angular.module('resourceTracker')
         $scope.createResource = function() {
 
   	    };
+
+        $scope.enableResourceCreatePanel = function() {
+            $scope.disableAllResourcePanels();
+            $scope.activeResourceCreatePanel = true;
+        };
+
+        $scope.enableResourceUpdatePanel = function() {
+            $scope.disableAllResourcePanels();
+            $scope.activeResourceUpdatePanel = true;
+        };
+
+        $scope.enableResourceViewPanel = function() {
+            $scope.disableAllResourcePanels();
+            $scope.activeResourceViewPanel = true;
+        };
+
+        $scope.disableAllResourcePanels = function() {
+            $scope.activeResourceCreatePanel = false;
+            $scope.activeResourceUpdatePanel = false;
+            $scope.activeResourceViewPanel = false;
+        };
 
      });
 
