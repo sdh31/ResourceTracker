@@ -77,7 +77,6 @@ router.get('/signin', function(req, res, next){
 			// might needa change this for redirects?
 			req.session.isValid = true;
 			req.session.user = user;
-
 			var signInResponse = {};
 			signInResponse.permission_level = user.permission_level;
 			res.send(signInResponse);
