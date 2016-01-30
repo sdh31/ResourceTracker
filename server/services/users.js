@@ -35,6 +35,7 @@ function get_user(username, callback){
 	}
 
 	query = query.toString();
+
     var rowCount = 0;
 	db_sql.connection.query(query)
 		.on('result', function (row) {
@@ -42,11 +43,11 @@ function get_user(username, callback){
             callback(row);
         })
         .on('error', function (err) {
-            callback({error: true, err: err});
+            callback({error: true, err: err, empty: false});
          })
         .on('end', function () {
             if (rowCount == 0) {
-                callback({error: true});
+                callback({error: true, empty: true});
             }
          }
     );

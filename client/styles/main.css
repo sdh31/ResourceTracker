@@ -10,3 +10,25 @@
   margin-top: auto;
   margin-bottom: auto;
 }
+
+.tags .tag {
+    border-radius: 6px;
+    background-color: #EFEFEF;
+    border: 1px solid #DDD;
+    padding: 5px;
+    margin-right: 10px;
+}
+
+.tags .glyph_top {
+	top: 2px
+}
+
+.dropdown {
+  width: 350px;
+}
+
+textarea {
+  resize: none;
+  height: 150px;
+  width: 450px;
+}
