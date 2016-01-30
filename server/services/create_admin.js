@@ -5,7 +5,10 @@ exports.createAdmin = function(err) {
 	var admin = {
 		username: 'admin',
 		password: 'admin',
-		permission_level: 'admin'
+		permission_level: 'admin',
+		firstName: 'admin',
+		lastName: 'admin',
+		email: 'admin@admin.com'
 	};
 	
 	var createAdminUserCallback = function (result) {
