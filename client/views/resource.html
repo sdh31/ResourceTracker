@@ -1,6 +1,6 @@
 <div class="input-group" id="login" aria-describedby="sizing-addon3">
 	<input type="text" class="form-control" placeholder="name" ng-model="newResource.name"><br>
-	<input type="text" class="form-control" placeholder="description" ng-model="newResource.description"><br>
+	<textarea class="form-control" placeholder="description of resource" ng-model="newResource.description"></textarea><br>
 	<input type="text" class="form-control" placeholder="tag" ng-model="activeTag">
 	<div class="tags">
 		<a ng-repeat="(index, tag) in newResource.tags" class="tag" ng-click="removeTag(index)">{{tag}}</a>
