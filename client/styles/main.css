@@ -18,7 +18,15 @@
     padding: 5px;
     margin-right: 10px;
 }
+
 .tags .tag:hover {
     color: red;
     text-decoration: none;
+}
+
+textarea {
+  resize: none;
+  height: 150px;
+  width: 450px;
+
 }
