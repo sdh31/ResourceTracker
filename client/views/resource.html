@@ -5,7 +5,12 @@
 		<input type="text" class="form-control" placeholder="tag" ng-model="activeTag">
 		<button type="button" class="btn btn-default btn-sm" ng-click="addTag()">Add Tag</button>
 	<span>
+	<div class="tags">
+		<a ng-repeat="(index, tag) in newResource.tags" class="tag" ng-click="removeTag(index)">{{tag}}</a>
+	</div>
+
 	<button type="button" class="btn btn-default btn-sm" ng-click="createResource()">Create Resource</button>
 </div>
+
 
 
