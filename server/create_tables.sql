@@ -5,4 +5,3 @@ CREATE TABLE IF NOT EXISTS reservation (reservation_id INT NOT NULL AUTO_INCREME
 CREATE TABLE IF NOT EXISTS tag (tag_id INT NOT NULL, tag_name varchar(255), PRIMARY KEY (tag_id));
 CREATE TABLE IF NOT EXISTS user_reservation (user_id INT, reservation_id INT, PRIMARY KEY (user_id, reservation_id), FOREIGN KEY (user_id) REFERENCES user(user_id), FOREIGN KEY (reservation_id) REFERENCES reservation(reservation_id));
 CREATE TABLE IF NOT EXISTS resource_tag (resource_id INT, tag_id INT, PRIMARY KEY (resource_id, tag_id), FOREIGN KEY (resource_id) REFERENCES resource(resource_id), FOREIGN KEY (tag_id) REFERENCES tag(tag_id));
-INSERT IGNORE INTO user (username, password, permission_level) VALUES ('admin', 'admin', 'admin');
