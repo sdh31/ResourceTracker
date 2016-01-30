@@ -8,11 +8,11 @@ angular.module('resourceTracker')
             tags: []
         };
 
-        $scope.currentTag = '';
+        $scope.activeTag = '';
 
         $scope.addTag = function() {
-        	$scope.newResource.tags.push($scope.currentTag);
-        	$scope.currentTag = '';
+        	$scope.newResource.tags.push($scope.activeTag);
+        	$scope.activeTag = '';
         	console.log($scope.newResource.tags);
   	     };
 
