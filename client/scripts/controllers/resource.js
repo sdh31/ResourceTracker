@@ -9,6 +9,7 @@ angular.module('resourceTracker')
         };
 
         $scope.activeTag = '';
+        $scope.isResourceCreatePanel = false;
 
         $scope.addTag = function() {
         	$scope.newResource.tags.push($scope.activeTag);
@@ -23,6 +24,6 @@ angular.module('resourceTracker')
         $scope.createResource = function() {
 
   	    };
-  	    
+
      });
 
