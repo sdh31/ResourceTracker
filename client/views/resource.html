@@ -1,6 +1,8 @@
-<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceCreatePanel()'>Create Resource</button><br>
-<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceUpdatePanel()'>Modify Resources</button>
-<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceViewPanel()'>View Resources</button>
+<div>
+	<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceCreatePanel()'>Create Resource</button>
+	<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceUpdatePanel()'>Modify Resources</button>
+	<button type="button" class="btn btn-default btn-sm" ng-click='enableResourceViewPanel()'>View Resources</button>
+</div>
 
 <div class="input-group" id="login" aria-describedby="sizing-addon3" ng-show="activeResourceCreatePanel">
 	<input type="text" class="form-control" placeholder="name" ng-model="newResource.name"><br>
@@ -13,15 +15,13 @@
 	<button type="button" class="btn btn-default btn-sm" ng-click="createResource()">Create</button>
 </div>
 
-<div ng-show="activeResourceModifyPanel">
+<div ng-show="activeResourceUpdatePanel">
 	MODIFY RESOURCES
-
 </div>
 
 
 <div ng-show="activeResourceViewPanel">
 	VIEW RESOURCES
-
 </div>
 
 
