@@ -11,13 +11,13 @@ angular.module('resourceTracker')
         $scope.currentTag = '';
 
         $scope.addTag = function() {
-        	$scope.newResource.tags.push(currentTag);
+        	$scope.newResource.tags.push($scope.currentTag);
         	$scope.currentTag = '';
-        	console.log($scope.tags);
+        	console.log($scope.newResource.tags);
   	     };
 
         $scope.createResource = function() {
 
 
-  	     };
+  	    };
      });
