@@ -11,7 +11,7 @@ angular.module('resourceTracker')
         $scope.currentTag = '';
 
         $scope.addTag = function() {
-        	$scope.tags.push(currentTag);
+        	$scope.newResource.tags.push(currentTag);
         	$scope.currentTag = '';
         	console.log($scope.tags);
   	     };
