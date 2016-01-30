@@ -10,21 +10,24 @@ exports.initializeDB = function(callback) {
 	    return; 
     }
 
-    var rl = readline.createInterface({
-      input: fs.createReadStream('./create_tables.sql'),
-      terminal: false
-     });
+	var rl = readline.createInterface({
+		input: fs.createReadStream('./create_tables.sql'),
+		terminal: false
+	});
 
     rl.on('line', function(chunk){
         connection.query(chunk.toString('ascii'), [], function(err, results){ 
-          if(err) {
-            console.log(err);
-          }
+        	if(err) {
+				console.log(err);
+        	}
         });
     });
 
     rl.on('close', function(){
-      connection.release();
+		callback(false);
+		connection.release();
     });
   });
 };
+
+

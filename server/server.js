@@ -14,7 +14,7 @@ var reservation_routes = require('./routes/reservations');
 var script_routes = require('./routes/scripts');
 var style_routes = require('./routes/styles');
 var initialize_tables = require('./services/initialize_tables');
-var user_db_functions = require('./services/users');
+var create_admin = require('./services/create_admin');
 
 app.use(body_parser.json());
 app.use(cookie_parser());
@@ -35,7 +35,7 @@ app.use('/styles', style_routes);
 
 app.engine('html', require('ejs').renderFile);
 
-initialize_tables.initializeDB(function callback(){});
+initialize_tables.initializeDB(create_admin.createAdmin);
 
 app.listen(80, function () {
   console.log('Example app listening on port 80!');
