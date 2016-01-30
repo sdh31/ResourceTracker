@@ -16,3 +16,12 @@
     width: 50%;
 }
 
+.reservation-datepicker.hour {
+    height: 50%;
+    width: 50%;
+}
+
+.reservation-datepicker.minute {
+    height: 50%;
+    width: 50%;
+}
