@@ -11,11 +11,7 @@
   margin-bottom: auto;
 }
 
-.reservation-datepicker .form-control {
-    height: 10px;
-    padding: 11px;
+.reservation-datepicker .table {
+    width: 50%;
 }
 
-.reservation-datepicker .btn {
-    padding: 1px 2px;
-}
