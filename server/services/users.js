@@ -11,6 +11,9 @@ function create_user(user, callback){
 	        .set("username", user.username)
 	        .set("password", hash)
 	        .set("permission_level", user.permission_level)
+			.set("first_name", user.firstName)
+			.set("last_name", user.lastName)
+			.set("email_address", user.email)
 	        .toString();
 
             db_sql.connection.query(query)
