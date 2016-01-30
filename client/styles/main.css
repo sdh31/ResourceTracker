@@ -11,9 +11,14 @@
   margin-bottom: auto;
 }
 
-#startDate, #endDate {
+#startDate { 
     width: 10px;
     height: 10px; 
     float: left;
-    margin: 0 auto;
+}
+
+#endDate {
+    width: 10px;
+    height: 10px; 
+    float: right;
 }
