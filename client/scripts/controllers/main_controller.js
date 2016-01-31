@@ -17,8 +17,8 @@ angular.module('resourceTracker')
 		$scope.alertMessage = "Incorrect username or password"
 
         $scope.login = function() {
-            var loginQueryString = '/user/signin?username=' +  $scope.user.username + '&password=' + $scope.user.password;
-            $http.get(loginQueryString).then(function(response) {
+            var signInUrl = '/user/signin';
+            $http.post(signInUrl, $scope.user).then(function(response) {
 				$scope.loginError = false;
 				$scope.user.loggedIn = true;
                 $scope.user.permission_level = response.data.permission_level;
@@ -39,8 +39,8 @@ angular.module('resourceTracker')
 		}
 
         $scope.logout = function() {
-            var logoutQueryString = '/user/signout';
-            $http.get(logoutQueryString).then(function(response) {
+            var signOutUrl = '/user/signout'; 
+            $http.post(signOutUrl).then(function(response) {
                 $scope.initializeUser();
                 $location.url('/');
             }, function(error) {

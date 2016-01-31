@@ -67,10 +67,10 @@ router.delete('/', function(req, res, next){
 	}
 });
 
-router.get('/signin', function(req, res, next){
+router.post('/signin', function(req, res, next){
 	//login user
-	var username = req.query.username;
-	var password = req.query.password;
+	var username = req.body.username;
+	var password = req.body.password;
 
 	var comparePasswordsCallback = function(result, user) {
 		if (result == true) {
@@ -97,7 +97,7 @@ router.get('/signin', function(req, res, next){
 	user_service.get_user(username, getUserCallback);
 });
 
-router.get('/signout', function(req, res, next){
+router.post('/signout', function(req, res, next){
 
 	req.session.destroy(function() {
 		res.type('text/plain');
