@@ -17,6 +17,13 @@
   		<strong>Warning:</strong> {{alertMessage}}
 		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearAlert()"></a>
 	</div>
+	<div ng-show="successfulRegister" class="alert alert-success">
+		{{successfulRegisterMessage}}
+		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
+	</div>
+
+
+	
 </div>
 
 
