@@ -44,7 +44,7 @@ angular.module('resourceTracker')
                 initializeNewUser();
             }, function(error) {
                 $scope.alertMessage = registerAlerts.failedRegisterAlert;
-                $scope.successfulRegister = true;
+                $scope.successfulRegister = false;
             });
 
   	     };
@@ -53,7 +53,7 @@ angular.module('resourceTracker')
             var validFields = validateNonEmptyField($scope.newUser.firstName,         registerAlerts.firstNameAlert) &&
                               validateNonEmptyField($scope.newUser.lastName,          registerAlerts.lastNameAlert) &&
                               validateNonEmptyField($scope.newUser.username,          registerAlerts.usernameAlert) &&
-                              validateNonEmptyField($scope.newUser.email,             registerAlerts.emialAlert) &&
+                              validateNonEmptyField($scope.newUser.email,             registerAlerts.emailAlert) &&
                               validateNonEmptyField($scope.newUser.permission_level,  registerAlerts.permissionLevelAlert);
 
             validFields = validFields && validatePassword();
