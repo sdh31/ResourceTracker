@@ -21,8 +21,8 @@ authorization.use('admin', function (req) {
 });
 
 authorization.use('user', function (req) {
-	return req.session && req.session.user && (req.session.user.permission_level == 'user' || 
-											   req.session.user.permission_level == 'admin');
+	return req.session && req.session.user &&
+		(req.session.user.permission_level == 'user' || req.session.user.permission_level == 'admin');
 });
 
 app.use(authorization.middleware());
