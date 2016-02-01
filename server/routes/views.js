@@ -1,28 +1,8 @@
 var express = require('express');
 var router = express.Router();
 var app = express();
-var ConnectRoles = require('connect-roles');
 
-// Role based authentication
-var user_auth = new ConnectRoles({
-  failureHandler: function (req, res, action) {
-    // optional function to customise code that runs when 
-    // user fails authorisation 
-    var accept = req.headers.accept || '';
-    res.status(403);
-    if (~accept.indexOf('html')) {
-      res.render('access-denied', {action: action});
-    } else {
-      res.send('Access Denied - You don\'t have permission to: ' + action);
-    }
-  }
-});
-
-
-user_auth.use('can access resource page', function (req) {
-	return req.session && req.session.user && req.session.user.permission_level == 'admin';
-});
-
+var auth = require('../services/authorization');
 
 var basePath =  '/home/bitnami/ResourceTracker/client';
 
@@ -30,11 +10,27 @@ router.get('/', function(req, res, next){
 	res.render(basePath + '/views/index.html');
 });
 
-router.get('/views/resource.html', user_auth.can('can access resource page'), function (req, res) {
-  res.render(basePath + '/views/resource.html');
+
+// ADMIN PERMISSION LEVEL
+var adminViews = ['resource.html', 'register.html'];
+
+adminViews.forEach(function(adminView) {
+    router.get('/views/' + adminView, auth.is('admin'), function (req, res) {
+        res.render(basePath + '/views/' + adminView);
+    });
 });
 
-router.get('/views/*.html', function(req, res, next){
+// NO PERMISSION REQUIRED
+var permissionlessViews = ['index.html', 'login.html', 'contact.html'];
+
+permissionlessViews.forEach(function(view) {
+    router.get('/views/' + view, function (req, res) {
+        res.render(basePath + '/views/' + view);
+    });
+});
+
+// DEFAULT TO USER PERMISSION LEVEL
+router.get('/views/*.html', auth.is('user'), function(req, res, next){
 	res.render(basePath + req.path);
 });
 
