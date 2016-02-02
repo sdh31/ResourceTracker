@@ -58,7 +58,7 @@ function create_resource(resource, callback){
 }
 
 function get_all_resources(callback) {
-	var query = squel.select().from('resource').join('resource_tag', null, 'resource.resource_id = resource_tag.resource_id').join('tag', null, 'resource_tag.tag_id = tag.tag_id').toString();
+	var query = squel.select().from('resource').left_join('resource_tag', null, 'resource.resource_id = resource_tag.resource_id').left_join('tag', null, 'resource_tag.tag_id = tag.tag_id').toString();
 
 	var resources = [];
 
@@ -82,11 +82,12 @@ function get_all_resources(callback) {
 					if (index != -1) {
 						resourcesToSend[index].tags.push(thisResource.tag_name);
 					} else {
+						var tag = (thisResource.tag_name == null) ? null : [thisResource.tag_name];
 						var resource = {
 							name: thisResource.name,
 							description: thisResource.description,
 							max_users: thisResource.max_users,
-							tags: [thisResource.tag_name],
+							tags: tag,
 							resource_id: thisResource.resource_id
 						};
 						resourcesToSend.push(resource);
@@ -111,10 +112,11 @@ resource: dictionary of fields TO UPDATE, and the id of specified resource
 		if (resource.description != null || resource.name != ""){
             query.set("description", resource.description);
         }
-        if (resource.max_users != null || resource.name != ""){
+        if (resource.max_users != null || resource.name != "" || resource.max_users != ''){
             query.set("max_users", resource.max_users);
         }
         query = query.toString();
+		console.log(query);
 
 	db_sql.connection.query(query)
 		.on('result', function (row) {

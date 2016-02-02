@@ -30,21 +30,24 @@ function create_resource_tag_link(res_id, tag_id, callback){
 }
 
 
-function create_tag (res_id, tag_info, response_callback, tag_callback){
+function create_tag (res_id, addedTags, response_callback, tag_callback){
     /*
     Create tag object from tag name
     res_id: resource id when creating a link b/w tag and resource
-    tag: list of tag names to be used
+    addedTags: list of tag names to be used
     response_callback: callback that sends final responses (status codes)
     tag_callback: calback that continues the process of adding a tag (getting ids)
     */
    // var resource_id = tag_info.resource_id;
-    var tags = tag_info;
+	
+	if (addedTags.length == 0) {
+		response_callback({error: false});
+	}
     var rows_to_add = [];
-	console.log("tags " + tags);
-	console.log("tags length " + tags.length);
-    for(var i = 0; i < tags.length; i++){
-        var row = {"tag_name": tags[i]};
+	//console.log("tags " + tags);
+	//console.log("tags length " + tags.length);
+    for(var i = 0; i < addedTags.length; i++){
+        var row = {"tag_name": addedTags[i]};
         rows_to_add.push(row);
     }
 
@@ -63,7 +66,7 @@ function create_tag (res_id, tag_info, response_callback, tag_callback){
          })
         .on('end', function () {
             console.log('finished!')
-            select_tag_id(res_id, tags, response_callback, tag_callback);
+            select_tag_id(res_id, addedTags, response_callback, tag_callback);
         });
 }
 
@@ -161,13 +164,16 @@ function delete_resource_tag_pairs_by_resource(id, callback, success_callback){
         });
 }
 
-function remove_tag_from_object(tag_info, callback){
-    var tags = tag_info.deletedTags;
-    console.log(tags)
-    var resource_id = tag_info.resource_id;
+function remove_tag_from_object(resource_id, deletedTags, callback){
+    //var tags = deletedTags;
+    //var resource_id = tag_info.resource_id;
+
+	if (deletedTags.length == 0) {
+		callback({error: false});
+	}
     var tag_filter = squel.expr();
-    for (var i = 0; i < tags.length; i++){
-        tag_filter.or("tag_name = '" + tags[i] + "'")
+    for (var i = 0; i < deletedTags.length; i++){
+        tag_filter.or("tag_name = '" + deletedTags[i] + "'")
     }
     tag_filter.and("resource_id = '" + resource_id + "'");
  
