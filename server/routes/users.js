@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var user_service = require('../services/users');
+var auth = require('../services/authorization');
 
 router.get('/', function(req, res, next){
 	//read user
@@ -14,7 +15,7 @@ router.get('/', function(req, res, next){
 	user_service.get_user(username, getUserCallback);
 });
 
-router.put('/', function(req, res, next){
+router.put('/', auth.is('admin'), function(req, res, next){
 	//create user
   	var createUserCallback = function(result){
   		if (result.error == true) {
@@ -25,7 +26,7 @@ router.put('/', function(req, res, next){
   	}
   	//These might need to be changed to json body fields
 
-	if(!req.session || !req.session.user || !(req.session.user.permission_level == 'admin') || req.body.username == null || req.body.password == null || req.body.permission_level == null){
+	if(req.body.username == null || req.body.password == null || req.body.permission_level == null){
 	  	res.sendStatus(401);
   	} else {
 		user_service.create_user(req.body, createUserCallback);
