@@ -17,7 +17,7 @@ angular
             })
             .when('/resource', {
                 templateUrl: '/views/resource.html',
-                controller: 'ResourceCtrl'
+                controller: 'MainResourceCtrl'
             })
             .when('/reservation', {
                 templateUrl: '/views/reservation.html',

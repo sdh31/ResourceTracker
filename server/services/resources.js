@@ -40,7 +40,7 @@ function create_resource(resource, callback){
 		.set("max_users", resource.max_users)
 		.toString();
 
-        var rowCount = 0;
+    var rowCount = 0;
 	db_sql.connection.query(query)
 		.on('result', function (row) {
             rowCount++;
