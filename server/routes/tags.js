@@ -43,7 +43,7 @@ router.post('/', function(req, res, next){
         }
             res.sendStatus(200);
         }
-        tag_service.remove_tag_from_object(req.body.resource_id, req.body.deletedTags, delete_callback)
+        tag_service.remove_tag_from_object(req.body, delete_callback)
     })
 
 module.exports = router;

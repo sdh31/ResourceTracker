@@ -58,7 +58,8 @@ function create_resource(resource, callback){
 }
 
 function get_all_resources(callback) {
-	var query = squel.select().from('resource').left_join('resource_tag', null, 'resource.resource_id = resource_tag.resource_id').left_join('tag', null, 'resource_tag.tag_id = tag.tag_id').toString();
+	//var query = squel.select().from('resource').left_join('resource_tag', null, 'resource.resource_id = resource_tag.resource_id').left_join('tag', null, 'resource_tag.tag_id = tag.tag_id').toString();
+	var query = "SELECT r.resource_id, r.name, r.description, r.max_users, r.created_by, t.tag_id, t.tag_name FROM resource r LEFT JOIN resource_tag as rt ON (r.resource_id = rt.resource_id) LEFT JOIN tag as t ON (rt.tag_id = t.tag_id)"
 
 	var resources = [];
 
@@ -75,25 +76,8 @@ function get_all_resources(callback) {
             if (rowCount == 0){
                 callback({empty: true, resources: resources});
             } else {
-				var resourcesToSend = [];
-				for (var i = 0; i<resources.length; i++) {
-					var thisResource = resources[i];
-					var index = resourceExists(thisResource, resourcesToSend);
-					if (index != -1) {
-						resourcesToSend[index].tags.push(thisResource.tag_name);
-					} else {
-						var tag = (thisResource.tag_name == null) ? null : [thisResource.tag_name];
-						var resource = {
-							name: thisResource.name,
-							description: thisResource.description,
-							max_users: thisResource.max_users,
-							tags: tag,
-							resource_id: thisResource.resource_id
-						};
-						resourcesToSend.push(resource);
-					}
-				}
-				callback({empty: false, resources: resourcesToSend});
+				
+				callback({empty: false, resources: organizeResources(resources)});
 			}
         });
 }
@@ -161,6 +145,29 @@ var resourceExists = function(thisResource, resources) {
 		}
 	}
 	return -1;
+};
+
+var organizeResources = function(resources) {
+
+	var resourcesToSend = [];
+	for (var i = 0; i<resources.length; i++) {
+		var thisResource = resources[i];
+		var index = resourceExists(thisResource, resourcesToSend);
+		if (index != -1) {
+			resourcesToSend[index].tags.push(thisResource.tag_name);
+		} else {
+			var tag = (thisResource.tag_name == null) ? null : [thisResource.tag_name];
+			var resource = {
+				name: thisResource.name,
+				description: thisResource.description,
+				max_users: thisResource.max_users,
+				tags: tag,
+				resource_id: thisResource.resource_id
+			};
+			resourcesToSend.push(resource);
+		}
+	}
+	return resourcesToSend;
 }
 
 module.exports = {

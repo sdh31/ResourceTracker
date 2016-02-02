@@ -53,42 +53,18 @@ router.put('/', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-  //update resource
-
-	var deleteTagsCallback = function(result){
-		if (result.error == true){
-		  console.log("err" + " "+result.err)
-		  res.sendStatus(400);
-		} else {
-        	res.sendStatus(200);
-
-		}
-    }
-
-	var addTagsCallback = function(result){
-        if(result.error == true){
-            console.log(result.err)
-            res.sendStatus(400);
-        }
-        else{
-            //res.write(JSON.stringify(result));
-			tag_service.remove_tag_from_object(req.body.resource.resource_id, req.body.deletedTags, deleteTagsCallback)
-            //res.sendStatus(200);
-        }
-    }
-
+  //update user
     var update_resource_callback = function(result){
         if(result.error == true){
             res.sendStatus(400);
         }
         else{
             //res.write(JSON.stringify(result));
-			tag_service.create_tag(req.body.resource.resource_id, req.body.addedTags, addTagsCallback, tag_service.create_resource_tag_link);
-            //res.sendStatus(200);
+            res.sendStatus(200);
         }
     }
 
-    res_service.update_resource_by_id(req.body.resource, update_resource_callback);
+    res_service.update_resource_by_id(req.body, update_resource_callback);
 });
 
 router.delete('/', function(req, res, next){
@@ -102,7 +78,7 @@ router.delete('/', function(req, res, next){
     res.sendStatus(200);
   }
 
-  id = req.query["id"];
+  id = req.query["resource_id"];
   tag_service.delete_resource_tag_pairs_by_resource(id,delete_resource_callback, res_service. delete_resource_by_id);
 });
 

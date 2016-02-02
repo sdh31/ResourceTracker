@@ -43,6 +43,7 @@ angular.module('resourceTracker')
 			$scope.editingResource.name = oldName;
 			$scope.editingResource.description = oldDescription;
 			$scope.editingResource.tags = oldTags;
+			$scope.saveOldResourceState();
 		};
 
 		$scope.addTag = function() {
@@ -74,20 +75,65 @@ angular.module('resourceTracker')
 			}
 			$scope.editingResource.tags.splice(tag_index, 1);			
 		};
-
-		$scope.updateResource = function() {
-			var toSend = {
-				resource: $scope.editingResource,
-				addedTags: addedTags,
-				deletedTags: deletedTags
-			};
-			$http.post('/resource', toSend).then(function(response) {
-				console.log('here');
-				alert('resource successfully updated');
-				getAllResources();
+	
+		$scope.deleteResource = function() {
+			var deleteQueryString = '/resource?resource_id=' + $scope.editingResource.resource_id;
+			console.log($scope.selectedResource);
+			$http.delete(deleteQueryString).then(function(response) {
+				showMessageAndReload("Successfully deleted resource!");
             }, function(error) {
 				$scope.addError(resourceService.alertMessages.resourceUpdatingFailed);
             });
+		};
+
+		$scope.updateResource = function() {
+			$http.post('/resource', $scope.editingResource).then(function(response) {
+				addTagsToResource();
+            }, function(error) {
+				$scope.addError(resourceService.alertMessages.resourceUpdatingFailed);
+            });
+		};
+
+		var addTagsToResource = function() {
+			if (addedTags.length > 0) {
+				var body = {
+					resource_id: $scope.editingResource.resource_id,
+					addedTags: addedTags
+				};
+				$http.put('/tag', body).then(function(response) {
+					deleteTagsFromResource();
+		        }, function(error) {
+					$scope.addError(resourceService.alertMessages.resourceUpdatingFailed);
+		        });
+			} else {
+				deleteTagsFromResource();
+			}
+		}
+
+		var deleteTagsFromResource = function() {
+			if (deletedTags.length > 0) {
+				var body = {
+					resource_id: $scope.editingResource.resource_id,
+					deletedTags: deletedTags
+				};
+				$http.post('/tag', body).then(function(response) {
+					showSuccessEditingMessageAndReload();
+		        }, function(error) {
+					$scope.addError(resourceService.alertMessages.resourceUpdatingFailed);
+		        });
+			} else {
+				showSuccessEditingMessageAndReload();
+			}		
+
+		};
+
+		var showSuccessEditingMessageAndReload = function() {
+			showMessageAndReload("Successfully updated resource!");
+		};
+
+		var showMessageAndReload = function(message) {
+			alert(message);
+			getAllResources();
 		};
 
 		var getAllResources = function() {
@@ -98,6 +144,7 @@ angular.module('resourceTracker')
 			deletedTags = [];
 			$scope.editingResource = {};
 			$scope.selectedResource = {};
+			$scope.turnOffError();
 			$http.get('/resource/all').then(function(response) {	
 				$scope.allResources = response.data;
 				console.log($scope.allResources);
