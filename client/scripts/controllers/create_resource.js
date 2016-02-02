@@ -15,23 +15,28 @@ angular.module('resourceTracker')
 		$scope.activeTag = '';
 
 		$scope.addCreateTag = function() {
+			var initialTagLength = $scope.newResource.tags.length;
 			resourceService.addTagToResource($scope.newResource, $scope.activeTag, function(alertMessage) {
 				$scope.addError(alertMessage);
 			});
 
-			// if no alert message, adding the tag was a success. 
-			if ($scope.alertMessage.length == 0) {
+			// if length of tag array increases by 1, then successful add
+			if ($scope.newResource.tags.length == initialTagLength + 1) {
+				$scope.turnOffError();
 				$scope.activeTag = '';
 			}
 		};
 
 		$scope.removeCreateTag = function(tag_index) {
-			addTagToResource.removeTagFromResource($scope.newResource, tag_index);
+			resourceService.removeTagFromResource($scope.newResource, tag_index);
 		};
 
 		$scope.createResource = function() {
-			resourceService.createResource.then(function(response) {
+			var self = this;
+			resourceService.createResource($scope.newResource).then(function(response) {
 				$scope.success.value = true;
+				$scope.turnOffError();
+				initializeNewResource();
 			}, function(alertMessage) {
 				$scope.addError(alertMessage);
 			})

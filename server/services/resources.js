@@ -75,10 +75,26 @@ function get_all_resources(callback) {
             if (rowCount == 0){
                 callback({empty: true, resources: resources});
             } else {
-				callback({empty: false, resources: resources});
+				var resourcesToSend = [];
+				for (var i = 0; i<resources.length; i++) {
+					var thisResource = resources[i];
+					var index = resourceExists(thisResource, resourcesToSend);
+					if (index != -1) {
+						resourcesToSend[index].tags.push(thisResource.tag_name);
+					} else {
+						var resource = {
+							name: thisResource.name,
+							description: thisResource.description,
+							max_users: thisResource.max_users,
+							tags: [thisResource.tag_name],
+							resource_id: thisResource.resource_id
+						};
+						resourcesToSend.push(resource);
+					}
+				}
+				callback({empty: false, resources: resourcesToSend});
 			}
         });
-	
 }
 
 function update_resource_by_id(resource,callback){
@@ -134,6 +150,15 @@ id:id of resource to delete
         .on('end', function (){
                 callback({error: false});
         });
+}
+
+var resourceExists = function(thisResource, resources) {
+	for (var i = 0; i<resources.length; i++) {
+		if (thisResource.resource_id == resources[i].resource_id) {
+			return i;
+		}
+	}
+	return -1;
 }
 
 module.exports = {

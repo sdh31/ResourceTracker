@@ -27,13 +27,14 @@ angular.module('resourceTracker')
 	    this.createResource = function(resource) {
 	    	var deferred = $q.defer();
 			if (resource.name == '') {
-				deferred.reject(alertMessages.emptyResourceName);
+				deferred.reject(this.alertMessages.emptyResourceName);
 			}
 
+			var resourceCreationFailedMessage = this.alertMessages.resourceCreationFailed;
 			$http.put('/resource', resource).then(function(response) {
 				deferred.resolve();
 	        }, function(error) {
-				deferred.reject(alertMessages.resourceCreationFailed);
+				deferred.reject(resourceCreationFailedMessage);
 	        });
 	        return deferred.promise;
   	    };
