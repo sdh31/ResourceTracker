@@ -30,7 +30,7 @@ function create_resource_tag_link(res_id, tag_id, callback){
 }
 
 
-function create_tag (tag_info, response_callback, tag_callback){
+function create_tag (res_id, tag_info, response_callback, tag_callback){
     /*
     Create tag object from tag name
     res_id: resource id when creating a link b/w tag and resource
@@ -38,9 +38,11 @@ function create_tag (tag_info, response_callback, tag_callback){
     response_callback: callback that sends final responses (status codes)
     tag_callback: calback that continues the process of adding a tag (getting ids)
     */
-    var resource_id = tag_info.resource_id;
-    var tags = tag_info.tags;
+   // var resource_id = tag_info.resource_id;
+    var tags = tag_info;
     var rows_to_add = [];
+	console.log("tags " + tags);
+	console.log("tags length " + tags.length);
     for(var i = 0; i < tags.length; i++){
         var row = {"tag_name": tags[i]};
         rows_to_add.push(row);
@@ -52,16 +54,16 @@ function create_tag (tag_info, response_callback, tag_callback){
         .toString()
         console.log(query);
 
-
         db_sql.connection.query(query)
         .on('error', function (err) {
+			console.log('error in tag query');
             if (err.code != "ER_DUP_ENTRY"){
                 response_callback({error: true, err: err});
             }
          })
         .on('end', function () {
             console.log('finished!')
-            select_tag_id(resource_id, tags, response_callback, tag_callback);
+            select_tag_id(res_id, tags, response_callback, tag_callback);
         });
 }
 
@@ -160,7 +162,7 @@ function delete_resource_tag_pairs_by_resource(id, callback, success_callback){
 }
 
 function remove_tag_from_object(tag_info, callback){
-    var tags = tag_info.tags;
+    var tags = tag_info.deletedTags;
     console.log(tags)
     var resource_id = tag_info.resource_id;
     var tag_filter = squel.expr();

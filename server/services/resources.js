@@ -57,6 +57,30 @@ function create_resource(resource, callback){
         });
 }
 
+function get_all_resources(callback) {
+	var query = squel.select().from('resource').join('resource_tag', null, 'resource.resource_id = resource_tag.resource_id').join('tag', null, 'resource_tag.tag_id = tag.tag_id').toString();
+
+	var resources = [];
+
+	var rowCount = 0;
+	db_sql.connection.query(query)
+		.on('result', function (row) {
+			rowCount++;
+            resources.push(row);
+        })
+        .on('error', function (err) {
+            callback({error: true, err: err});
+        })
+        .on('end', function () {
+            if (rowCount == 0){
+                callback({empty: true, resources: resources});
+            } else {
+				callback({empty: false, resources: resources});
+			}
+        });
+	
+}
+
 function update_resource_by_id(resource,callback){
 /*
 Update specified fields of specified resource
@@ -64,7 +88,7 @@ resource: dictionary of fields TO UPDATE, and the id of specified resource
 */
 	var query = squel.update()
 		.table('resource')
-		.where("resource_id=" + resource.id);
+		.where("resource_id=" + resource.resource_id);
         if (resource.name != null || resource.name != ""){
 		  query.set("name", resource.name);
         }
@@ -116,5 +140,6 @@ module.exports = {
 	get_resource_by_name: get_resource_by_name,
 	create_resource: create_resource,
     update_resource_by_id: update_resource_by_id,
-    delete_resource_by_id:delete_resource_by_id
+    delete_resource_by_id:delete_resource_by_id,
+	get_all_resources: get_all_resources
 };
