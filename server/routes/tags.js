@@ -32,10 +32,10 @@ router.put('/', function(req, res, next){
         }
         
     }
-    tag_service.create_tag(req.body, create_tag_resource_callback, tag_service.create_resource_tag_link);
+    tag_service.create_tag(req.body.resource_id, req.body.addedTags, create_tag_resource_callback, tag_service.create_resource_tag_link);
 })
 
-router.delete('/', function(req, res, next){
+router.post('/', function(req, res, next){
     var delete_callback = function(result){
         if (result.error == true){
           console.log("err" + " "+result.err)
@@ -43,7 +43,7 @@ router.delete('/', function(req, res, next){
         }
             res.sendStatus(200);
         }
-        tag_service.remove_tag_from_object(req.query, delete_callback)
+        tag_service.remove_tag_from_object(req.body, delete_callback)
     })
 
 module.exports = router;

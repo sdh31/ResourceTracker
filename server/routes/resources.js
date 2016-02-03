@@ -25,28 +25,31 @@ else{
 
 router.put('/', function(req, res, next){
   //create user
- var create_tag_resource_callback = function(result){
+    var create_tag_resource_callback = function(result) {
         console.log(result.error)
         if(result.error == true){
-          console.log(result.err)
+            console.log(result.err)
             res.sendStatus(400);
-        }
-        else{
+        } else {
             //res.write(JSON.stringify(result));
             res.sendStatus(200);
         }
     }
-  var create_resource_callback = function(result){
-    if(result.error == true){
-      res.sendStatus(400);
-  }
-    else{
-        var res_id = result.insertId;//JSON.parse(result).insertId;
-        //console.log("yo"+JSON.parse(result).insertId)
-        tag_service.create_tag(res_id, req.body.tag, create_tag_resource_callback, tag_service.create_resource_tag_link);
-  }
-}
-res_service.create_resource(req.body, create_resource_callback);
+
+    var create_resource_callback = function(result) {
+        if(result.error == true) {
+            res.sendStatus(400);
+        } else {
+            var res_id = result.insertId;
+            if (req.body.tags.length) {
+                tag_service.create_tag(res_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
+            } else {
+                res.sendStatus(200);
+            }
+        }
+    }
+
+    res_service.create_resource(req.body, create_resource_callback);
 });
 
 router.post('/', function(req, res, next){
@@ -75,7 +78,7 @@ router.delete('/', function(req, res, next){
     res.sendStatus(200);
   }
 
-  id = req.query["id"];
+  id = req.query["resource_id"];
   tag_service.delete_resource_tag_pairs_by_resource(id,delete_resource_callback, res_service. delete_resource_by_id);
 });
 
@@ -93,6 +96,24 @@ router.get('/tag', function(req, res, next){
   var tags = [].concat(req.query['tags'])
 
   tag_service.filter_by_tag(tags, filter_callback)
+});
+
+router.get('/all', function(req, res, next) {
+	var getAllResourcesCallback = function(result){
+		if (result.error == true) {
+		  console.log("err" + " "+result.err)
+		  res.sendStatus(400);
+		} else if (result.empty == true) {
+			console.log("no resources!");
+			res.send(JSON.stringify(result.resources));
+		} else {
+			console.log('we good, we got resources');
+			res.send(result.resources);
+		}
+  	}
+
+  res_service.get_all_resources(getAllResourcesCallback);
+	
 });
 
 router.put('/tag', function(req, res, next){
