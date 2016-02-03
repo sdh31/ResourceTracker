@@ -82,22 +82,6 @@ router.delete('/', function(req, res, next){
   tag_service.delete_resource_tag_pairs_by_resource(id,delete_resource_callback, res_service. delete_resource_by_id);
 });
 
-router.get('/tag', function(req, res, next){
-  var filter_callback = function(result){
-    if (result.error == true){
-      console.log("err" + " "+result.err)
-      res.sendStatus(400);
-    }
-    res.send(JSON.stringify(result));
-  }
-
-  //This is due to weird json behavior -- if there is only one string it isn't recognized as a list
-  //-- if list is only one string long, it reads characters instead of words
-  var tags = [].concat(req.query['tags'])
-
-  tag_service.filter_by_tag(tags, filter_callback)
-});
-
 router.get('/all', function(req, res, next) {
 	var getAllResourcesCallback = function(result){
 		if (result.error == true) {

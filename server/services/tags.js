@@ -1,5 +1,6 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel').useFlavour('mysql');
+var resources_utility = require('./resources_utility');
 
 function create_resource_tag_link(res_id, tag_id, callback){
     /*
@@ -102,35 +103,90 @@ function select_tag_id(resource_id, tags, response_callback, tag_callback){
         });
 }
 
-function filter_by_tag(tags, callback){
-    var tag_filter = squel.expr()
-    for (var i = 0; i < tags.length; i++){
-        tag_filter.or("tag_name = '" + tags[i] + "'")
+function filter_by_tag(includedTags, excludedTags, callback){
+    var included_filter = squel.expr()
+	for (var i = 0; i < includedTags.length; i++){
+        included_filter.or("tag_name = '" + includedTags[i] + "'");
     }
-    var query = squel.select()
-        .from("resource_tag")
-        
-        //can add more joins (i.e. reservations, resources if more info is needed in return)
-        .join("tag", null, "resource_tag.tag_id = tag.tag_id")
-        .where(tag_filter)
-    query = query.toString()
-    console.log(query)
-    var resources = []
 
-    db_sql.connection.query(query)
+	var includedQuery = squel.select()
+		.from("resource_tag")
+
+		//can add more joins (i.e. reservations, resources if more info is needed in return)
+		.join("tag", null, "resource_tag.tag_id = tag.tag_id")
+		.join("resource", null, "resource_tag.resource_id = resource.resource_id")
+		.where(included_filter).toString();
+	
+	var excluded_filter = squel.expr();
+
+	for (var j = 0; j < excludedTags.length; j++) {
+		excluded_filter.or("tag_name = '" + excludedTags[j] + "'");
+	}
+
+	var excludedQuery = squel.select()
+		.from("resource_tag")
+
+		//can add more joins (i.e. reservations, resources if more info is needed in return)
+		.join("tag", null, "resource_tag.tag_id = tag.tag_id")
+		.where(excluded_filter).toString();
+
+	console.log(excludedQuery);
+	console.log(includedQuery);
+	var resourcesFound = [];
+	var idsSeen = [];
+
+	var includeCallback = function() {
+		db_sql.connection.query(includedQuery)
                 .on('result', function (row) {
-                    if (resources.indexOf(row.resource_id) < 0){
-                       resources.push(row.resource_id)
-                    }
+					if (excludedResourceIds.indexOf(row.resource_id) == -1) {
+                    	resourcesFound.push(row);
+					}
                 })
                 .on('error', function (err) {
                     console.log(err)
                     callback({error: true, err: err});
                 })
                 .on('end', function () {
-                    callback({resource_id:resources})
+                    callback({resources: resources_utility.organizeResources(resourcesFound)})
+                });
+	}
+	
+	var excludedResourceIds = [];
+
+    db_sql.connection.query(excludedQuery)
+                .on('result', function (row) {
+                    excludedResourceIds.push(row.resource_id);
+                })
+                .on('error', function (err) {
+                    console.log(err)
+                    callback({error: true, err: err});
+                })
+                .on('end', function () {
+                    includeCallback({excludedResourceIds: excludedResourceIds})
                 });
 }
+
+function get_all_tags(callback) {
+
+	var query = squel.select().from("tag").join("resource_tag", null, "tag.tag_id = resource_tag.tag_id").toString();
+	var tags = [];
+	var seenTagIds = [];
+	db_sql.connection.query(query)
+		.on('result', function (row) {
+			if (seenTagIds.indexOf(row.tag_id) == -1) {
+				seenTagIds.push(row.tag_id);
+				tags.push(row);
+			}
+		})
+		.on('error', function (err) {
+			console.log(err)
+			callback({error: true, err: err});
+		})
+		.on('end', function () {
+			callback({tags: tags})
+		});
+	
+};
 
 function delete_resource_tag_pairs_by_resource(id, callback, success_callback){
     /*
@@ -194,6 +250,7 @@ module.exports = {
     create_tag:create_tag,
     create_resource_tag_link:create_resource_tag_link,
     filter_by_tag:filter_by_tag,
+	get_all_tags: get_all_tags,
     remove_tag_from_object:remove_tag_from_object,
     delete_resource_tag_pairs_by_resource:delete_resource_tag_pairs_by_resource
 }

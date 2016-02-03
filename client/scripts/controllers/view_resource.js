@@ -151,6 +151,23 @@ angular.module('resourceTracker')
             }, function(error) {
 				console.log(error);
             });
+		
+			$http.get('/tag').then(function(response) {	
+				console.log(response.data);
+            }, function(error) {
+				console.log(error);
+            });
+
+			var includedTags = ['blah', 'blahblah'];
+			var excludedTags = ['oscar'];
+
+			var toSend = {includedTags: includedTags, excludedTags: excludedTags};
+
+			$http.post('/tag/filter', toSend).then(function(response) {	
+				console.log(response.data);
+            }, function(error) {
+				console.log(error);
+            });
 		};
 
 		getAllResources();
