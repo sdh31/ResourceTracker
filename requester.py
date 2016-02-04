@@ -2,7 +2,7 @@ import requests
 import json
 
 url = 'http://colab-sbx-202.oit.duke.edu/reservation'
-method = "GET"
+method = "POST"
 headers = {
 	"Content-Type:":'application/json'
 }
@@ -13,9 +13,10 @@ user_params = {
 	'permission_level':'admin'
 }
 reservation_params = {
-	'start_time': 10,
-	'end_time':2,
-	'resource_id':200
+	'reservation_id':8,
+	'start_time': 11,
+	'end_time':200,
+	'resource_id':1
 }
 resource_params = {
 	'id' : 13,
@@ -33,7 +34,7 @@ tag_params = {
 response = requests.request(
 	method,
 	url = url,
-	#json = tag_params,
+	#json = reservation_params,
 	params = reservation_params,
 	)
 
