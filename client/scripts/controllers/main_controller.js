@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('resourceTracker')
-    .controller('MainCtrl', function ($scope, $http, $location) {
+    .controller('MainCtrl', function ($scope, $http, $location, $window) {
 
         $scope.initializeUser = function() {
             $scope.user = {
@@ -22,7 +22,11 @@ angular.module('resourceTracker')
 				$scope.loginError = false;
 				$scope.user.loggedIn = true;
                 $scope.user.permission_level = response.data.permission_level;
-                $scope.goToRegisterPage();
+                if ($scope.user.permission_level == 'admin') {
+                    $scope.goToRegisterPage();
+                } else {
+                    $scope.goToReservationPage();
+                }
             }, function(error) {
 				$scope.loginError = true;
 				clearFields();
@@ -43,6 +47,9 @@ angular.module('resourceTracker')
             $http.post(signOutUrl).then(function(response) {
                 $scope.initializeUser();
                 $location.url('/');
+                // this is necessary - if you login as user, then logout, then log back in, the google timeline UI throws an error.
+                // this fixes the error as is restarts the entire state of the application
+                $window.location.reload();
             }, function(error) {
                 console.log('there is an error when logging out....');
             });
