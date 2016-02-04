@@ -44,7 +44,7 @@ app.engine('html', require('ejs').renderFile);
 
 initialize_tables.initializeDB(create_admin.createAdmin);
 
-app.listen(80, function () {
+app.listen(8080, function () {
   console.log('Example app listening on port 80!');
 });
 
