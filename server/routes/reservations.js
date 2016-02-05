@@ -18,7 +18,7 @@ router.get('/', function(req, res, next){
     if(!("start_time" in query) || !("end_time" in query) || !("resource_id" in query)){
         res.sendStatus(400);
     }
-    reservation_service.get_conflicting_reservations(req.query, request_callback);
+    reservation_service.get_conflicting_reservations(req.query, request_callback, request_callback);
 });
 
 router.put('/', function(req, res, next){
@@ -43,7 +43,6 @@ router.put('/', function(req, res, next){
     else if(reservation.start_time >= reservation.end_time){
         res.sendStatus(400);
     }
-<<<<<<< HEAD
     else{
         reservation_service.get_conflicting_reservations(
           req.session.user,
@@ -51,14 +50,6 @@ router.put('/', function(req, res, next){
           request_callback,
           reservation_service.create_reservation);
     }
-=======
-
-    reservation_service.get_conflicting_reservations(
-      req.session.user,
-      reservation,
-      request_callback,
-      reservation_service.create_reservation);
->>>>>>> 63f99f7ea1c60bf70a274d8ac73d2c3db550442e
 });
 
 router.post('/', function(req, res, next){
