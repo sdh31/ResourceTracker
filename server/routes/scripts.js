@@ -21,6 +21,10 @@ router.get('/services/*.js', function(req, res, next){
   res.sendFile(basePath + req.path);
 });
 
+router.get('/directives/*.js', function(req, res, next){
+  res.sendFile(basePath + req.path);
+});
+
 
 module.exports = router;
 
