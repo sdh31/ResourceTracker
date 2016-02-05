@@ -41,7 +41,7 @@ module.exports = function(agenda) {
         db_sql.connection.query(getUserInfoQuery)
             .on('result', function (row) {
                 if (row.emails_enabled == 1) {
-                    getUserInfoCallback();
+                    getUserInfoCallback(row);
                 } else {
                     console.log("EMAILS AINT ENABLED ANYMORE BRUH");
                 }
@@ -51,7 +51,7 @@ module.exports = function(agenda) {
                 //callback({error: true, err: err});
             })
 
-        var getUserInfoCallback = function() {
+        var getUserInfoCallback = function(userInfo) {
             var reservationExistsQuery = squel.select().from("reservation").where("reservation.reservation_id = '" + job.attrs.data.reservation.reservation_id + "'").toString();
 
             console.log(reservationExistsQuery);
@@ -60,7 +60,8 @@ module.exports = function(agenda) {
             db_sql.connection.query(reservationExistsQuery)
                 .on('result', function (row) {
                     if (row.start_time == job.attrs.data.reservation.start_time) {
-                        reservationExistsCallback();
+
+                        reservationExistsCallback(userInfo);
                     }
                 })
                 .on('error', function (err) {
@@ -69,13 +70,15 @@ module.exports = function(agenda) {
                 })
         }
 
-        var reservationExistsCallback = function() {
+
+        var reservationExistsCallback = function(userInfo) {
             var resourceNameQuery = squel.select().from("resource").where("resource.resource_id = '" + job.attrs.data.reservation.resource_id + "'").toString();
             console.log(resourceNameQuery);
 
             db_sql.connection.query(resourceNameQuery)
                 .on('result', function (row) {
-                    resourceNameQueryCallback(row.name);
+
+                    resourceNameQueryCallback(userInfo, row.name);
                 })
                 .on('error', function (err) {
                     console.log("error in finding resource name when scheduling email");
@@ -83,8 +86,9 @@ module.exports = function(agenda) {
                 })
         };
 
-        var resourceNameQueryCallback = function (resource_name) {
-		    setConfigsAndSend(job.attrs.data.user, resource_name);
+
+        var resourceNameQueryCallback = function (userInfo, resource_name) {
+		    setConfigsAndSend(userInfo, resource_name);
         };
 	});
 }

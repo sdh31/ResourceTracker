@@ -77,8 +77,8 @@ function create_reservation(user, reservation, callback, success_callback){
                         reservation_id: row.insertId
                     };
                     reservation["reservation_id"] = row.insertId
-                    //scheduleEmailForReservation(user, res);
-                   //console.log("INSERTED" + JSON.stringify(row))
+                    scheduleEmailForReservation(user, res, callback);
+                    console.log("INSERTED" + JSON.stringify(row))
                 })
                 .on('error', function (err) {
                     console.log(err)
@@ -181,9 +181,10 @@ function update_reservation_by_id(reservation, callback){
 }
 
 function scheduleEmailForReservation(user, reservation) {
+    //Doesn't have a callback so that the other data functions can run first.
+    //Also don't really want to throw an error if all of thINSERTS worked correctly
     if (user.emailsEnabled == false) {
         console.log("YOUR EMAILS AINT ENABLED BRUH");
-        callback({error: false});
     } else {
         var data = {
             user: user,
