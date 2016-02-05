@@ -91,13 +91,13 @@ resource: dictionary of fields TO UPDATE, and the id of specified resource
 	var query = squel.update()
 		.table('resource')
 		.where("resource_id=" + resource.resource_id);
-        if (!("name" in resource)){
+        if (("name" in resource)){
 		  query.set("name", resource.name);
         }
-		if (!("description" in resource)){
+		if (("description" in resource)){
             query.set("description", resource.description);
         }
-        if (!("max_users" in resource)){
+        if (("max_users" in resource)){
             query.set("max_users", resource.max_users);
         }
         query = query.toString();

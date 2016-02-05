@@ -145,14 +145,14 @@ angular.module('resourceTracker')
 			$scope.editingResource = {};
 			$scope.selectedResource = {};
 			$scope.turnOffError();
-			$http.get('/resource/all').then(function(response) {	
+			$http.get('/resource/all').then(function(response) {
 				$scope.allResources = response.data;
 				console.log($scope.allResources);
             }, function(error) {
 				console.log(error);
             });
 		
-			$http.get('/tag').then(function(response) {	
+			$http.get('/tag').then(function(response) {
 				console.log(response.data);
             }, function(error) {
 				console.log(error);
@@ -165,6 +165,22 @@ angular.module('resourceTracker')
 
 			$http.post('/tag/filter', toSend).then(function(response) {	
 				console.log(response.data);
+            }, function(error) {
+				console.log(error);
+            });
+
+            var testDate = new Date();
+            console.log(testDate.valueOf());
+
+            var startDate = new Date(2016, 1, 4, 18, 47);
+            var endDate = new Date(2016, 1, 4, 18, 48);
+            var reservation = {
+                resource_id: 1,
+                start_time: startDate.valueOf(),
+                end_time: endDate.valueOf()
+            };
+            $http.put('/reservation', reservation).then(function(response) {
+				console.log(response);
             }, function(error) {
 				console.log(error);
             });

@@ -1,6 +1,6 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel');
-
+var agenda = require('./agenda');
 
 function generate_conflict_expression(reservation){
     var time_check = squel.expr()
@@ -15,7 +15,7 @@ function generate_conflict_expression(reservation){
         return time_check;
 }
 
-function get_conflicting_reservations(reservation, callback, no_conflict_callback){
+function get_conflicting_reservations(user, reservation, callback, no_conflict_callback){
     /*
     return resource specified by name (might have to change to id if names aren't unique)
     name: resource name
@@ -50,7 +50,7 @@ function get_conflicting_reservations(reservation, callback, no_conflict_callbac
      })
     .on('end', function (err){
         if (row_count == 0){
-            no_conflict_callback(reservation, callback);
+            no_conflict_callback(user, reservation, callback);
         }
         else{
             //TODO: Going to need to change what we do here ... Maybe another callback field?
@@ -59,7 +59,7 @@ function get_conflicting_reservations(reservation, callback, no_conflict_callbac
     });
 }
 
-function create_reservation(reservation, callback){
+function create_reservation(user, reservation, callback){
         var query = squel.insert()
             .into("reservation")
             .set("start_time", reservation.start_time)
@@ -69,15 +69,23 @@ function create_reservation(reservation, callback){
             console.log(query)
             db_sql.connection.query(query)
                 .on('result', function (row) {
-                    console.log("INSERTED" + row)
+                    var res = {
+                        start_time: reservation.start_time,
+                        end_time: reservation.end_time,
+                        resource_id: reservation.resource_id,
+                        reservation_id: row.insertId
+                    };
+                    scheduleEmailForReservation(user, res, callback);
+                    console.log("INSERTED" + JSON.stringify(row))
                 })
                 .on('error', function (err) {
                     console.log(err)
                     callback({error: true, err: err})
-                })
-                .on('end', function (err){
-                    callback({error: false})
                 });
+       //         .on('end', function (err){
+
+         //           callback({error: false})
+           //     });
     }
 
 function delete_reservation_by_id(reservation, callback){
@@ -116,6 +124,22 @@ function update_reservation_by_id(reservation, callback){
 
 
 }
+
+function scheduleEmailForReservation(user, reservation, callback) {
+    if (user.emailsEnabled == false) {
+        console.log("YOUR EMAILS AINT ENABLED BRUH");
+        callback({error: false});
+    } else {
+        var data = {
+            user: user,
+            reservation: reservation
+        };
+
+        agenda.schedule(new Date(reservation.start_time), 'send email', data);
+       // agenda.now('send email', data);
+        callback({error: false});
+    }
+};
 
 
 module.exports = {
