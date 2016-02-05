@@ -59,5 +59,19 @@ Steps to Generate SSL Certificate for Server
         Then, restart apache with the command 'sudo /opt/bitnami/ctlscript.sh restart apache'. 
         Lastly, stop apache using the command 'sudo /opt/bitnami/ctlscript.sh stop apache'
 
+Using Redis Store to store info for session handling
 
+Can launch redis command line interface using redis-cli
+
+Session keys might build up in the db if "logout" isn't clicked every time to destroy the key..you can flush the redisDB using FLUSHDB
+
+
+How to install mongo on Ubuntu VMs:
+
+follow steps from https://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
+
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv EA312927
+echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-3.2.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
 
