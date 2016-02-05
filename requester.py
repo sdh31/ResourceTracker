@@ -25,13 +25,13 @@ def login_to_session():
 
 session = login_to_session()
 
-url = 'http://colab-sbx-202.oit.duke.edu/resource'
+url = 'http://colab-sbx-202.oit.duke.edu/reservation'
 method = "DELETE"
 reservation_params = {
-	'reservation_id':8,
-	'start_time': 11,
-	'end_time':200,
-	'resource_id':4
+	'reservation_id':26,
+	'start_time': 999,
+	'end_time':9999,
+	'resource_id':5
 }
 resource_params = {
 	'resource_id' : 4,
@@ -49,9 +49,9 @@ tag_params = {
 response = requests.request(
 	method,
 	url = url,
-	#json = resource_params,
+	#son = reservation_params,
 	cookies = session,
-	params = resource_params,
+	params = reservation_params,
 	)
 
 response_json = response.content

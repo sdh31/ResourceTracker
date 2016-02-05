@@ -22,6 +22,7 @@ function get_conflicting_reservations(user, reservation, callback, no_conflict_c
     */
     //Generate SQL logic to check for conflicting values
     var time_check = generate_conflict_expression(reservation);
+    console.log(user)
 
     var query = squel.select()
         .from("reservation")
@@ -59,7 +60,7 @@ function get_conflicting_reservations(user, reservation, callback, no_conflict_c
     });
 }
 
-function create_reservation(user, reservation, callback){
+function create_reservation(user, reservation, callback, success_callback){
         var query = squel.insert()
             .into("reservation")
             .set("start_time", reservation.start_time)
@@ -75,18 +76,55 @@ function create_reservation(user, reservation, callback){
                         resource_id: reservation.resource_id,
                         reservation_id: row.insertId
                     };
-                    scheduleEmailForReservation(user, res, callback);
-                    console.log("INSERTED" + JSON.stringify(row))
+                    reservation["reservation_id"] = row.insertId
+                    //scheduleEmailForReservation(user, res);
+                   //console.log("INSERTED" + JSON.stringify(row))
                 })
                 .on('error', function (err) {
                     console.log(err)
                     callback({error: true, err: err})
+                })
+                .on('end', function (err) {
+                    add_user_reservation_link(user, reservation, callback);
                 });
-       //         .on('end', function (err){
-
-         //           callback({error: false})
-           //     });
     }
+
+function add_user_reservation_link(user, reservation, callback){
+    var query = squel.insert()
+        .into("user_reservation")
+        .set("user_id", user.user_id)
+        .set("reservation_id", reservation.reservation_id)
+        .toString()
+        console.log(query)
+        db_sql.connection.query(query)                
+                .on('error', function (err) {
+                    console.log(err)
+                    callback({error: true, err: err})
+                })
+                .on('end', function (err){
+                    callback({error:false})
+                });
+}
+function delete_user_reservation_link(user, reservation, callback, success_callback){
+    var query = squel.delete()
+        .from("user_reservation")
+        if("reservation_id" in reservation){
+            query = query.where("reservation_id =" + reservation.reservation_id)
+        }
+        else{
+            query = query.where("user_id =" + user.user_id)
+        }
+        query = query.toString()
+        console.log(query)
+        db_sql.connection.query(query)                
+                .on('error', function (err) {
+                    console.log(err)
+                    callback({error: true, err: err})
+                })
+                .on('end', function (err){
+                    success_callback(reservation, callback)
+                });
+}
 
 function delete_reservation_by_id(reservation, callback){
     var query = squel.delete()
@@ -142,7 +180,7 @@ function update_reservation_by_id(reservation, callback){
 
 }
 
-function scheduleEmailForReservation(user, reservation, callback) {
+function scheduleEmailForReservation(user, reservation) {
     if (user.emailsEnabled == false) {
         console.log("YOUR EMAILS AINT ENABLED BRUH");
         callback({error: false});
@@ -151,10 +189,8 @@ function scheduleEmailForReservation(user, reservation, callback) {
             user: user,
             reservation: reservation
         };
-
         agenda.schedule(new Date(reservation.start_time), 'send email', data);
        // agenda.now('send email', data);
-        callback({error: false});
     }
 };
 
@@ -164,5 +200,7 @@ module.exports = {
     create_reservation:create_reservation,
     delete_reservation_by_id:delete_reservation_by_id,
     update_reservation_by_id:update_reservation_by_id,
-    delete_reservation_by_resource:delete_reservation_by_resource
+    delete_reservation_by_resource:delete_reservation_by_resource,
+    add_user_reservation_link:add_user_reservation_link,
+    delete_user_reservation_link:delete_user_reservation_link
 }

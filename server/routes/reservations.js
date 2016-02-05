@@ -91,10 +91,15 @@ router.delete('/', function(req, res, next){
     }
     var reservation = req.query;
     if(!("reservation_id" in reservation)){
-      res.sendStatus(400);
+        res.sendStatus(400);
     }
 
-  reservation_service.delete_reservation_by_id(reservation, request_callback);
+    reservation_service.delete_user_reservation_link(
+        req.session.user, 
+        reservation, 
+        request_callback,
+        reservation_service.delete_reservation_by_id
+    );
 
 
 });

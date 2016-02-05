@@ -26,7 +26,7 @@ router.put('/', auth.is('admin'), function(req, res, next){
   	}
   	//These might need to be changed to json body fields
 
-	if(req.body.username == null || req.body.password == null || req.body.permission_level == null){
+	if(!('username' in req.body) || !('password' in req.body) || !('permission_level' in req.body)){
 	  	res.sendStatus(401);
   	} else {
 		user_service.create_user(req.body, createUserCallback);
