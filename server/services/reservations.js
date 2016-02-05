@@ -91,7 +91,7 @@ function create_reservation(user, reservation, callback){
 function delete_reservation_by_id(reservation, callback){
     var query = squel.delete()
         .from("reservation")
-        .where("reservation_id = '" + reservation.reservation_id + "'")
+        .where("reservation_id =" + reservation.reservation_id)
         .toString();
 
         db_sql.connection.query(query)                
@@ -103,6 +103,23 @@ function delete_reservation_by_id(reservation, callback){
                     callback({error: false})
                 });
 
+}
+
+function delete_reservation_by_resource(resource, callback, success_callback){
+    console.log(resource)
+    var query = squel.delete()
+        .from("reservation")
+        .where("resource_id =" + resource.resource_id)
+        .toString()
+        console.log(query)
+        db_sql.connection.query(query)                
+                .on('error', function (err) {
+                    console.log(err)
+                    callback({error: true, err: err})
+                })
+                .on('end', function (err){
+                    success_callback(resource, callback)
+                });
 }
 
 function update_reservation_by_id(reservation, callback){
@@ -146,5 +163,6 @@ module.exports = {
     get_conflicting_reservations:get_conflicting_reservations,
     create_reservation:create_reservation,
     delete_reservation_by_id:delete_reservation_by_id,
-    update_reservation_by_id:update_reservation_by_id
+    update_reservation_by_id:update_reservation_by_id,
+    delete_reservation_by_resource:delete_reservation_by_resource
 }

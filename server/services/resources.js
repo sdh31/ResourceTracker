@@ -115,18 +115,19 @@ resource: dictionary of fields TO UPDATE, and the id of specified resource
 
 
 
-function delete_resource_by_id(id, callback){
+function delete_resource_by_id(resource, callback){
 /*
 deletes resource row given id of the resource
 id:id of resource to delete
 
 */
-    console.log('drbi');
+var id = resource.resource_id;
     var query = squel.delete()
         .from("resource")
-        .where("resource_id = '" + id + "'")
+        .where("resource_id = " + id )
         .toString();
         var row_count = 0;
+        console.log(query)
     db_sql.connection.query(query)
         .on('result', function (row) {
             row_count ++;

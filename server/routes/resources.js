@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var res_service = require('../services/resources');
 var tag_service = require('../services/tags');
+var reservation_service = require('../services/reservations');
 
 router.get('/', function(req, res, next){
   //read user from name in URL queries
@@ -41,7 +42,7 @@ router.put('/', function(req, res, next){
             res.sendStatus(400);
         } else {
             var res_id = result.insertId;
-            if (req.body.tags.length) {
+            if ("tags" in req.body) {
                 tag_service.create_tag(res_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
             } else {
                 res.sendStatus(200);
@@ -78,8 +79,7 @@ router.delete('/', function(req, res, next){
     res.sendStatus(200);
   }
 
-  id = req.query["resource_id"];
-  tag_service.delete_resource_tag_pairs_by_resource(id,delete_resource_callback, res_service. delete_resource_by_id);
+  tag_service.delete_resource_tag_pairs_by_resource(req.query,delete_resource_callback, reservation_service.delete_reservation_by_resource);
 });
 
 router.get('/all', function(req, res, next) {

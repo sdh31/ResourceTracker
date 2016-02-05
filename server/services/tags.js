@@ -1,6 +1,7 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel').useFlavour('mysql');
 var resources_utility = require('./resources_utility');
+var resource_service = require('../services/resources');
 
 function create_resource_tag_link(res_id, tag_id, callback){
     /*
@@ -168,7 +169,9 @@ function filter_by_tag(includedTags, excludedTags, callback){
 
 function get_all_tags(callback) {
 
-	var query = squel.select().from("tag").join("resource_tag", null, "tag.tag_id = resource_tag.tag_id").toString();
+	var query = squel.select()
+    .from("tag").
+    join("resource_tag", null, "tag.tag_id = resource_tag.tag_id").toString();
 	var tags = [];
 	var seenTagIds = [];
 	db_sql.connection.query(query)
@@ -188,12 +191,14 @@ function get_all_tags(callback) {
 	
 };
 
-function delete_resource_tag_pairs_by_resource(id, callback, success_callback){
+function delete_resource_tag_pairs_by_resource(resource, callback, success_callback){
     /*
     deletes resource tag pair given a resource id
     useful when resource is being deleted
     id: id of resource to delete
     */
+    var id  = resource.resource_id;
+    console.log(resource)
     var query = squel.delete()
         .from("resource_tag")
         .where("resource_id = '" + id + "'")
@@ -202,7 +207,6 @@ function delete_resource_tag_pairs_by_resource(id, callback, success_callback){
         var row_count = 0;
     db_sql.connection.query(query)
         .on('result', function (row) {
-            console.log('sdf')
             row_count ++;
             //success_callback(id, callback)
         })
@@ -212,14 +216,13 @@ function delete_resource_tag_pairs_by_resource(id, callback, success_callback){
         .on('end', function (err){
             console.log('sadf')
             //if (row_count == 0){
-                success_callback(id, callback)
+            success_callback(resource, callback, resource_service.delete_resource_by_id);
            // }
         });
 }
 
 function remove_tag_from_object(tag_info, callback){
     var tags = tag_info.deletedTags;
-    console.log(tags)
     var resource_id = tag_info.resource_id;
     var tag_filter = squel.expr();
     for (var i = 0; i < tags.length; i++){
