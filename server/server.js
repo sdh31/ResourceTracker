@@ -35,7 +35,7 @@ app.use('/views', views);
 app.use('/tag', tag_routes);
 app.use('/user', user_routes);
 app.use('/resource', resource_routes);
-app.use('/reservations', reservation_routes);
+app.use('/reservation', reservation_routes);
 app.use('/scripts', script_routes);
 app.use('/node_modules', node_modules_routes);
 app.use('/styles', style_routes);

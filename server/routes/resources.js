@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var res_service = require('../services/resources');
 var tag_service = require('../services/tags');
+var reservation_service = require('../services/reservations');
 
 router.get('/', function(req, res, next){
   //read user from name in URL queries
@@ -14,13 +15,7 @@ router.get('/', function(req, res, next){
       }
   };
 
-  name = req.query['name'];
-  if (name == null){
-    res.sendStatus(401);
-}
-else{
-    res_service.get_resource_by_name(name, getResourceCallback);
-}
+    res_service.get_resource_by_name(req.query, getResourceCallback);
 });
 
 router.put('/', function(req, res, next){
@@ -41,7 +36,7 @@ router.put('/', function(req, res, next){
             res.sendStatus(400);
         } else {
             var res_id = result.insertId;
-            if (req.body.tags.length) {
+            if ("tags" in req.body) {
                 tag_service.create_tag(res_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
             } else {
                 res.sendStatus(200);
@@ -78,24 +73,7 @@ router.delete('/', function(req, res, next){
     res.sendStatus(200);
   }
 
-  id = req.query["resource_id"];
-  tag_service.delete_resource_tag_pairs_by_resource(id,delete_resource_callback, res_service. delete_resource_by_id);
-});
-
-router.get('/tag', function(req, res, next){
-  var filter_callback = function(result){
-    if (result.error == true){
-      console.log("err" + " "+result.err)
-      res.sendStatus(400);
-    }
-    res.send(JSON.stringify(result));
-  }
-
-  //This is due to weird json behavior -- if there is only one string it isn't recognized as a list
-  //-- if list is only one string long, it reads characters instead of words
-  var tags = [].concat(req.query['tags'])
-
-  tag_service.filter_by_tag(tags, filter_callback)
+  tag_service.delete_resource_tag_pairs_by_resource(req.query,delete_resource_callback, reservation_service.delete_reservation_by_resource);
 });
 
 router.get('/all', function(req, res, next) {
