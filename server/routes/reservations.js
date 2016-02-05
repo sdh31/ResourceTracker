@@ -43,12 +43,13 @@ router.put('/', function(req, res, next){
     else if(reservation.start_time >= reservation.end_time){
         res.sendStatus(400);
     }
-
-    reservation_service.get_conflicting_reservations(
-      req.session.user,
-      reservation,
-      request_callback,
-      reservation_service.create_reservation);
+    else{
+        reservation_service.get_conflicting_reservations(
+          req.session.user,
+          reservation,
+          request_callback,
+          reservation_service.create_reservation);
+    }
 });
 
 router.post('/', function(req, res, next){
@@ -94,12 +95,10 @@ router.delete('/', function(req, res, next){
         res.sendStatus(400);
     }
 
-    reservation_service.delete_user_reservation_link(
-        req.session.user, 
-        reservation, 
-        request_callback,
-        reservation_service.delete_reservation_by_id
-    );
+    reservation_service.delete_reservation_by_id(
+        reservation,
+        request_callback
+    )
 
 
 });

@@ -15,13 +15,7 @@ router.get('/', function(req, res, next){
       }
   };
 
-  name = req.query['name'];
-  if (name == null){
-    res.sendStatus(401);
-}
-else{
-    res_service.get_resource_by_name(name, getResourceCallback);
-}
+    res_service.get_resource_by_name(req.query, getResourceCallback);
 });
 
 router.put('/', function(req, res, next){

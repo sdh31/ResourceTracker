@@ -2,15 +2,17 @@ var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var resources_utility = require('./resources_utility');
 
-function get_resource_by_name(name, callback){
+function get_resource_by_name(resource, callback){
     /*
     return resource specified by name (might have to change to id if names aren't unique)
     name: resource name
     */
 	var query = squel.select()
 		.from("resource")
-		.where("name = '" + name + "'")
-		.toString();
+        if("name" in resource){
+		  query = query.where("name = '" + resource.name + "'")
+        }
+		query = query.toString();
 		//Query the database, return all resources with given name
     var rowCount = 0;
 
