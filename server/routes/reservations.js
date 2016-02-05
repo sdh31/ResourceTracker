@@ -45,7 +45,8 @@ router.put('/', function(req, res, next){
     }
 
     reservation_service.get_conflicting_reservations(
-      reservation, 
+      req.session.user,
+      reservation,
       request_callback,
       reservation_service.create_reservation);
 });
