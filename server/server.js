@@ -2,6 +2,12 @@ var body_parser = require('body-parser');
 var express = require('express');
 var app = express();
 
+var fs = require('fs');
+var https = require('https');
+var privateKey = fs.readFileSync('/opt/bitnami/apache2/conf/server.key', 'utf8');
+var certificate = fs.readFileSync('/opt/bitnami/apache2/conf/server.crt', 'utf8');
+var credentials = {key: privateKey, cert: certificate};
+
 var body_parser = require('body-parser');
 var cookie_parser = require('cookie-parser');
 var session = require('express-session');
@@ -44,9 +50,7 @@ app.engine('html', require('ejs').renderFile);
 
 initialize_tables.initializeDB(create_admin.createAdmin);
 
-app.listen(80, function () {
-  console.log('Example app listening on port 80!');
-});
+https.createServer(credentials, app).listen(443);
 
 // leaves the server up when exception occurs
 
