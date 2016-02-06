@@ -2,9 +2,9 @@
 	<input type="text" class="form-control" placeholder="username" ng-model="user.username"><br>
 	<input type="password" class="form-control" placeholder="password" ng-model="user.password"><br>
 	<button type="button" class="btn btn-default btn-sm" ng-click="login()">Login</button>
-	<div class="alert alert-danger" ng-show="loginError">
-		{{alertMessage}}
-		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="turnOffError()"></a>
+	<div class="alert alert-danger" ng-show="hasError.value">
+		{{alertMessage.value}}
+		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
 	</div>
 </div>
 

@@ -13,13 +13,18 @@ angular.module('resourceTracker')
         };
 
         $scope.initializeUser();
-		$scope.loginError = false;
-		$scope.alertMessage = "Incorrect username or password"
+
+        $scope.invalidLoginAlert = "Incorrect username or password";
+
+        $scope.hasSuccess = { value: false };
+        $scope.hasError = { value: false };
+        $scope.successMessage = { value: '' };
+        $scope.alertMessage = { value: '' };
 
         $scope.login = function() {
             var signInUrl = '/user/signin';
             $http.post(signInUrl, $scope.user).then(function(response) {
-				$scope.loginError = false;
+                $scope.clearError();
 				$scope.user.loggedIn = true;
                 $scope.user.permission_level = response.data.permission_level;
                 if ($scope.user.permission_level == 'admin') {
@@ -28,7 +33,7 @@ angular.module('resourceTracker')
                     $scope.goToReservationPage();
                 }
             }, function(error) {
-				$scope.loginError = true;
+				$scope.addError($scope.invalidLoginAlert);
 				clearFields();
             });
         };
@@ -38,9 +43,28 @@ angular.module('resourceTracker')
 			$scope.user.password = '';
 		};
 
-		$scope.turnOffError = function() {
-			$scope.loginError = false;
-		}
+
+        $scope.clearError = function() {
+            $scope.hasError.value = false;
+            $scope.alertMessage.value = '';
+        };
+
+        $scope.clearSuccess = function() {
+            $scope.hasSuccess.value = false;
+            $scope.successMessage.value = '';
+        };
+
+        $scope.addError = function(errorMsg) {
+            $scope.hasError.value = true;
+            $scope.alertMessage.value = errorMsg;
+            $scope.clearSuccess();
+        }
+
+        $scope.addSuccess = function(successMsg) {
+            $scope.hasSuccess.value = true;
+            $scope.successMessage.value = successMsg;
+            $scope.clearError();
+        };
 
         $scope.logout = function() {
             var signOutUrl = '/user/signout'; 
@@ -73,6 +97,10 @@ angular.module('resourceTracker')
 
         $scope.goToReservationPage = function() {
             $location.url('/reservation');
+        };
+
+        $scope.goToCreateReservationPage = function() {
+            $location.url('/create_reservation');
         };
 
 });
