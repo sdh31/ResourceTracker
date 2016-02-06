@@ -150,7 +150,39 @@ angular.module('resourceTracker')
 				console.log($scope.allResources);
             }, function(error) {
 				console.log(error);
-            });
+            });		
+		//	$http.get('/tag').then(function(response) {
+			//	console.log(response.data);
+            //}, function(error) {
+				//console.log(error);
+        //    });
+
+			var includedTags = ['tag1'];
+			var excludedTags = [];
+
+			var toSend = {includedTags: includedTags, excludedTags: excludedTags, start_time: 0, end_time: Number.MAX_VALUE};
+
+			$http.post('/tag/filter', toSend).then(function(response) {	
+				console.log(response.data);
+            }, function(error) {
+				console.log(error);
+			});
+
+            var testDate = new Date();
+            console.log(testDate.valueOf());
+
+            var startDate = new Date(2016, 1, 4, 18, 47);
+            var endDate = new Date(2016, 1, 4, 18, 48);
+            var reservation = {
+                resource_id: 1,
+                start_time: startDate.valueOf(),
+                end_time: endDate.valueOf()
+            };
+           // $http.put('/reservation', reservation).then(function(response) {
+			//	console.log(response);
+            //}, function(error) {
+		//		console.log(error);
+          //  });
 		};
 
 		getAllResources();

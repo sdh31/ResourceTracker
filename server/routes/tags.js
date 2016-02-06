@@ -30,8 +30,10 @@ router.post('/filter', function(req, res, next){
 
 	var includedTags = req.body.includedTags;
 	var excludedTags = req.body.excludedTags;
+    var start_time = req.body.start_time;
+    var end_time = req.body.end_time;
 
-	tag_service.filter_by_tag(includedTags, excludedTags, filter_callback);
+	tag_service.filter_by_tag(includedTags, excludedTags, start_time, end_time, filter_callback);
 });
 
 router.put('/', function(req, res, next){

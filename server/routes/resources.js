@@ -36,7 +36,7 @@ router.put('/', function(req, res, next){
             res.sendStatus(400);
         } else {
             var res_id = result.insertId;
-            if ("tags" in req.body) {
+            if ("tags" in req.body && req.body.tags.length > 0) {
                 tag_service.create_tag(res_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
             } else {
                 res.sendStatus(200);
@@ -86,11 +86,11 @@ router.get('/all', function(req, res, next) {
 			res.send(JSON.stringify(result.resources));
 		} else {
 			console.log('we good, we got resources');
-			res.send(result.resources);
+			res.send(JSON.stringify(result.resources));
 		}
   	}
 
-  res_service.get_all_resources(getAllResourcesCallback);
+  tag_service.filter_by_tag([], [], 0, Number.MAX_VALUE, getAllResourcesCallback);
 	
 });
 

@@ -1,16 +1,16 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel');
-var resources_utility = require('./resources_utility');
+var tag_service = require('../services/tags');
 
 function get_resource_by_name(resource, callback){
     /*
-    return resource specified by name (might have to change to id if names aren't unique)
-    name: resource name
+    return resource specified by resource_id (might have to change to id if names aren't unique)
+    resource_id: resource id
     */
 	var query = squel.select()
 		.from("resource")
-        if("name" in resource){
-		  query = query.where("name = '" + resource.name + "'")
+        if("resource_id" in resource){
+		  query = query.where("resource_id = '" + resource.resource_id + "'")
         }
 		query = query.toString();
 		//Query the database, return all resources with given name
@@ -60,31 +60,6 @@ function create_resource(resource, callback){
         });
 }
 
-function get_all_resources(callback) {
-	//var query = squel.select().from('resource').left_join('resource_tag', null, 'resource.resource_id = resource_tag.resource_id').left_join('tag', null, 'resource_tag.tag_id = tag.tag_id').toString();
-	var query = "SELECT r.resource_id, r.name, r.description, r.max_users, r.created_by, t.tag_id, t.tag_name FROM resource r LEFT JOIN resource_tag as rt ON (r.resource_id = rt.resource_id) LEFT JOIN tag as t ON (rt.tag_id = t.tag_id)"
-
-	var resources = [];
-
-	var rowCount = 0;
-	db_sql.connection.query(query)
-		.on('result', function (row) {
-			rowCount++;
-            resources.push(row);
-        })
-        .on('error', function (err) {
-            callback({error: true, err: err});
-        })
-        .on('end', function () {
-            if (rowCount == 0){
-                callback({empty: true, resources: resources});
-            } else {
-				
-				callback({empty: false, resources: resources_utility.organizeResources(resources)});
-			}
-        });
-}
-
 function update_resource_by_id(resource,callback){
 /*
 Update specified fields of specified resource
@@ -115,8 +90,6 @@ resource: dictionary of fields TO UPDATE, and the id of specified resource
         });
 }
 
-
-
 function delete_resource_by_id(resource, callback){
 /*
 deletes resource row given id of the resource
@@ -146,6 +119,5 @@ module.exports = {
 	get_resource_by_name: get_resource_by_name,
 	create_resource: create_resource,
     update_resource_by_id: update_resource_by_id,
-    delete_resource_by_id:delete_resource_by_id,
-	get_all_resources: get_all_resources
+    delete_resource_by_id:delete_resource_by_id
 };
