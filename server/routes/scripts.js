@@ -13,10 +13,6 @@ router.get('/controllers/*.js', function(req, res, next){
   res.sendFile(basePath + req.path);
 });
 
-router.get('/controllers/*.js', function(req, res, next){
-  res.sendFile(basePath + req.path);
-});
-
 router.get('/services/*.js', function(req, res, next){
   res.sendFile(basePath + req.path);
 });
@@ -24,7 +20,6 @@ router.get('/services/*.js', function(req, res, next){
 router.get('/directives/*.js', function(req, res, next){
   res.sendFile(basePath + req.path);
 });
-
 
 module.exports = router;
 

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('resourceTracker')
-    .controller('MainCtrl', function ($scope, $http, $location, $window) {
+    .controller('MainCtrl', function ($scope, $http, $location, $window, $rootScope) {
 
         $scope.initializeUser = function() {
             $scope.user = {
@@ -11,6 +11,9 @@ angular.module('resourceTracker')
                 loggedIn: false
             };
         };
+
+
+        $rootScope.googleChartLoaded = { value: false };
 
         $scope.initializeUser();
 
@@ -95,8 +98,8 @@ angular.module('resourceTracker')
             $location.url('/resource');
         };
 
-        $scope.goToReservationPage = function() {
-            $location.url('/reservation');
+        $scope.goToFilterReservationPage = function() {
+            $location.url('/filter_reservation');
         };
 
         $scope.goToCreateReservationPage = function() {

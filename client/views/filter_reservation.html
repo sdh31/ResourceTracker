@@ -14,7 +14,12 @@
 	 	 translation-texts="tagExcludeTranslationText"
 	 	 style="vertical-align:top;"></span><br>
 	<button type="button" class="btn btn-default btn-sm" ng-click="filterReservations()">Filter Reservations</button>
+	<br><br>
+	<div class="alert alert-danger" ng-show="hasError.value">
+		<strong>Warning:</strong> {{alertMessage.value}}
+		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
+	</div>
 </div>
 <br><br><br>
-<div ng-controller="TimelineCtrl" id="timeline" style="margin: auto;"></div>
+<div id="timeline" style="margin: auto;"></div>
 

@@ -38,6 +38,7 @@ function get_user(username, callback){
 	}
 
 	query = query.toString();
+    console.log(query);
 
     var rowCount = 0;
 	db_sql.connection.query(query)
