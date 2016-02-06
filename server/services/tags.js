@@ -1,6 +1,5 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel').useFlavour('mysql');
-var resources_utility = require('./resources_utility');
 var resource_service = require('../services/resources');
 
 function create_resource_tag_link(res_id, tag_id, callback){
@@ -104,33 +103,12 @@ function select_tag_id(resource_id, tags, response_callback, tag_callback){
         });
 }
 
-function filter_by_tag(includedTags, excludedTags, callback){
-    var included_filter = squel.expr()
-	for (var i = 0; i < includedTags.length; i++){
-        included_filter.or("tag_name = '" + includedTags[i] + "'");
-    }
-
-	var includedQuery = squel.select()
-		.from("resource_tag")
-
-		//can add more joins (i.e. reservations, resources if more info is needed in return)
-		.join("tag", null, "resource_tag.tag_id = tag.tag_id")
-		.join("resource", null, "resource_tag.resource_id = resource.resource_id")
-		.where(included_filter).toString();
-	
-	var excluded_filter = squel.expr();
-
-	for (var j = 0; j < excludedTags.length; j++) {
-		excluded_filter.or("tag_name = '" + excludedTags[j] + "'");
-	}
-
-	var excludedQuery = squel.select()
-		.from("resource_tag")
-
-		//can add more joins (i.e. reservations, resources if more info is needed in return)
-		.join("tag", null, "resource_tag.tag_id = tag.tag_id")
-		.where(excluded_filter).toString();
-
+// this returns a list of resources that have the includedTags and do not have the excludedTags
+// each resource comes with a list of reservations that are between the start_time and end_time
+function filter_by_tag (includedTags, excludedTags, start_time, end_time, callback){
+    
+	var includedQuery = createIncludedQuery(includedTags, start_time, end_time);
+	var excludedQuery = createExcludedQuery(excludedTags);
 	console.log(excludedQuery);
 	console.log(includedQuery);
 	var resourcesFound = [];
@@ -138,33 +116,37 @@ function filter_by_tag(includedTags, excludedTags, callback){
 
 	var includeCallback = function() {
 		db_sql.connection.query(includedQuery)
-                .on('result', function (row) {
-					if (excludedResourceIds.indexOf(row.resource_id) == -1) {
-                    	resourcesFound.push(row);
-					}
-                })
-                .on('error', function (err) {
-                    console.log(err)
-                    callback({error: true, err: err});
-                })
-                .on('end', function () {
-                    callback({resources: resources_utility.organizeResources(resourcesFound)})
-                });
+            .on('result', function (row) {
+			    if (excludedResourceIds.indexOf(row.resource_id) == -1) {
+                    //console.log(row);
+                	resourcesFound.push(row);
+			    }
+            })
+            .on('error', function (err) {
+                console.log(err)
+                callback({error: true, err: err});
+            })
+            .on('end', function () {
+                callback({resources: organizeResources(resourcesFound)})
+            });
 	}
 	
 	var excludedResourceIds = [];
 
     db_sql.connection.query(excludedQuery)
-                .on('result', function (row) {
-                    excludedResourceIds.push(row.resource_id);
-                })
-                .on('error', function (err) {
-                    console.log(err)
-                    callback({error: true, err: err});
-                })
-                .on('end', function () {
-                    includeCallback({excludedResourceIds: excludedResourceIds})
-                });
+        .on('result', function (row) {
+            excludedResourceIds.push(row.resource_id);
+        })
+        .on('error', function (err) {
+            // empty excluded query is totally ok
+            if (err.code != 'ER_EMPTY_QUERY') {
+                console.log(err);
+                callback({error: true, err: err});
+            }
+        })
+        .on('end', function () {
+            includeCallback({excludedResourceIds: excludedResourceIds})
+        });
 }
 
 function get_all_tags(callback) {
@@ -245,9 +227,123 @@ function remove_tag_from_object(tag_info, callback){
         .on('end', function (){
             callback({error: false});
         });
-
 }
 
+var resourceExists = function(thisResource, resources) {
+	for (var i = 0; i<resources.length; i++) {
+		if (thisResource.resource_id == resources[i].resource_id) {
+			return i;
+		}
+	}
+	return -1;
+};
+
+var containsResourceTagPair = function(thisResource, seenResourceTagPairs) {
+    for (var i = 0; i<seenResourceTagPairs.length; i++) {
+		if ((thisResource.resource_id == seenResourceTagPairs[i].resource_id) && (thisResource.tag_name == seenResourceTagPairs[i].tag_name)) {
+			return true;
+		}
+	}
+	return false;
+};
+
+var organizeResources = function(resources) {
+	var resourcesToSend = [];
+    var seenResourceTagPairs = [];
+    var seenReservations = [];
+    
+	for (var i = 0; i<resources.length; i++) {
+		var thisResource = resources[i];
+        var thisReservation = {
+            reservation_id: thisResource.reservation_id,
+            start_time: thisResource.start_time,
+            end_time: thisResource.end_time,
+            username: thisResource.username,
+            first_name: thisResource.first_name,
+            last_name: thisResource.last_name,
+            user_id: thisResource.user_id
+        };
+		var index = resourceExists(thisResource, resourcesToSend);
+		if (index != -1) {
+            if (thisResource.tag_name != null && !containsResourceTagPair(thisResource, seenResourceTagPairs)) {
+			    resourcesToSend[index].tags.push(thisResource.tag_name);
+                seenResourceTagPairs.push({tag_name: thisResource.tag_name, resource_id: thisResource.resource_id});
+            }
+            if (thisResource.reservation_id != null && seenReservations.indexOf(thisResource.reservation_id) == -1) {
+                resourcesToSend[index].reservations.push(thisReservation);
+                seenReservations.push(thisResource.reservation_id);
+            }
+		} else {
+			var tag = (thisResource.tag_name == null) ? [] : [thisResource.tag_name];
+            var reservation = (thisResource.reservation_id == null) ? [] : [thisReservation];
+            seenResourceTagPairs.push({tag_name: thisResource.tag_name, resource_id: thisResource.resource_id});
+            seenReservations.push(thisResource.reservation_id);
+			var resource = {
+				name: thisResource.name,
+				description: thisResource.description,
+				max_users: thisResource.max_users,
+				tags: tag,
+				resource_id: thisResource.resource_id,
+                reservations: reservation
+			};
+			resourcesToSend.push(resource);
+		}
+	}
+	return resourcesToSend;
+};
+
+var createIncludedQuery = function(includedTags, start_time, end_time) {
+    var included_filter = squel.expr()
+	for (var i = 0; i < includedTags.length; i++){
+        included_filter.or("tag_name = '" + includedTags[i] + "'");
+    }
+
+    return squel.select()
+        .field("resource.name")
+        .field("resource.resource_id")
+        .field("resource.description")
+        .field("resource.max_users")
+        .field("resource.created_by")
+        .field("tag.tag_name")
+        .field("reservation.reservation_id")
+        .field("reservation.start_time")
+        .field("reservation.end_time")
+        .field("user.username")
+        .field("user.first_name")
+        .field("user.last_name")
+        .field("user.user_id")
+		.from("resource")
+        .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")		
+        .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")		
+        .left_join("reservation", null, "reservation.resource_id = resource.resource_id AND reservation.start_time > " + start_time + " AND reservation.end_time < " + end_time)
+        .left_join("user_reservation", null, "reservation.reservation_id = user_reservation.reservation_id")
+        .left_join("user", null, "user_reservation.user_id = user.user_id")
+		.where(included_filter).toString();
+};
+
+var createExcludedQuery = function(excludedTags) {
+    var excluded_filter = squel.expr();
+     
+	for (var j = 0; j < excludedTags.length; j++) {
+		excluded_filter.or("tag_name = '" + excludedTags[j] + "'");
+	}
+
+    // this is necessary because we dont want to make an excluded query if there are no tags to exclude!
+    var excludedQuery;
+    if (excludedTags.length == 0) {
+        excludedQuery = "";
+    } else{
+        excludedQuery = squel.select()
+		    .from("resource_tag")
+
+		    //can add more joins (i.e. reservations, resources if more info is needed in return)
+		    .join("tag", null, "resource_tag.tag_id = tag.tag_id")
+		    .where(excluded_filter).toString();
+    }
+
+    return excludedQuery;
+
+};
 
 module.exports = {
     create_tag:create_tag,

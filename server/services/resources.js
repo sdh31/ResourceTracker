@@ -1,16 +1,17 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel');
-var resources_utility = require('./resources_utility');
+var tag_service = require('../services/tags');
+var agenda = require('./agenda');
 
 function get_resource_by_name(resource, callback){
     /*
-    return resource specified by name (might have to change to id if names aren't unique)
-    name: resource name
+    return resource specified by resource_id (might have to change to id if names aren't unique)
+    resource_id: resource id
     */
 	var query = squel.select()
 		.from("resource")
-        if("name" in resource){
-		  query = query.where("name = '" + resource.name + "'")
+        if("resource_id" in resource){
+		  query = query.where("resource_id = '" + resource.resource_id + "'")
         }
 		query = query.toString();
 		//Query the database, return all resources with given name
@@ -60,31 +61,6 @@ function create_resource(resource, callback){
         });
 }
 
-function get_all_resources(callback) {
-	//var query = squel.select().from('resource').left_join('resource_tag', null, 'resource.resource_id = resource_tag.resource_id').left_join('tag', null, 'resource_tag.tag_id = tag.tag_id').toString();
-	var query = "SELECT r.resource_id, r.name, r.description, r.max_users, r.created_by, t.tag_id, t.tag_name FROM resource r LEFT JOIN resource_tag as rt ON (r.resource_id = rt.resource_id) LEFT JOIN tag as t ON (rt.tag_id = t.tag_id)"
-
-	var resources = [];
-
-	var rowCount = 0;
-	db_sql.connection.query(query)
-		.on('result', function (row) {
-			rowCount++;
-            resources.push(row);
-        })
-        .on('error', function (err) {
-            callback({error: true, err: err});
-        })
-        .on('end', function () {
-            if (rowCount == 0){
-                callback({empty: true, resources: resources});
-            } else {
-				
-				callback({empty: false, resources: resources_utility.organizeResources(resources)});
-			}
-        });
-}
-
 function update_resource_by_id(resource,callback){
 /*
 Update specified fields of specified resource
@@ -115,30 +91,63 @@ resource: dictionary of fields TO UPDATE, and the id of specified resource
         });
 }
 
-
-
 function delete_resource_by_id(resource, callback){
 /*
 deletes resource row given id of the resource
 id:id of resource to delete
 
 */
-var id = resource.resource_id;
-    var query = squel.delete()
-        .from("resource")
-        .where("resource_id = " + id )
-        .toString();
-        var row_count = 0;
-        console.log(query)
-    db_sql.connection.query(query)
+    var id = resource.resource_id;
+
+    var checkReservationsOnResourceQuery = squel.select().from("reservation").left_join("user_reservation", null, "reservation.reservation_id = user_reservation.reservation_id").left_join("resource", null, "reservation.resource_id = resource.resource_id").left_join("user", null, "user_reservation.user_id = user.user_id").where("reservation.resource_id = '" + id + "'").toString();
+
+    console.log(checkReservationsOnResourceQuery);
+
+    db_sql.connection.query(checkReservationsOnResourceQuery)
         .on('result', function (row) {
-            row_count ++;
+            var info = {
+                resource_name: row.name,
+                user: {
+                    username: row.username,
+                    first_name: row.first_name,
+                    email_address: row.email_address,
+                    last_name: row.last_name
+                },
+                reservation: {
+                    start_time: row.start_time,
+                    end_time: row.end_time
+                }
+            };
+            
+            var currentTime = new Date();
+
+            if (currentTime.valueOf() <= info.reservation.start_time) {
+                agenda.now('notify on delete reservation', info);
+            }
         })
+        .on('error', function (err) {
+            console.log("error in check reservations for delete resource " + err);
+           // callback({error: true, err: err});
+        })
+        .on('end', function (){
+            deleteResource(id, callback);
+        });
+}
+
+var deleteResource = function(resource_id, callback) {
+
+    var deleteQuery = squel.delete()
+    .from("resource")
+    .where("resource_id = " + resource_id)
+    .toString();
+    console.log(deleteQuery);
+    
+    db_sql.connection.query(deleteQuery)
         .on('error', function (err) {
             callback({error: true, err: err});
         })
         .on('end', function (){
-                callback({error: false});
+            callback({error: false});
         });
 }
 
@@ -146,6 +155,5 @@ module.exports = {
 	get_resource_by_name: get_resource_by_name,
 	create_resource: create_resource,
     update_resource_by_id: update_resource_by_id,
-    delete_resource_by_id:delete_resource_by_id,
-	get_all_resources: get_all_resources
+    delete_resource_by_id:delete_resource_by_id
 };

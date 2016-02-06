@@ -36,7 +36,7 @@ router.put('/', function(req, res, next){
             res.sendStatus(400);
         } else {
             var res_id = result.insertId;
-            if ("tags" in req.body) {
+            if ("tags" in req.body && req.body.tags.length > 0) {
                 tag_service.create_tag(res_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
             } else {
                 res.sendStatus(200);
@@ -73,7 +73,7 @@ router.delete('/', function(req, res, next){
     res.sendStatus(200);
   }
 
-  tag_service.delete_resource_tag_pairs_by_resource(req.query,delete_resource_callback, reservation_service.delete_reservation_by_resource);
+  res_service.delete_resource_by_id(req.query, delete_resource_callback);
 });
 
 router.get('/all', function(req, res, next) {
@@ -86,11 +86,11 @@ router.get('/all', function(req, res, next) {
 			res.send(JSON.stringify(result.resources));
 		} else {
 			console.log('we good, we got resources');
-			res.send(result.resources);
+			res.send(JSON.stringify(result.resources));
 		}
   	}
 
-  res_service.get_all_resources(getAllResourcesCallback);
+  tag_service.filter_by_tag([], [], 0, Number.MAX_VALUE, getAllResourcesCallback);
 	
 });
 

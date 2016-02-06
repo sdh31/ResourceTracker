@@ -14,7 +14,7 @@ var smtpConfig = {
 
 var transporter = nodemailer.createTransport(smtpConfig);
 
-var setConfigsAndSend = function(user, resource_name) {
+var setConfigsAndSendReservationStartingEmail = function(user, resource_name) {
     var mailOptions = {
 	    from: 'Hypotheticorp LLC <asdf@gmail.com>', // sender address
 	    to: user.email_address, // list of receivers
@@ -23,6 +23,22 @@ var setConfigsAndSend = function(user, resource_name) {
 	    html: '' // html body
     };
 
+    sendEmail(mailOptions);
+};
+
+var setConfigsAndSendReservationDeletedEmail = function(user, resource_name, reservation) {
+    var mailOptions = {
+	    from: 'Hypotheticorp LLC <asdf@gmail.com>', // sender address
+	    to: user.email_address, // list of receivers
+	    subject: 'Your reservation of ' + resource_name + ' has been deleted' , // Subject line
+	    text: 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation of ' + resource_name + ', which has been scheduled for ' + new Date(reservation.start_time) + ' has been deleted', // plaintext body
+	    html: '' // html body
+    };
+
+    sendEmail(mailOptions);
+};
+
+var sendEmail = function(mailOptions) {
     transporter.sendMail(mailOptions, function(error, info){
 	    if(error){
 		    return console.log(error);
@@ -32,6 +48,10 @@ var setConfigsAndSend = function(user, resource_name) {
 };
 
 module.exports = function(agenda) {
+
+    agenda.define('notify on delete reservation', function(job) {
+        setConfigsAndSendReservationDeletedEmail(job.attrs.data.user, job.attrs.data.resource_name, job.attrs.data.reservation);        
+    });
 	// job.attrs.data has information regarding the job
 	agenda.define('send email', function(job) {
 
@@ -88,7 +108,7 @@ module.exports = function(agenda) {
 
 
         var resourceNameQueryCallback = function (userInfo, resource_name) {
-		    setConfigsAndSend(userInfo, resource_name);
+		    setConfigsAndSendReservationStartingEmail(userInfo, resource_name);
         };
 	});
 }
