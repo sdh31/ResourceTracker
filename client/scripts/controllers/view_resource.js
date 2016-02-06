@@ -171,10 +171,10 @@ angular.module('resourceTracker')
             var testDate = new Date();
             console.log(testDate.valueOf());
 
-            var startDate = new Date(2016, 1, 4, 18, 50);
-            var endDate = new Date(2016, 1, 4, 18, 51);
+            var startDate = new Date(2016, 1, 7, 18, 53);
+            var endDate = new Date(2016, 1, 7, 18, 54);
             var reservation = {
-                resource_id: 1,
+                resource_id: 2,
                 start_time: startDate.valueOf(),
                 end_time: endDate.valueOf()
             };

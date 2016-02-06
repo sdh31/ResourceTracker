@@ -73,7 +73,7 @@ router.delete('/', function(req, res, next){
     res.sendStatus(200);
   }
 
-  tag_service.delete_resource_tag_pairs_by_resource(req.query,delete_resource_callback, reservation_service.delete_reservation_by_resource);
+  res_service.delete_resource_by_id(req.query, delete_resource_callback);
 });
 
 router.get('/all', function(req, res, next) {

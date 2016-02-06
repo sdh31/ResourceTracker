@@ -1,6 +1,7 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var tag_service = require('../services/tags');
+var agenda = require('./agenda');
 
 function get_resource_by_name(resource, callback){
     /*
@@ -96,22 +97,57 @@ deletes resource row given id of the resource
 id:id of resource to delete
 
 */
-var id = resource.resource_id;
-    var query = squel.delete()
-        .from("resource")
-        .where("resource_id = " + id )
-        .toString();
-        var row_count = 0;
-        console.log(query)
-    db_sql.connection.query(query)
+    var id = resource.resource_id;
+
+    var checkReservationsOnResourceQuery = squel.select().from("reservation").left_join("user_reservation", null, "reservation.reservation_id = user_reservation.reservation_id").left_join("resource", null, "reservation.resource_id = resource.resource_id").left_join("user", null, "user_reservation.user_id = user.user_id").where("reservation.resource_id = '" + id + "'").toString();
+
+    console.log(checkReservationsOnResourceQuery);
+
+    db_sql.connection.query(checkReservationsOnResourceQuery)
         .on('result', function (row) {
-            row_count ++;
+            var info = {
+                resource_name: row.name,
+                user: {
+                    username: row.username,
+                    first_name: row.first_name,
+                    email_address: row.email_address,
+                    last_name: row.last_name
+                },
+                reservation: {
+                    start_time: row.start_time,
+                    end_time: row.end_time
+                }
+            };
+            
+            var currentTime = new Date();
+
+            if (currentTime.valueOf() <= info.reservation.start_time) {
+                agenda.now('notify on delete reservation', info);
+            }
         })
+        .on('error', function (err) {
+            console.log("error in check reservations for delete resource " + err);
+           // callback({error: true, err: err});
+        })
+        .on('end', function (){
+            deleteResource(id, callback);
+        });
+}
+
+var deleteResource = function(resource_id, callback) {
+
+    var deleteQuery = squel.delete()
+    .from("resource")
+    .where("resource_id = " + resource_id)
+    .toString();
+    console.log(deleteQuery);
+    
+    db_sql.connection.query(deleteQuery)
         .on('error', function (err) {
             callback({error: true, err: err});
         })
         .on('end', function (){
-                callback({error: false});
+            callback({error: false});
         });
 }
 
