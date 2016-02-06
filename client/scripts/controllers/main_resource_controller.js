@@ -9,14 +9,14 @@ angular.module('resourceTracker')
         $scope.activeResourcePanel = 'resourceCreatePanel';
 
         $scope.enableResourceCreatePanel = function() {
-            this.clearSuccess();
-            this.clearError();
+            $scope.clearSuccess();
+            $scope.clearError();
             $scope.activeResourcePanel = $scope.resourcePanels.resourceCreatePanel;
         };
 
         $scope.enableResourceViewPanel = function() {
-            this.clearSuccess();
-            this.clearError();
+            $scope.clearSuccess();
+            $scope.clearError();
             $scope.activeResourcePanel = $scope.resourcePanels.resourceViewPanel;
         };
      
