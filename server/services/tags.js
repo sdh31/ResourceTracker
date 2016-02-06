@@ -257,7 +257,11 @@ var organizeResources = function(resources) {
         var thisReservation = {
             reservation_id: thisResource.reservation_id,
             start_time: thisResource.start_time,
-            end_time: thisResource.end_time
+            end_time: thisResource.end_time,
+            username: thisResource.username,
+            first_name: thisResource.first_name,
+            last_name: thisResource.last_name,
+            user_id: thisResource.user_id
         };
 		var index = resourceExists(thisResource, resourcesToSend);
 		if (index != -1) {
@@ -304,10 +308,16 @@ var createIncludedQuery = function(includedTags, start_time, end_time) {
         .field("reservation.reservation_id")
         .field("reservation.start_time")
         .field("reservation.end_time")
+        .field("user.username")
+        .field("user.first_name")
+        .field("user.last_name")
+        .field("user.user_id")
 		.from("resource")
         .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")		
         .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")		
         .left_join("reservation", null, "reservation.resource_id = resource.resource_id AND reservation.start_time > " + start_time + " AND reservation.end_time < " + end_time)
+        .left_join("user_reservation", null, "reservation.reservation_id = user_reservation.reservation_id")
+        .left_join("user", null, "user_reservation.user_id = user.user_id")
 		.where(included_filter).toString();
 };
 

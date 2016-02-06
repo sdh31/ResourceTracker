@@ -171,18 +171,18 @@ angular.module('resourceTracker')
             var testDate = new Date();
             console.log(testDate.valueOf());
 
-            var startDate = new Date(2016, 1, 4, 18, 47);
-            var endDate = new Date(2016, 1, 4, 18, 48);
+            var startDate = new Date(2016, 1, 4, 18, 50);
+            var endDate = new Date(2016, 1, 4, 18, 51);
             var reservation = {
                 resource_id: 1,
                 start_time: startDate.valueOf(),
                 end_time: endDate.valueOf()
             };
-           // $http.put('/reservation', reservation).then(function(response) {
-			//	console.log(response);
-            //}, function(error) {
-		//		console.log(error);
-          //  });
+            $http.put('/reservation', reservation).then(function(response) {
+				console.log(response);
+            }, function(error) {
+				console.log(error);
+            });
 		};
 
 		getAllResources();
