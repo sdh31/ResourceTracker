@@ -5,7 +5,7 @@ angular
 	.config(function ($routeProvider) {
     	$routeProvider
             .when('/login', {
-        		    templateUrl: '/views/login.html'
+                templateUrl: '/views/login.html'
                 // NOTE: do not include controller for this templateUrl so it can default to the same main_controller as index.html
             })
             .when('/register', {
@@ -22,6 +22,10 @@ angular
             .when('/reservation', {
                 templateUrl: '/views/reservation.html',
                 controller: 'ReservationCtrl'
+            })
+            .when('/create_reservation', {
+                templateUrl: '/views/create_reservation.html',
+                controller: 'CreateReservationCtrl'
             })
             .otherwise({
       		    redirectTo: '/login'

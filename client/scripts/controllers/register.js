@@ -29,9 +29,7 @@ angular.module('resourceTracker')
                                 failedRegisterAlert: 'Error when registering user.'
                             };
 
-        $scope.alertMessage = '';
         $scope.successfulRegisterMessage = 'User created successfully.';
-        $scope.successfulRegister = false;
 
         $scope.register = function() {
             if (!validate()) {
@@ -39,12 +37,10 @@ angular.module('resourceTracker')
             }
 
             $http.put('/user', $scope.newUser).then(function(response) {
-                $scope.alertMessage = '';
-                $scope.successfulRegister = true;
+                $scope.addSuccess($scope.successfulRegisterMessage);
                 initializeNewUser();
             }, function(error) {
-                $scope.alertMessage = registerAlerts.failedRegisterAlert;
-                $scope.successfulRegister = false;
+                $scope.addError(registerAlerts.failedRegisterAlert);
             });
 
   	     };
@@ -62,7 +58,7 @@ angular.module('resourceTracker')
 
          var validateNonEmptyField = function(field, errorMessage) {
             if (field.length == 0) {
-                $scope.alertMessage = errorMessage;
+                $scope.addError(errorMessage);
                 return false;
             }
             return true;
@@ -70,26 +66,14 @@ angular.module('resourceTracker')
 
          var validatePassword = function() {
             if ($scope.newUser.password.length < 5) {
-                $scope.alertMessage = registerAlerts.passwordLengthAlert
+                $scope.addError(registerAlerts.passwordLengthAlert);
                 return false;
             }
             if ($scope.newUser.password != $scope.newUser.confirmPassword) {
-                $scope.alertMessage = registerAlerts.passwordMatchAlert;
+                $scope.addError(registerAlerts.passwordMatchAlert);
                 return false;
             }
             return true;
-         };
-
-         $scope.activeRegisterAlert = function() {
-            return $scope.alertMessage.length > 0;
-         };
-
-		 $scope.clearAlert = function() {
-			$scope.alertMessage = '';
-		 };
-
-         $scope.clearSuccess = function() {
-            $scope.successfulRegister = false;
          };
      
      });

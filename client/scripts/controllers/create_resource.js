@@ -13,6 +13,7 @@ angular.module('resourceTracker')
 
 		initializeNewResource();
 		$scope.activeTag = '';
+		$scope.onCreateResourceSuccessMessage = "Created Resource!";
 
 		$scope.addCreateTag = function() {
 			var initialTagLength = $scope.newResource.tags.length;
@@ -22,7 +23,7 @@ angular.module('resourceTracker')
 
 			// if length of tag array increases by 1, then successful add
 			if ($scope.newResource.tags.length == initialTagLength + 1) {
-				$scope.turnOffError();
+				$scope.clearError();
 				$scope.activeTag = '';
 			}
 		};
@@ -34,8 +35,7 @@ angular.module('resourceTracker')
 		$scope.createResource = function() {
 			var self = this;
 			resourceService.createResource($scope.newResource).then(function(response) {
-				$scope.success.value = true;
-				$scope.turnOffError();
+				$scope.addSuccess($scope.onCreateResourceSuccessMessage);
 				initializeNewResource();
 			}, function(alertMessage) {
 				$scope.addError(alertMessage);

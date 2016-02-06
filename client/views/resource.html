@@ -38,10 +38,10 @@
  	</div>
  	<div class="alert alert-danger" ng-show="hasError.value">
 		<strong>Warning:</strong> {{alertMessage.value}}
-		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="turnOffError()"></a>
+		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
 	</div>
-	<div class="alert alert-success" ng-show="success.value">
-		<strong>Success:</strong> created resource!
+	<div class="alert alert-success" ng-show="hasSuccess.value">
+		<strong>Success:</strong> {{successMessage.value}}
 		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
 	</div>
 </div>
