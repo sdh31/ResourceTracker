@@ -3,6 +3,9 @@
 angular.module('resourceTracker')
     .controller('RegisterCtrl', function ($scope, $http) {
 
+        $scope.clearError();
+        $scope.clearSuccess();
+        
         var initializeNewUser = function() {
             $scope.newUser =  {
                 firstName: '',

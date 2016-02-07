@@ -3,6 +3,10 @@
 angular.module('resourceTracker')
     .controller('ViewResourceCtrl', function ($scope, $http, $location, resourceService) {
         
+
+        $scope.clearError();
+        $scope.clearSuccess();
+
 		$scope.allResources = [];
 		$scope.selectedResource = {};
 		$scope.editingResource = {};

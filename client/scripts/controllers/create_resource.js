@@ -3,6 +3,9 @@
 angular.module('resourceTracker')
     .controller('CreateResourceCtrl', function ($scope, $http, $location, resourceService) {
 
+    	$scope.clearError();
+        $scope.clearSuccess();
+
 		var initializeNewResource = function() {
 			$scope.newResource = {
 				name: '',

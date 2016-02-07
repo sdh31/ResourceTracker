@@ -1,23 +1,26 @@
-<div class="input-group" id="login" aria-describedby="sizing-addon3">
-	Pick a Start Time: 
-	<input type="datetime-local" id="exampleInput" name="input" ng-model="startTime" placeholder="yyyy-MM-ddTHH:mm:ss"required />
-	<br><br><br>
-	Pick an End Time:
-	<input type="datetime-local" id="exampleInput" name="input" ng-model="endTime" placeholder="yyyy-MM-ddTHH:mm:ss"required />
-	<br><br><br>
-	<span ng-dropdown-multiselect="" options="allTags" selected-model="tagsToInclude"
-	 	 extra-settings="{enableSearch: true}"
-	 	 translation-texts="tagIncludeTranslationText"
-	 	 style="vertical-align:top;"></span>
-	<span ng-dropdown-multiselect="" options="allTags" selected-model="tagsToExclude"
-	 	 extra-settings="{enableSearch: true}"
-	 	 translation-texts="tagExcludeTranslationText"
-	 	 style="vertical-align:top;"></span><br>
-	<button type="button" class="btn btn-default btn-sm" ng-click="filterReservations()">Filter Reservations</button>
-	<br><br>
-	<div class="alert alert-danger" ng-show="hasError.value">
-		<strong>Warning:</strong> {{alertMessage.value}}
-		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
+<div class="input-group panel panel-default" id="login" aria-describedby="sizing-addon3">
+	<div class="panel-body">
+		<h5>Pick a Start Time: </h5>
+		<input type="datetime-local" id="exampleInput" name="input" ng-model="startTime" placeholder="yyyy-MM-ddTHH:mm:ss"required />
+		<br><br>
+		<h5>Pick an End Time: </h5>
+		<input type="datetime-local" id="exampleInput" name="input" ng-model="endTime" placeholder="yyyy-MM-ddTHH:mm:ss"required />
+		<br><br>
+		<span ng-dropdown-multiselect="" options="allTags" selected-model="tagsToInclude"
+		 	 extra-settings="{enableSearch: true}"
+		 	 translation-texts="tagIncludeTranslationText"
+		 	 style="vertical-align:top;"></span>
+		<span ng-dropdown-multiselect="" options="allTags" selected-model="tagsToExclude"
+		 	 extra-settings="{enableSearch: true}"
+		 	 translation-texts="tagExcludeTranslationText"
+		 	 style="vertical-align:top;"></span><br>
+		<br>
+		<button type="button" class="btn btn-default btn-md" ng-click="filterReservations()">Filter Reservations</button>
+		<br><br>
+		<div class="alert alert-danger" ng-show="hasError.value">
+			<strong>Warning:</strong> {{alertMessage.value}}
+			<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
+		</div>
 	</div>
 </div>
 <br><br><br>
