@@ -14,6 +14,7 @@ var session = require('express-session');
 var redis = require('redis');
 var redis_store = require('connect-redis')(session);
 var client = redis.createClient();
+var sqlinjection = require('sql-injection');
 
 var views = require('./routes/views');
 var tag_routes = require('./routes/tags');
@@ -26,6 +27,7 @@ var style_routes = require('./routes/styles');
 var initialize_tables = require('./services/initialize_tables');
 var create_admin = require('./services/create_admin');
 
+//app.use(sqlinjection);
 app.use(body_parser.json());
 app.use(cookie_parser());
 app.use(session({
