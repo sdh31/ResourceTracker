@@ -19,9 +19,9 @@ angular
                 templateUrl: '/views/resource.html',
                 controller: 'MainResourceCtrl'
             })
-            .when('/reservation', {
-                templateUrl: '/views/reservation.html',
-                controller: 'ReservationCtrl'
+            .when('/filter_reservation', {
+                templateUrl: '/views/filter_reservation.html',
+                controller: 'FilterReservationCtrl'
             })
             .when('/create_reservation', {
                 templateUrl: '/views/create_reservation.html',

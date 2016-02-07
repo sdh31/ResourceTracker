@@ -18,8 +18,8 @@
     <script src="scripts/controllers/view_resource.js"></script>
     <script src="scripts/controllers/create_resource.js"></script>
     <script src="scripts/services/resource.js"></script>
-    <script src="scripts/controllers/reservation.js"></script>
-    <script src="scripts/controllers/timeline.js"></script>
+    <script src="scripts/controllers/filter_reservation.js"></script>
+    <script src="scripts/services/timeline.js"></script>
     <script src="scripts/controllers/create_reservation.js"></script>
 
     <link rel="stylesheet" href="styles/main.css"/>
@@ -47,7 +47,7 @@
             <ul class="nav nav-pills pull-right">
                 <li><button class="btn btn-default btn-sm" ng-show="isAdmin()" ng-click="goToRegisterPage()">Register User</button></li>
                 <li><button class="btn btn-default btn-sm" ng-show="isAdmin()" ng-click="goToResourcePage()">Resources</button></li>
-                <li><button class="btn btn-default btn-sm" ng-show="isAdmin()" ng-click="goToReservationPage()">Reservation</button></li>
+                <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="goToFilterReservationPage()">Filter Reservation</button></li>
                 <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="goToCreateReservationPage()">Create Reservation</button><li>
                 <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="logout()">Logout</button><li>
                 <li><button class="btn btn-default btn-sm" ng-click="goToContactPage()">Contact</button></li>
