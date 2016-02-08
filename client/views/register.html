@@ -1,25 +1,28 @@
-<div class="input-group" id="login" aria-describedby="sizing-addon3">
-	<input type="text" class="form-control" placeholder="first name" ng-model="newUser.firstName"><br>
-	<input type="text" class="form-control" placeholder="last name" ng-model="newUser.lastName"><br>
-	<input type="text" class="form-control" placeholder="username" ng-model="newUser.username"><br>
-	<input type="text" class="form-control" placeholder="email address" ng-model="newUser.email"><br>
+<div class="input-group panel panel-default" id="login" aria-describedby="sizing-addon3">
+	<div class="panel-body">
+		<h4 style="text-align: center;">User Registration</h4>
+		<input type="text" class="form-control" placeholder="first name" ng-model="newUser.firstName"><br>
+		<input type="text" class="form-control" placeholder="last name" ng-model="newUser.lastName"><br>
+		<input type="text" class="form-control" placeholder="username" ng-model="newUser.username"><br>
+		<input type="text" class="form-control" placeholder="email address" ng-model="newUser.email"><br>
 
-     <select class="form-control" ng-model="newUser.permission_level">
-         <option value="" ng-selected="true"> -- Permission Level -- </option>
-         <option ng-repeat="role in permission_levels" value="{{role}}"
-          		 ng-selected="{{newUser.permission_level === role}}">{{role}}</option>
-    </select>
+	     <select class="form-control" ng-model="newUser.permission_level">
+	         <option value="" ng-selected="true"> -- Permission Level -- </option>
+	         <option ng-repeat="role in permission_levels" value="{{role}}"
+	          		 ng-selected="{{newUser.permission_level === role}}">{{role}}</option>
+	    </select>
 
-	<input type="password" class="form-control" placeholder="password" ng-model="newUser.password"><br>
-	<input type="password" class="form-control" placeholder="confirm password" ng-model="newUser.confirmPassword"><br>
-	<button type="button" class="btn btn-default btn-sm" ng-click="register()">Register</button>
- 	<div class="alert alert-danger" ng-show="hasError.value">
-		<strong>Warning:</strong> {{alertMessage.value}}
-		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
-	</div>
-	<div class="alert alert-success" ng-show="hasSuccess.value">
-		<strong>Success:</strong> {{successMessage.value}}
-		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
+		<input type="password" class="form-control" placeholder="password" ng-model="newUser.password"><br>
+		<input type="password" class="form-control" placeholder="confirm password" ng-model="newUser.confirmPassword"><br>
+		<button type="button" class="btn btn-default btn-sm" ng-click="register()">Register</button>
+	 	<div class="alert alert-danger" ng-show="hasError.value">
+			<strong>Warning:</strong> {{alertMessage.value}}
+			<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
+		</div>
+		<div class="alert alert-success" ng-show="hasSuccess.value">
+			<strong>Success:</strong> {{successMessage.value}}
+			<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
+		</div>
 	</div>
 </div>
 

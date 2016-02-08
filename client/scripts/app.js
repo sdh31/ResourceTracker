@@ -24,8 +24,8 @@ angular
                 controller: 'FilterReservationCtrl'
             })
             .when('/create_reservation', {
-                templateUrl: '/views/create_reservation.html',
-                controller: 'CreateReservationCtrl'
+                templateUrl: '/views/manage_reservation.html',
+                controller: 'ManageReservationCtrl'
             })
             .otherwise({
       		    redirectTo: '/login'
@@ -37,6 +37,5 @@ angular
                 $templateCache.remove(current.templateUrl);
             }
          });
-
     });
 

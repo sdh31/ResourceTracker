@@ -3,11 +3,14 @@
 angular.module('resourceTracker')
     .controller('FilterReservationCtrl', function ($scope, $http, timelineService) {
 
+        $scope.clearError();
+        $scope.clearSuccess();
+
     	var currentTime = new Date();
     	$scope.startTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
-    							    currentTime.getDay(), currentTime.getHours(), currentTime.getMinutes());
+    							    currentTime.getDate(), currentTime.getHours(), currentTime.getMinutes());
     	$scope.endTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
-    							    currentTime.getDay(), currentTime.getHours(), currentTime.getMinutes());
+    							    currentTime.getDate(), currentTime.getHours(), currentTime.getMinutes());
 
     	$scope.selectedResource = {};
 
