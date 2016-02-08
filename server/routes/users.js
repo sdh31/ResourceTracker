@@ -6,11 +6,15 @@ var auth = require('../services/authorization');
 router.get('/', function(req, res, next){
 	//read user
 	var getUserCallback = function(result){
-		result.password = "";
-  		res.send(JSON.stringify(result));
+        if (result.error) {
+            res.send(403);
+        } else {
+		    result.password = "";
+      		res.send(JSON.stringify(result));
+        }
 	}
-	var username=req.session.user.username;
-	
+
+	var username=req.session.user.username;	
 	user_service.get_user(username, getUserCallback);
 });
 
@@ -48,22 +52,16 @@ router.post('/', function(req, res, next){
 });
 
 router.delete('/', function(req, res, next){
-	var deleteUserCallback = function(err) {
-		if (err.error == false) {
-			res.sendStatus(200);
-		} else {
-			// not sure of correct error code to send in this case
+	var deleteUserCallback = function(result) {
+		if (result.error) {
 			res.sendStatus(403);
+		} else {
+			res.sendStatus(200);
 		}
 	}
 
-	var username = req.body.username;
-	if (username == null || username == "") {
-		res.sendStatus(403);
-	} else {
-
-		user_service.delete_user(username, deleteUserCallback);
-	}
+	var username = req.query["username"];
+	user_service.delete_user(username, deleteUserCallback);
 });
 
 router.post('/signin', function(req, res, next){

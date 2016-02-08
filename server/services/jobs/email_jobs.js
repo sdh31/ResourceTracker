@@ -80,7 +80,6 @@ module.exports = function(agenda) {
             db_sql.connection.query(reservationExistsQuery)
                 .on('result', function (row) {
                     if (row.start_time == job.attrs.data.reservation.start_time) {
-
                         reservationExistsCallback(userInfo);
                     }
                 })
