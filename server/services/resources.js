@@ -1,7 +1,7 @@
 var db_sql = require('./db_wrapper');
 var tag_service = require('../services/tags');
 var agenda = require('./agenda');
-var resource_query_builder = require('./resource_query_builder');
+var resource_query_builder = require('./query_builders/resource_query_builder');
 
 function get_resource_by_id(resource, callback){
     /*

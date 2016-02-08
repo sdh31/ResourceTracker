@@ -2,13 +2,14 @@ var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var bcrypt = require('bcrypt');
 var tag_service = require('./tags');
+var user_query_builder = require('./query_builders/user_query_builder');
 
 function create_user(user, callback){
     //Creates user given all parameters
     bcrypt.genSalt(10, function(err, salt) {
         bcrypt.hash(user.password, salt, function(err, hash) {
             // Store hash in your password DB.
-            var createUserQuery = buildQueryForCreateUser(user, hash);
+            var createUserQuery = user_query_builder.buildQueryForCreateUser(user, hash);
 
             db_sql.connection.query(createUserQuery)
                 .on('result', function (row) {
@@ -29,7 +30,7 @@ function get_user(username, callback){
         return;
     }
 
-    var getUserQuery = buildQueryForGetUser(username);
+    var getUserQuery = user_query_builder.buildQueryForGetUser(username);
     console.log(getUserQuery);
 
     var rowCount = 0;
@@ -75,7 +76,7 @@ function delete_user(username, callback) {
         return;
     }
 
-    var deleteUserQuery = buildQueryForDeleteUser(username);
+    var deleteUserQuery = user_query_builder.buildQueryForDeleteUser(username);
 
     db_sql.connection.query(deleteUserQuery)
         .on('error', function (err) {
@@ -140,85 +141,6 @@ function compare_passwords(password, user, callback) {
         callback(res, user);
     });
 }
-
-var buildQueryForCreateUser = function(user, hash) {
-    return squel.insert().into("user")
-            .set("username", user.username)
-            .set("password", hash)
-            .set("permission_level", user.permission_level)
-            .set("first_name", user.firstName)
-            .set("last_name", user.lastName)
-            .set("email_address", user.email)
-            .toString();
-};
-
-var buildQueryForGetUser = function(username) {
-   return squel.select()
-                .field("resource.name")
-                .field("resource.resource_id")
-                .field("resource.description")
-                .field("resource.max_users")
-                .field("resource.created_by")
-                .field("tag.tag_name")
-                .field("reservation.reservation_id")
-                .field("reservation.start_time")
-                .field("reservation.end_time")
-                .field("user.username")
-                .field("user.first_name")
-                .field("user.last_name")
-                .field("user.user_id")
-                .field("user.password")
-                .field("user.permission_level")
-                .from("user")
-                .left_join("user_reservation", null, "user.user_id = user_reservation.user_id")
-                .left_join("reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-                .left_join("resource", null, "reservation.resource_id = resource.resource_id")
-                .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")
-                .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")
-                .where("username = '" + username + "'")
-                .toString();
-};
-
-var buildQueryForDeleteUser = function(username) {
-    return squel.delete()
-                .from("user")
-                .where("username = '" + username + "'")
-                .toString();
-};
-
-var buildQueryForGetUser = function(username) {
-   return squel.select()
-                .field("resource.name")
-                .field("resource.resource_id")
-                .field("resource.description")
-                .field("resource.max_users")
-                .field("resource.created_by")
-                .field("tag.tag_name")
-                .field("reservation.reservation_id")
-                .field("reservation.start_time")
-                .field("reservation.end_time")
-                .field("user.username")
-                .field("user.first_name")
-                .field("user.last_name")
-                .field("user.user_id")
-                .field("user.password")
-                .field("user.permission_level")
-                .from("user")
-                .left_join("user_reservation", null, "user.user_id = user_reservation.user_id")
-                .left_join("reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-                .left_join("resource", null, "reservation.resource_id = resource.resource_id")
-                .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")
-                .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")
-                .where("username = '" + username + "'")
-                .toString();
-};
-
-var buildQueryForDeleteUser = function(username) {
-    return squel.delete()
-                .from("user")
-                .where("username = '" + username + "'")
-                .toString();
-};
 
 module.exports = {
     create_user: create_user,
