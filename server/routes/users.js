@@ -9,7 +9,7 @@ router.get('/', function(req, res, next){
 		result.password = "";
   		res.send(JSON.stringify(result));
 	}
-	var username=req.query["username"];
+	var username=req.session.user.username;
 	
 	user_service.get_user(username, getUserCallback);
 });
