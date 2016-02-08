@@ -66,7 +66,7 @@ router.post('/', function(req, res, next){
     }
 }
 
-  var reservation = req.query;
+  var reservation = req.body;
   if(!("start_time" in reservation) || !("end_time" in reservation) || !("reservation_id" in reservation)){
         res.sendStatus(400);
     }
