@@ -3,7 +3,7 @@ var router = express.Router();
 var user_service = require('../services/users');
 var auth = require('../services/authorization');
 
-router.get('/', function(req, res, next){
+router.get('/', auth.is('user'), function(req, res, next){
 	//read user
 	var getUserCallback = function(result){
         if (result.error) {
@@ -35,7 +35,7 @@ router.put('/', auth.is('admin'), function(req, res, next){
 	}
 });
 
-router.post('/', function(req, res, next){
+router.post('/', auth.is('user'), function(req, res, next){
 	//update user
 
 	var updateUserCallback = function(result) {
@@ -51,7 +51,7 @@ router.post('/', function(req, res, next){
 	user_service.update_user(req.body, updateUserCallback);
 });
 
-router.delete('/', function(req, res, next){
+router.delete('/', auth.is('user'), function(req, res, next){
 	var deleteUserCallback = function(result) {
 		if (result.error) {
 			res.sendStatus(403);
@@ -94,7 +94,7 @@ router.post('/signin', function(req, res, next){
 	user_service.get_user(username, getUserCallback);
 });
 
-router.post('/signout', function(req, res, next){
+router.post('/signout', auth.is('user'), function(req, res, next){
 
 	req.session.destroy(function() {
 		res.type('text/plain');

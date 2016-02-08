@@ -1,8 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var reservation_service = require('../services/reservations');
+var auth = require('../services/authorization');
 
-router.get('/', function(req, res, next){
+router.get('/', auth.is('user'), function(req, res, next){
     var request_callback = function(result){
         if(result.error == true){
             res.status(400).json(result);
@@ -24,7 +25,7 @@ router.get('/', function(req, res, next){
         request_callback);
 });
 
-router.put('/', function(req, res, next){
+router.put('/', auth.is('user'), function(req, res, next){
 
     var request_callback = function(result){
         if(result.error == true){
@@ -49,7 +50,7 @@ router.put('/', function(req, res, next){
     }
 });
 
-router.post('/', function(req, res, next){
+router.post('/', auth.is('user'), function(req, res, next){
 
     var request_callback = function(result){
         if(result.error == true){
@@ -72,13 +73,11 @@ router.post('/', function(req, res, next){
     }
 });
 
-router.delete('/', function(req, res, next){
-    function request_callback(result){
+router.delete('/', auth.is('user'), function(req, res, next){
+    var request_callback = function(result){
         if(result.error == true){
-            console.log(result.err)
             res.sendStatus(403);
         } else {
-            console.log("success")
             res.sendStatus(200);
         }
     };
