@@ -166,11 +166,11 @@ angular.module('resourceTracker')
 
 			var toSend = {includedTags: includedTags, excludedTags: excludedTags, start_time: 0, end_time: Number.MAX_VALUE};
 
-			$http.post('/tag/filter', toSend).then(function(response) {	
-				console.log(response.data);
-            }, function(error) {
-				console.log(error);
-			});
+			//$http.post('/tag/filter', toSend).then(function(response) {	
+				//console.log(response.data);
+           // }, function(error) {
+			///	console.log(error);
+		///	});
 
             var testDate = new Date();
             console.log(testDate.valueOf());
@@ -182,11 +182,11 @@ angular.module('resourceTracker')
                 start_time: startDate.valueOf(),
                 end_time: endDate.valueOf()
             };
-            $http.put('/reservation', reservation).then(function(response) {
-				console.log(response);
-            }, function(error) {
-				console.log(error);
-            });
+          //  $http.put('/reservation', reservation).then(function(response) {
+			//	console.log(response);
+            //}, function(error) {
+				//console.log(error);
+            //});
 		};
 
 		getAllResources();

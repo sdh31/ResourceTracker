@@ -351,5 +351,6 @@ module.exports = {
     filter_by_tag:filter_by_tag,
 	get_all_tags: get_all_tags,
     remove_tag_from_object:remove_tag_from_object,
-    delete_resource_tag_pairs_by_resource:delete_resource_tag_pairs_by_resource
+    delete_resource_tag_pairs_by_resource:delete_resource_tag_pairs_by_resource,
+	organizeResources : organizeResources
 }

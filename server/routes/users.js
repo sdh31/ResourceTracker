@@ -8,7 +8,6 @@ router.get('/', function(req, res, next){
 	var getUserCallback = function(result){
 		result.password = "";
   		res.send(JSON.stringify(result));
-    	//need to add json response
 	}
 	var username=req.query["username"];
 	
@@ -24,7 +23,6 @@ router.put('/', auth.is('admin'), function(req, res, next){
 			res.sendStatus(200);
 		}
   	}
-  	//These might need to be changed to json body fields
 
 	if(!('username' in req.body) || !('password' in req.body) || !('permission_level' in req.body)){
 	  	res.sendStatus(401);
