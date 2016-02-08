@@ -9,7 +9,7 @@
 		<input type="datetime-local" id="exampleInput" name="input" ng-model="endReservationTime" placeholder="yyyy-MM-ddTHH:mm:ss"required />
 		<div class="control-group" style="margin-top: 10px;">
 			<span ng-dropdown-multiselect="" options="allResources" selected-model="resourceToCreate"
-		 	 extra-settings="{enableSearch: true, selectionLimit: 1}"
+		 	 extra-settings="{enableSearch: true, selectionLimit: 1, smartButtonMaxItems:1}"
 		 	 translation-texts="{buttonDefaultText: 'Select a Resource'}"></span>
 			<button type="button" class="btn btn-default btn-md" ng-click="createReservation()">Create Reservation</button>
 		</div>
@@ -20,13 +20,14 @@
 		<h4 style="text-align: center;">Manage Reservations</h4>
 		<h5>Select a Resource</h5>
 		<span ng-dropdown-multiselect="" options="allUserResources" selected-model="resourceReservationToModify"
-		 	 extra-settings="{enableSearch: true, selectionLimit: 1}"
+		 	 extra-settings="{enableSearch: true, selectionLimit: 1, smartButtonMaxItems: 1}"
 		 	 translation-texts="{buttonDefaultText: 'Select a Resource'}"
 		 	 events="{onItemSelect: onResourceReservationToggle, onItemDeselect: onResourceReservationToggle}"></span>
 		<h5>Select a Reservation for Your Resource</h5>
 		<span ng-dropdown-multiselect="" options="allReservationsForSelectedResource" selected-model="reservationToModify"
 		 	 extra-settings="{enableSearch: true, selectionLimit: 1}"
-		 	 translation-texts="{buttonDefaultText: 'Select a Reservation'}"></span>
+		 	 translation-texts="{buttonDefaultText: 'Select a Reservation'}"
+		 	 events="{onItemSelect: onReservationSelect}"></span>
 		<h5>Select a New Start Time:</h5> 
 		<input type="datetime-local" id="exampleInput" name="input" ng-model="newStartReservationTime" placeholder="yyyy-MM-ddTHH:mm:ss"required />
 		<h5>Select a New End Time:</h5> 

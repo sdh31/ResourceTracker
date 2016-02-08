@@ -26,6 +26,7 @@ angular.module('resourceTracker')
 				return;
 			}
 
+			$scope.currentTag = '';
 			oldName = $scope.selectedResource.name;
 			oldDescription = $scope.selectedResource.description;
 			oldTags = [];

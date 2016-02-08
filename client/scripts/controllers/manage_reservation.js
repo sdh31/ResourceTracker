@@ -34,12 +34,15 @@ angular.module('resourceTracker')
             // resource_id to array of reservations
             $scope.resourceReservationMap = {};
 
+            // reservation_id to obj with startTime & endTime attributes
+            $scope.reservationMap = {};
+
+
             // all resources found in database, so admin can use them to modify/delete
             $scope.allResources = [];
 
             // create resource dropdown model
             $scope.resourceToCreate = {}; 
-
 
             // all resources for a given user found in database
             $scope.allUserResources = [];
@@ -108,12 +111,20 @@ angular.module('resourceTracker')
             // go through map.....
             var id = $scope.resourceReservationToModify.id;
             $scope.resourceReservationMap[id].forEach(function(reservation) {
+                var startTime = new Date(reservation.start_time);
+                var endTime = new Date(reservation.end_time);
                 var res_id = reservation.reservation_id;
-                var res_label = 'Start Time: ' + new Date(reservation.start_time) + ' ' +
-                            'End Time: '   + new Date(reservation.end_time);
+                var res_label = 'Start Time: ' + startTime + ' End Time: '   + endTime;
                 var resObj = {id: res_id, label: res_label};
                 $scope.allReservationsForSelectedResource.push(resObj);
+                $scope.reservationMap[res_id] = {start_time: startTime, end_time: endTime};
             });
+        };
+
+        $scope.onReservationSelect = function(item) {
+            var id = item.id;
+            $scope.newStartReservationTime = $scope.reservationMap[id].start_time;
+            $scope.newEndReservationTime = $scope.reservationMap[id].end_time;
         };
 
         $scope.updateReservation = function() {
