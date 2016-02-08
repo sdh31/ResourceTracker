@@ -3,6 +3,10 @@
   border-bottom: 1px solid #e5e5e5;
 }
 
+.body {
+  padding: 25px 0 0 0;
+}
+
 #login {
   width: 350px ;
   margin-left: auto ;
@@ -11,6 +15,10 @@
   margin-bottom: auto;
 }
 
+.vertical-align {
+  display: flex;
+  align-items: center;
+}
 .tags .tag {
     border-radius: 6px;
     background-color: #EFEFEF;
