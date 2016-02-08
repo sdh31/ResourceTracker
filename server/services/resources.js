@@ -48,7 +48,6 @@ function create_resource(resource, callback){
 	db_sql.connection.query(query)
 		.on('result', function (row) {
             rowCount++;
-            console.log('This got sent!')
             callback(row);
         })
         .on('error', function (err) {

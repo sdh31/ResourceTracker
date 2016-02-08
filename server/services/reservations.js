@@ -44,6 +44,7 @@ function get_conflicting_reservations(user, reservation, callback, no_conflict_c
         .on('result', function (row) {
             row_count ++;
             console.log(row)
+            response_values.push(row)
             
      })
     .on('error', function (err) {
@@ -55,7 +56,7 @@ function get_conflicting_reservations(user, reservation, callback, no_conflict_c
         }
         else{
             //TODO: Going to need to change what we do here ... Maybe another callback field?
-            callback({error: true, err: 'conflict found!'})
+            callback({error: true, err: 'conflict found'})
         }
     });
 }
