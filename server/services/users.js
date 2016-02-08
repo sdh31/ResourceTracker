@@ -1,24 +1,17 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var bcrypt = require('bcrypt');
+var tag_service = require('./tags');
 
 function create_user(user, callback){
 	//Creates user given all parameters
     bcrypt.genSalt(10, function(err, salt) {
 		bcrypt.hash(user.password, salt, function(err, hash) {
             // Store hash in your password DB.
-			var query = squel.insert().into("user")
-	        .set("username", user.username)
-	        .set("password", hash)
-	        .set("permission_level", user.permission_level)
-			.set("first_name", user.firstName)
-			.set("last_name", user.lastName)
-			.set("email_address", user.email)
-	        .toString();
+			var createUserQuery = buildQueryForCreateUser(user, hash);
 
-            db_sql.connection.query(query)
+            db_sql.connection.query(createUserQuery)
 	            .on('result', function (row) {
-                    row.password = "";
                     callback(row);
                 })
                 .on('error', function (err) {
@@ -31,12 +24,14 @@ function create_user(user, callback){
 
 function get_user(username, callback){
 	//Check if user is valid 
+
 	var query = squel.select()
                     .field("resource.name")
                     .field("resource.resource_id")
                     .field("resource.description")
                     .field("resource.max_users")
                     .field("resource.created_by")
+                    .field("tag.tag_name")
                     .field("reservation.reservation_id")
                     .field("reservation.start_time")
                     .field("reservation.end_time")
@@ -49,9 +44,11 @@ function get_user(username, callback){
                     .from("user")
                     .left_join("user_reservation", null, "user.user_id = user_reservation.user_id")
                     .left_join("reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-                    .left_join("resource", null, "reservation.resource_id = resource.resource_id");
-	
+                    .left_join("resource", null, "reservation.resource_id = resource.resource_id")
+                    .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")
+                    .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")
 	if (username != null){
+        /// probably should exit if this is the case...
 		query = query.where("username = '" + username + "'");
 	}
 
@@ -59,22 +56,14 @@ function get_user(username, callback){
     console.log(query);
 
     var rowCount = 0;
-    var resultToSend = {};
+    var resources = [];
+    var userInfo = {};
+    
 	db_sql.connection.query(query)
 		.on('result', function (row) {
-            var thisReservation = {
-                reservation_id: row.reservation_id,
-                resource_id: row.resource_id,
-                resource_name: row.name,
-                description: row.description,
-                max_users: row.max_users,
-                created_by: row.created_by,
-                start_time: row.start_time,
-                end_time: row.end_time
-            };
             
             if (rowCount == 0) {
-                resultToSend = {    
+                userInfo = {    
                     user_id: row.user_id,
                     username: row.username,
                     first_name: row.first_name,
@@ -82,11 +71,10 @@ function get_user(username, callback){
                     email_address: row.email_address,
                     password: row.password,
                     permission_level: row.permission_level,
-                    reservations: thisReservation.reservation_id == null ? [] : [thisReservation]
+                    resources: []
                 };
-            } else {
-                resultToSend.reservations.push(thisReservation);
             }
+            resources.push(row);
             rowCount++;
             //callback(row);
         })
@@ -97,7 +85,8 @@ function get_user(username, callback){
             if (rowCount == 0) {
                 callback({error: true, empty: true});
             } else {
-                callback(resultToSend);
+                userInfo.resources = tag_service.organizeResources(resources);
+                callback(userInfo);
             }
          }
     );
@@ -173,6 +162,17 @@ function compare_passwords(password, user, callback) {
         callback(res, user);
     });
 }
+
+var buildQueryForCreateUser = function(user, hash) {
+    return squel.insert().into("user")
+	        .set("username", user.username)
+	        .set("password", hash)
+	        .set("permission_level", user.permission_level)
+			.set("first_name", user.firstName)
+			.set("last_name", user.lastName)
+			.set("email_address", user.email)
+	        .toString();
+};
 
 module.exports = {
 	create_user: create_user,
