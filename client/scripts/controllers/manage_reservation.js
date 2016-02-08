@@ -15,6 +15,9 @@ angular.module('resourceTracker')
         $scope.onReservationDeleteSuccess = "Reservation Deleted!";
         $scope.onReservationDeleteFailure = "Unable to delete the reservation. There was an error doing so.";
 
+        $scope.onReservationCreateInPast = "Unable to create the reservation. Please select a time in the present or future."
+        $scope.onReservationStartAfterEnd = "Unable to create the reservation. Please select a start time before the end time."
+        $scope.onReservationNoResource = "Unable to create the reservation. Please select a resource to reserve."
         // this function initializes all global data on this page. 
         var initializeResourceReservations = function() {
 
@@ -88,7 +91,9 @@ angular.module('resourceTracker')
         $scope.createReservation = function() {
             var reservationData = {start_time: $scope.startReservationTime.valueOf(),
                 end_time: $scope.endReservationTime.valueOf(), resource_id: $scope.resourceToCreate.id};
-
+            if(!validateCreateReservation(reservationData)){ 
+                return;
+            }
             $http.put('/reservation', reservationData).then(function(response) {
                 $scope.addSuccess($scope.onReservationCreateSuccess);
                 initializeResourceReservations();
@@ -97,6 +102,23 @@ angular.module('resourceTracker')
                 initializeResourceReservations();
             });
         };
+
+        var validateCreateReservation = function(reservationData) {
+            var curr = new Date();
+            var startDiff = curr.valueOf() - reservationData.start_time;
+            var endDiff = curr.valueOf() - reservationData.end_time;
+            if(startDiff >= 60000 || endDiff >= 60000){
+                $scope.addError($scope.onReservationCreateInPast);
+                return false;
+            } if(reservationData.start_time >= reservationData.end_time){
+                $scope.addError($scope.onReservationStartAfterEnd);
+                return false;
+            } if(!reservationData.resource_id){
+                $scope.addError($scope.onReservationNoResource);
+                return false;
+            }
+            return true;
+        }
 
         var populateResourceArray = function(resourceData, resourceArray) {
             resourceData.forEach(function(resource) {
