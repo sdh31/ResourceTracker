@@ -26,8 +26,7 @@ router.put('/', function(req, res, next){
             console.log(result.err)
             res.sendStatus(400);
         } else {
-            //res.write(JSON.stringify(result));
-            res.sendStatus(200);
+            res.status(200).json(result.results)
         }
     }
 
@@ -39,7 +38,7 @@ router.put('/', function(req, res, next){
             if ("tags" in req.body) {
                 tag_service.create_tag(res_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
             } else {
-                res.sendStatus(200);
+                res.status(200).write(result);
             }
         }
     }

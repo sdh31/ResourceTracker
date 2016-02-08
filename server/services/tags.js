@@ -27,7 +27,7 @@ function create_resource_tag_link(res_id, tag_id, callback){
             })
             .on('end', function () {
                 console.log("finished")
-                callback({error: false});
+                callback({error: false, results: {insert_id: res_id}});
             });
 }
 
