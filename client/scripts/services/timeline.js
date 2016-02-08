@@ -37,8 +37,14 @@ angular.module('resourceTracker')
         var dataTableRows = [];
         dataTableRows.push(defaultData);
 
+        // index of empty rows in the table. needed to remove color from the row
+        var emptyRows = [];
+        var rowIndex = 0;
         timelineData.resources.forEach(function(resource) {
+            var existsReservation = false;
+            rowIndex++;
             resource.reservations.forEach(function(reservation) {
+                existsReservation = true;
 
                 var resourceTooltip = "<div>" + 
                                         "<b>Start Time: </b> " + new Date(reservation.start_time) + "<br>" + 
@@ -52,19 +58,49 @@ angular.module('resourceTracker')
                 data.push('');              // this is necessary... it is a column label, google charts is weird and requires it.
                 data.push(resourceTooltip);
                 data.push(new Date(reservation.start_time));
-                data.push(new Date(reservation.end_time));
+
+                if (new Date(reservation.end_time) > endTime) {
+                    data.push(endTime);
+                } else {
+                    data.push(new Date(reservation.end_time));
+                }
                 dataTableRows.push(data);
             });
+            if (!existsReservation) {
+                var data = [];
+                data.push(resource.name);
+                data.push('');
+                data.push('');
+                data.push(startTime);
+                data.push(startTime);
+                dataTableRows.push(data);
+                emptyRows.push(rowIndex);
+            }
         });
 
 
         dataTable.addRows(dataTableRows);
+        var colorsChosen = [];
+        var grayColor = "#f9f9f9";
+        var redColor = "#b22222"
+        // push default description color
+        colorsChosen.push(grayColor);
+        for (var index = 1; index < dataTable.getNumberOfRows(); index++) {
+            if (emptyRows.indexOf(index) != -1) {
+                colorsChosen.push(grayColor);
+            } else {
+                colorsChosen.push(redColor);
+            }
+        }
 
         var options = {
             timeline: { colorByRowLabel: false },
-            avoidOverlappingGridLines: true,
+            avoidOverlappingGridLines: false,
             width: 1200,
-            tooltip: { isHtml: true }
+            tooltip: { isHtml: true },
+            colors: colorsChosen,
+            backgroundColor: grayColor,
+            alternatingRowStyle: false
         }
 
         chart.draw(dataTable, options);
