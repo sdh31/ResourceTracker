@@ -1,6 +1,9 @@
 import requests
 import json
 
+requests.packages.urllib3.disable_warnings()
+
+
 headers = {
 		"Content-Type:":'application/json'
 	}
@@ -13,21 +16,23 @@ def send_request(method, params, url):
 			method,
 			url = url,
 			params = params,
-			cookies = session
+			cookies = session,
+			verify = False
 		)
 	else:
 			response = requests.request(
 			method,
 			url = url,
 			json = params,
-			cookies = session
+			cookies = session,
+			verify = False
 		)
 	return response
 
 
 
 def login_to_session(username, password):
-	url = 'http://colab-sbx-202.oit.duke.edu/user/signin'
+	url = 'https://colab-sbx-202.oit.duke.edu/user/signin'
 	method = "POST"
 	
 	params = {
@@ -39,7 +44,7 @@ def login_to_session(username, password):
 	return send_request(method, params, url)
 
 def create_user(username, password, permission_level):
-	url = 'http://colab-sbx-202.oit.duke.edu/user'
+	url = 'https://colab-sbx-202.oit.duke.edu/user'
 	method = "PUT"
 	 
 
@@ -51,7 +56,7 @@ def create_user(username, password, permission_level):
 	return send_request(method, params, url)
 
 def update_user(username, password = None, permission_level = None):
-	url = 'http://colab-sbx-202.oit.duke.edu/user'
+	url = 'https://colab-sbx-202.oit.duke.edu/user'
 	method = "POST"
 	params['username'] = username
 	if password:
@@ -62,7 +67,7 @@ def update_user(username, password = None, permission_level = None):
 	return send_request(method, params, url)
 
 def get_user(username):
-	url = 'http://colab-sbx-202.oit.duke.edu/user'
+	url = 'https://colab-sbx-202.oit.duke.edu/user'
 	method = "GET"
 
 	params['username'] = username
@@ -70,7 +75,7 @@ def get_user(username):
 	return send_request(method, params, url)
 
 def delete_user(username):
-	url = 'http://colab-sbx-202.oit.duke.edu/user'
+	url = 'https://colab-sbx-202.oit.duke.edu/user'
 	method = "DELETE"
 
 	params['username'] = username
@@ -78,7 +83,7 @@ def delete_user(username):
 	return send_request(method, params, url)
 
 def create_resource(name, description, max_users, tags = None):
-	url = 'http://colab-sbx-202.oit.duke.edu/resource'
+	url = 'https://colab-sbx-202.oit.duke.edu/resource'
 	method = "PUT"
 
 	params = {
@@ -91,7 +96,7 @@ def create_resource(name, description, max_users, tags = None):
 	return send_request(method, params, url)
 
 def update_resource(id, name = None, description = None, max_users = None):
-	url = 'http://colab-sbx-202.oit.duke.edu/resource'
+	url = 'https://colab-sbx-202.oit.duke.edu/resource'
 	method = "POST"
 
 	params['resource_id'] = id
@@ -105,7 +110,7 @@ def update_resource(id, name = None, description = None, max_users = None):
 	return send_request(method, params, url)
 
 def delete_resource(id):
-	url = 'http://colab-sbx-202.oit.duke.edu/resource'
+	url = 'https://colab-sbx-202.oit.duke.edu/resource'
 	method = "DELETE"
 
 	params['resource_id'] = id
@@ -113,7 +118,7 @@ def delete_resource(id):
 	return send_request(method, params, url)
 
 def add_tag(resource_id, tags):
-	url = 'http://colab-sbx-202.oit.duke.edu/tag'
+	url = 'https://colab-sbx-202.oit.duke.edu/tag'
 	method = "PUT"
 
 	params['resource_id'] = resource_id
@@ -122,7 +127,7 @@ def add_tag(resource_id, tags):
 	return send_request(method, params, url)
 
 def remove_tags(resource_id, tags):
-	url = 'http://colab-sbx-202.oit.duke.edu/tag'
+	url = 'https://colab-sbx-202.oit.duke.edu/tag'
 	method = "POST"
 
 	params['resource_id'] = resource_id
@@ -131,7 +136,7 @@ def remove_tags(resource_id, tags):
 	return send_request(method, params, url)
 
 def create_reservation(resource_id, start, end):
-	url = 'http://colab-sbx-202.oit.duke.edu/reservation'
+	url = 'https://colab-sbx-202.oit.duke.edu/reservation'
 	method = "PUT"
 
 	params = {
@@ -143,7 +148,7 @@ def create_reservation(resource_id, start, end):
 	return send_request(method, params, url)
 
 def delete_reservation(reservation_id):
-	url = 'http://colab-sbx-202.oit.duke.edu/reservation'
+	url = 'https://colab-sbx-202.oit.duke.edu/reservation'
 	method = "DELETE"
 
 	params = {
@@ -153,11 +158,26 @@ def delete_reservation(reservation_id):
 	return send_request(method, params, url)
 
 def get_reservations(resource_id, start, end ,reservation_id = None):
-	url = 'http://colab-sbx-202.oit.duke.edu/reservation'
+	url = 'https://colab-sbx-202.oit.duke.edu/reservation'
 	method = "GET"
 
 	params = {
 		'resource_id': resource_id,
+		'start_time': start,
+		'end_time': end,
+	}
+	if reservation_id:
+		params['reservation_id'] = reservation_id
+
+	return send_request(method, params, url)
+
+def update_reservations(resource_id, start, end, reservation_id):
+	url = 'https://colab-sbx-202.oit.duke.edu/reservation'
+	method = "POST"
+
+	params = {
+		'resource_id': resource_id,
+		'reservation_id': reservation_id,
 		'start_time': start,
 		'end_time': end,
 	}

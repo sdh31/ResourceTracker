@@ -52,11 +52,12 @@ function get_conflicting_reservations(user, reservation, callback, no_conflict_c
      })
     .on('end', function (err){
         if (row_count == 0){
+            console.log("no conflict!")
             no_conflict_callback(user, reservation, callback);
         }
         else{
             //TODO: Going to need to change what we do here ... Maybe another callback field?
-            callback({error: true, err: 'conflict found'})
+            callback({error: false, results: response_values})
         }
     });
 }
@@ -103,7 +104,7 @@ function add_user_reservation_link(user, reservation, callback){
                     callback({error: true, err: err})
                 })
                 .on('end', function (err){
-                    callback({error:false})
+                    callback({error:false, insertId: reservation.reservation_id})
                 });
 }
 function delete_user_reservation_link(user, reservation, callback, success_callback){
@@ -161,7 +162,7 @@ function delete_reservation_by_resource(resource, callback, success_callback){
                 });
 }
 
-function update_reservation_by_id(reservation, callback){
+function update_reservation_by_id(user, reservation, callback){
     var query = squel.update()
         .table("reservation")
         .where("reservation_id=" + reservation.reservation_id)
@@ -175,7 +176,7 @@ function update_reservation_by_id(reservation, callback){
                 callback({error: true, err: err})
             })
             .on('end', function (err){
-                callback({error: false})
+                callback({error: false, insertId: reservation.reservationId})
             });
 
 

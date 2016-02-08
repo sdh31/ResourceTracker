@@ -6,10 +6,10 @@ var reservation_service = require('../services/reservations');
 router.get('/', function(req, res, next){
   var request_callback = function(result){
         if(result.error == true){
-            res.sendStatus(400);
+            res.status(400).json(result);
         }
         else{
-            res.send(result.body);
+            res.send(result);
         }
   }
 
@@ -18,7 +18,11 @@ router.get('/', function(req, res, next){
     if(!("start_time" in query) || !("end_time" in query) || !("resource_id" in query)){
         res.sendStatus(400);
     }
-    reservation_service.get_conflicting_reservations(req.query, request_callback, request_callback);
+    reservation_service.get_conflicting_reservations(
+        req.session.user,
+        req.query,
+        request_callback, 
+        request_callback);
 });
 
 router.put('/', function(req, res, next){
@@ -27,11 +31,11 @@ router.put('/', function(req, res, next){
   var request_callback = function(result){
         if(result.error == true){
             console.log(result.err)
-            res.sendStatus(403);
+            res.status(403).json(result);
         }
         else{
             console.log("success")
-            res.sendStatus(200);
+            res.status(200).json(result);
         }
     }
 
@@ -72,6 +76,7 @@ router.post('/', function(req, res, next){
     }
 
     reservation_service.get_conflicting_reservations(
+        req.session.user,
         reservation,
         request_callback, 
         reservation_service.update_reservation_by_id
