@@ -24,12 +24,11 @@ function create_user(user, callback){
 
 function get_user(username, callback){
     // gets the user information given a username
-
     if (username == null) {
         callback(callback({error: true, err: err, empty: false}));
         return;
     }
-    
+
     var getUserQuery = buildQueryForGetUser(username);
     console.log(getUserQuery);
 
@@ -39,7 +38,6 @@ function get_user(username, callback){
     
     db_sql.connection.query(getUserQuery)
         .on('result', function (row) {
-            
             if (rowCount == 0) {
                 userInfo = {    
                     user_id: row.user_id,
@@ -152,6 +150,40 @@ var buildQueryForCreateUser = function(user, hash) {
             .set("last_name", user.lastName)
             .set("email_address", user.email)
             .toString();
+};
+
+var buildQueryForGetUser = function(username) {
+   return squel.select()
+                .field("resource.name")
+                .field("resource.resource_id")
+                .field("resource.description")
+                .field("resource.max_users")
+                .field("resource.created_by")
+                .field("tag.tag_name")
+                .field("reservation.reservation_id")
+                .field("reservation.start_time")
+                .field("reservation.end_time")
+                .field("user.username")
+                .field("user.first_name")
+                .field("user.last_name")
+                .field("user.user_id")
+                .field("user.password")
+                .field("user.permission_level")
+                .from("user")
+                .left_join("user_reservation", null, "user.user_id = user_reservation.user_id")
+                .left_join("reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
+                .left_join("resource", null, "reservation.resource_id = resource.resource_id")
+                .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")
+                .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")
+                .where("username = '" + username + "'")
+                .toString();
+};
+
+var buildQueryForDeleteUser = function(username) {
+    return squel.delete()
+                .from("user")
+                .where("username = '" + username + "'")
+                .toString();
 };
 
 var buildQueryForGetUser = function(username) {

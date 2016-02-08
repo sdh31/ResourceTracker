@@ -4,29 +4,28 @@ var res_service = require('../services/resources');
 var tag_service = require('../services/tags');
 var reservation_service = require('../services/reservations');
 
+// returns the resource specified by resource_id
+// req.query should have a field "resource_id"
 router.get('/', function(req, res, next){
-  //read user from name in URL queries
-  var getResourceCallback = function (result) {
-      if (result.error == true){
-        res.sendStatus(400)
-      }
-      else{
-        res.send(JSON.stringify(result));
-      }
-  };
+  
+    var getResourceCallback = function (result) {
+        if (result.error == true){
+            res.sendStatus(400)
+        } else{
+            res.send(JSON.stringify(result));
+        }
+    };
 
-    res_service.get_resource_by_name(req.query, getResourceCallback);
+    res_service.get_resource_by_id(req.query, getResourceCallback);
 });
 
 router.put('/', function(req, res, next){
-  //create user
+  
     var create_tag_resource_callback = function(result) {
-        console.log(result.error)
         if(result.error == true){
-            console.log(result.err)
             res.sendStatus(400);
         } else {
-            res.status(200).json(result.results)
+            res.sendStatus(200);
         }
     }
 
@@ -38,7 +37,7 @@ router.put('/', function(req, res, next){
             if ("tags" in req.body && req.body.tags.length > 0) {
                 tag_service.create_tag(res_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
             } else {
-                res.status(200).write(result);
+                res.sendStatus(200);
             }
         }
     }
@@ -47,13 +46,12 @@ router.put('/', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-  //update user
+  
     var update_resource_callback = function(result){
         if(result.error == true){
             res.sendStatus(400);
         }
         else{
-            //res.write(JSON.stringify(result));
             res.sendStatus(200);
         }
     }
@@ -62,13 +60,11 @@ router.post('/', function(req, res, next){
 });
 
 router.delete('/', function(req, res, next){
-  //delete resource
+  
   var delete_resource_callback = function(result){
     if (result.error == true){
-      console.log("err" + " "+result.err)
       res.sendStatus(400);
     }
-    //res.write(JSON.stringify(result));
     res.sendStatus(200);
   }
 
@@ -78,7 +74,6 @@ router.delete('/', function(req, res, next){
 router.get('/all', function(req, res, next) {
 	var getAllResourcesCallback = function(result){
 		if (result.error == true) {
-		  console.log("err" + " "+result.err)
 		  res.sendStatus(400);
 		} else if (result.empty == true) {
 			console.log("no resources!");
@@ -90,15 +85,6 @@ router.get('/all', function(req, res, next) {
   	}
 
   tag_service.filter_by_tag([], [], 0, Number.MAX_VALUE, getAllResourcesCallback);
-	
 });
-
-router.put('/tag', function(req, res, next){
-
-})
-
-router.delete('/tag', function(req, res, next){
-  
-})
 
 module.exports = router;
