@@ -4,7 +4,7 @@ exports.createAdmin = function(err) {
 
 	var admin = {
 		username: 'admin',
-		password: 'admin',
+		password: 'Treeadmin',
 		permission_level: 'admin',
 		firstName: 'admin',
 		lastName: 'admin',
