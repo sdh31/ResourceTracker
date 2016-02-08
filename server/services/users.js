@@ -4,63 +4,41 @@ var bcrypt = require('bcrypt');
 var tag_service = require('./tags');
 
 function create_user(user, callback){
-	//Creates user given all parameters
+    //Creates user given all parameters
     bcrypt.genSalt(10, function(err, salt) {
-		bcrypt.hash(user.password, salt, function(err, hash) {
+        bcrypt.hash(user.password, salt, function(err, hash) {
             // Store hash in your password DB.
-			var createUserQuery = buildQueryForCreateUser(user, hash);
+            var createUserQuery = buildQueryForCreateUser(user, hash);
 
             db_sql.connection.query(createUserQuery)
-	            .on('result', function (row) {
+                .on('result', function (row) {
                     callback(row);
                 })
                 .on('error', function (err) {
                     callback({error: true, err: err});
                  }
             );
-		});
-	});
+        });
+    });
 }
 
 function get_user(username, callback){
-	//Check if user is valid 
+    // gets the user information given a username
 
-	var query = squel.select()
-                    .field("resource.name")
-                    .field("resource.resource_id")
-                    .field("resource.description")
-                    .field("resource.max_users")
-                    .field("resource.created_by")
-                    .field("tag.tag_name")
-                    .field("reservation.reservation_id")
-                    .field("reservation.start_time")
-                    .field("reservation.end_time")
-                    .field("user.username")
-                    .field("user.first_name")
-                    .field("user.last_name")
-                    .field("user.user_id")
-                    .field("user.password")
-                    .field("user.permission_level")
-                    .from("user")
-                    .left_join("user_reservation", null, "user.user_id = user_reservation.user_id")
-                    .left_join("reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-                    .left_join("resource", null, "reservation.resource_id = resource.resource_id")
-                    .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")
-                    .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")
-	if (username != null){
-        /// probably should exit if this is the case...
-		query = query.where("username = '" + username + "'");
-	}
-
-	query = query.toString();
-    console.log(query);
+    if (username == null) {
+        callback(callback({error: true, err: err, empty: false}));
+        return;
+    }
+    
+    var getUserQuery = buildQueryForGetUser(username);
+    console.log(getUserQuery);
 
     var rowCount = 0;
     var resources = [];
     var userInfo = {};
     
-	db_sql.connection.query(query)
-		.on('result', function (row) {
+    db_sql.connection.query(getUserQuery)
+        .on('result', function (row) {
             
             if (rowCount == 0) {
                 userInfo = {    
@@ -76,11 +54,11 @@ function get_user(username, callback){
             }
             resources.push(row);
             rowCount++;
-            //callback(row);
         })
         .on('error', function (err) {
             callback({error: true, err: err, empty: false});
          })
+
         .on('end', function () {
             if (rowCount == 0) {
                 callback({error: true, empty: true});
@@ -94,24 +72,26 @@ function get_user(username, callback){
 
 function delete_user(username, callback) {
 
-    var query = squel.delete()
-                    .from("user").
-                     where("username = '" + username + "'").toString();
+    if (username == null) {
+        callback({error: true});
+        return;
+    }
 
-    db_sql.connection.query(query)
+    var deleteUserQuery = buildQueryForDeleteUser(username);
+
+    db_sql.connection.query(deleteUserQuery)
         .on('error', function (err) {
             callback({error: true, err: err});
          })
         .on('end', function () {
             // not sure of best practice for callback here..
             callback({error: false});
-         }
-    );
+         });
 }
 
 function update_user(body, callback) {
 
-	var username = body.username;
+    var username = body.username;
     var newUsername = body.newUsername;
     var password = body.password;
     var permission_level = body.permission_level;
@@ -128,20 +108,20 @@ function update_user(body, callback) {
 
     if (password != null && password != "") {
         bcrypt.genSalt(10, function(err, salt) {
-		    bcrypt.hash(password, salt, function(err, hash) {
+            bcrypt.hash(password, salt, function(err, hash) {
                 // Store hash in your password DB.
-			    query = query.set("password", hash).toString();
+                query = query.set("password", hash).toString();
 
                 db_sql.connection.query(query)
-	                .on('end', function () {
+                    .on('end', function () {
                         callback({error: false});
                     })
                     .on('error', function (err) {
                         callback({error: true, err: err});
                      }
                 );
-		    });
-	    });
+            });
+        });
     } else {
         query = query.toString();
         db_sql.connection.query(query)
@@ -165,18 +145,52 @@ function compare_passwords(password, user, callback) {
 
 var buildQueryForCreateUser = function(user, hash) {
     return squel.insert().into("user")
-	        .set("username", user.username)
-	        .set("password", hash)
-	        .set("permission_level", user.permission_level)
-			.set("first_name", user.firstName)
-			.set("last_name", user.lastName)
-			.set("email_address", user.email)
-	        .toString();
+            .set("username", user.username)
+            .set("password", hash)
+            .set("permission_level", user.permission_level)
+            .set("first_name", user.firstName)
+            .set("last_name", user.lastName)
+            .set("email_address", user.email)
+            .toString();
+};
+
+var buildQueryForGetUser = function(username) {
+   return squel.select()
+                .field("resource.name")
+                .field("resource.resource_id")
+                .field("resource.description")
+                .field("resource.max_users")
+                .field("resource.created_by")
+                .field("tag.tag_name")
+                .field("reservation.reservation_id")
+                .field("reservation.start_time")
+                .field("reservation.end_time")
+                .field("user.username")
+                .field("user.first_name")
+                .field("user.last_name")
+                .field("user.user_id")
+                .field("user.password")
+                .field("user.permission_level")
+                .from("user")
+                .left_join("user_reservation", null, "user.user_id = user_reservation.user_id")
+                .left_join("reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
+                .left_join("resource", null, "reservation.resource_id = resource.resource_id")
+                .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")
+                .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")
+                .where("username = '" + username + "'")
+                .toString();
+};
+
+var buildQueryForDeleteUser = function(username) {
+    return squel.delete()
+                .from("user")
+                .where("username = '" + username + "'")
+                .toString();
 };
 
 module.exports = {
-	create_user: create_user,
-	get_user: get_user,
+    create_user: create_user,
+    get_user: get_user,
     delete_user: delete_user,
     update_user: update_user,
     compare_passwords: compare_passwords

@@ -3,6 +3,9 @@
 angular.module('resourceTracker')
     .controller('ManageReservationCtrl', function ($scope, $http) {
 
+        $scope.clearError();
+        $scope.clearSuccess();
+
         $scope.onReservationCreateSuccess = "Reservation Created!";
         $scope.onReservationCreateFailure = "Unable to create the reservation. The selected resource has already been reserved " +
                                             "during this time.";
@@ -14,8 +17,6 @@ angular.module('resourceTracker')
 
         // this function initializes all global data on this page. 
         var initializeResourceReservations = function() {
-            $scope.clearError();
-            $scope.clearSuccess();
 
             var currentTime = new Date();
 
@@ -33,11 +34,15 @@ angular.module('resourceTracker')
             // resource_id to array of reservations
             $scope.resourceReservationMap = {};
 
-            // all resources found in database
+            // all resources found in database, so admin can use them to modify/delete
             $scope.allResources = [];
 
             // create resource dropdown model
             $scope.resourceToCreate = {}; 
+
+
+            // all resources for a given user found in database
+            $scope.allUserResources = [];
 
             // modify a reservation dropdown model for RESOURCE
             $scope.resourceReservationToModify = {};
@@ -49,12 +54,29 @@ angular.module('resourceTracker')
             $scope.reservationToModify = {};
 
             getAllResources();
+
+            // if we are admin, then resource/reservations that we can modify are the list of all resources.
+            // if we are user, we must get all resource/reservations for that particular user
+            if ($scope.isAdmin()) {
+                $scope.allUserResources = $scope.allResources;
+            } else {
+                getAllUserResources();
+            }
         };
 
         var getAllResources = function() {
             $http.get('/resource/all').then(function(response) {   
-                console.log(response);
-                populateResourceArray(response);
+                populateResourceArray(response.data, $scope.allResources);
+            }, function(error) {
+                console.log(error);
+            });
+        };
+
+
+        var getAllUserResources = function() {
+            $http.get('/user').then(function(response) {
+                console.log(response);   
+                populateResourceArray(response.data.resources, $scope.allUserResources);
             }, function(error) {
                 console.log(error);
             });
@@ -66,17 +88,17 @@ angular.module('resourceTracker')
 
             $http.put('/reservation', reservationData).then(function(response) {
                 $scope.addSuccess($scope.onReservationCreateSuccess);
+                initializeResourceReservations();
             }, function(error) {
                 $scope.addError($scope.onReservationCreateFailure);
+                initializeResourceReservations();
             });
-            // must reload all resources, because a new one was just created
-            initializeResourceReservations();
         };
 
-        var populateResourceArray = function(resourceResponse) {
-            resourceResponse.data.forEach(function(resource) {
+        var populateResourceArray = function(resourceData, resourceArray) {
+            resourceData.forEach(function(resource) {
                 var resourceData = {id: resource.resource_id, label: resource.name};
-                $scope.allResources.push(resourceData);
+                resourceArray.push(resourceData);
                 $scope.resourceReservationMap[resourceData.id] = resource.reservations;
             });
         };
@@ -99,20 +121,22 @@ angular.module('resourceTracker')
                 reservation_id: $scope.reservationToModify.id, resource_id: $scope.resourceReservationToModify.id};
             $http.post('/reservation', reservationData).then(function(response) {
                 $scope.addSuccess($scope.onReservationUpdateSuccess);
+                initializeResourceReservations(); 
             }, function(error) {
                 $scope.addError($scope.onReservationUpdateFailure);
-            });
-            initializeResourceReservations();     
+                initializeResourceReservations(); 
+            });    
         };
 
         $scope.deleteReservation = function() {
             var deleteReservationQuery = '/reservation?reservation_id=' + $scope.reservationToModify.id;
             $http.delete(deleteReservationQuery).then(function(response) {
                 $scope.addSuccess($scope.onReservationDeleteSuccess);
+                initializeResourceReservations();
             }, function(error) {
                 $scope.addError($scope.onReservationDeleteError);
+                initializeResourceReservations();
             });
-            initializeResourceReservations();
         };
 
         initializeResourceReservations();

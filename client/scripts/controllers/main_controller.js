@@ -33,7 +33,7 @@ angular.module('resourceTracker')
                 if ($scope.user.permission_level == 'admin') {
                     $scope.goToRegisterPage();
                 } else {
-                    $scope.goToReservationPage();
+                    $scope.goToManageReservationPage();
                 }
             }, function(error) {
 				$scope.addError($scope.invalidLoginAlert);
@@ -102,7 +102,7 @@ angular.module('resourceTracker')
             $location.url('/filter_reservation');
         };
 
-        $scope.goToCreateReservationPage = function() {
+        $scope.goToManageReservationPage = function() {
             $location.url('/create_reservation');
         };
 
