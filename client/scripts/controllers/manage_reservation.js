@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('resourceTracker')
-    .controller('ManageReservationCtrl', function ($scope, $http) {
+    .controller('ManageReservationCtrl', function ($scope, $http, $filter) {
 
         $scope.clearError();
         $scope.clearSuccess();
@@ -136,7 +136,10 @@ angular.module('resourceTracker')
                 var startTime = new Date(reservation.start_time);
                 var endTime = new Date(reservation.end_time);
                 var res_id = reservation.reservation_id;
-                var res_label = 'Start Time: ' + startTime + ' End Time: '   + endTime;
+                var startTimeLabel = $filter('date')(startTime, "medium");
+                var endTimeLabel = $filter('date')(endTime, "medium");
+
+                var res_label = 'Start Time: ' + startTimeLabel + ' End Time: '   + endTimeLabel;
                 var resObj = {id: res_id, label: res_label};
                 $scope.allReservationsForSelectedResource.push(resObj);
                 $scope.reservationMap[res_id] = {start_time: startTime, end_time: endTime};
