@@ -38,13 +38,6 @@ angular.module('resourceTracker')
         getAllTags();
 
 
-    	$scope.createReservation = function() {
-
-
-
-
-    	};
-
         $scope.filterReservations = function() {
             if ($scope.startTime >= $scope.endTime) {
                 $scope.addError($scope.timeRangeError);
