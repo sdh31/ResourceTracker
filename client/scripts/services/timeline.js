@@ -57,12 +57,18 @@ angular.module('resourceTracker')
                 data.push(resource.name);
                 data.push('');              // this is necessary... it is a column label, google charts is weird and requires it.
                 data.push(resourceTooltip);
-                data.push(new Date(reservation.start_time));
-
-                if (new Date(reservation.end_time) > endTime) {
+                
+                var resStartTime = new Date(reservation.start_time);
+                var resEndTime  = new Date(reservation.end_time);
+                if (resStartTime < startTime) {
+                    data.push(startTime);
+                } else {
+                    data.push(resStartTime);
+                }
+                if (resEndTime > endTime) {
                     data.push(endTime);
                 } else {
-                    data.push(new Date(reservation.end_time));
+                    data.push(resEndTime);
                 }
                 dataTableRows.push(data);
             });
