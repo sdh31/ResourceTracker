@@ -85,6 +85,9 @@ angular.module('resourceTracker')
         });
 
 
+
+    
+
         dataTable.addRows(dataTableRows);
         var colorsChosen = [];
         var grayColor = "#f9f9f9";
@@ -99,6 +102,11 @@ angular.module('resourceTracker')
             }
         }
 
+
+        var padding = 40;
+        var rowHeight = dataTable.getNumberOfRows() * 60;
+        var chartHeight = rowHeight + padding;
+
         var options = {
             timeline: { colorByRowLabel: false },
             avoidOverlappingGridLines: false,
@@ -106,7 +114,8 @@ angular.module('resourceTracker')
             tooltip: { isHtml: true },
             colors: colorsChosen,
             backgroundColor: grayColor,
-            alternatingRowStyle: false
+            alternatingRowStyle: false,
+            height: chartHeight
         }
 
         chart.draw(dataTable, options);
