@@ -15,12 +15,12 @@ Node Modules
 Servers
 
         Development Servers
-            Ashwin -> http://colab-sbx-366.oit.duke.edu
-            Chris -> http://colab-sbx-202.oit.duke.edu
+            Ashwin -> https://colab-sbx-366.oit.duke.edu
+            Chris -> https://colab-sbx-202.oit.duke.edu
         Test Server
-            Rahul -> http://colab-sbx-212.oit.duke.edu
+            Rahul -> https://colab-sbx-212.oit.duke.edu
         Production Server
-            Stephen -> http://colab-sbx-123.oit.duke.edu
+            Stephen -> https://colab-sbx-123.oit.duke.edu
 
 Database Structure
 
