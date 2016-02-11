@@ -79,6 +79,7 @@ sudo apt-get install -y mongodb-org
 How to install mocha.js on the VM
 
 run command to install mocha in the server folder: 
+
 sudo npm install -g mocha
 
 tutorial to create different types of tests https://mochajs.org/
