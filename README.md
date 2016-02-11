@@ -75,3 +75,12 @@ echo "deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse" 
 sudo apt-get update
 sudo apt-get install -y mongodb-org
 
+
+How to install mocha.js on the VM
+
+run command to install mocha in the server folder: 
+sudo npm install -g mocha
+
+tutorial to create different types of tests https://mochajs.org/
+
+To run the tests you created, place them in the test directory in server and then run the command "mocha" from either the server or test directory
