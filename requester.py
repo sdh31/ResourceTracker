@@ -198,3 +198,34 @@ def create_group(name, description, user_permissions, resource_permissions, rese
 		'reservation_management_permission': reservation_permissions,
 		'is_private': privacy
 	}
+	return send_request(method, params, url)
+
+def delete_group(group_id):
+	url = 'https://colab-sbx-202.oit.duke.edu/group';
+	method = "DELETE";
+	params = {
+		'group_id': group_id
+	}
+
+	return send_request(method, params, url)
+
+def update_group(group_id, name, description, user_permissions, resource_permissions, reservation_permissions):
+	url = 'https://colab-sbx-202.oit.duke.edu/group';
+	method = "POST";
+	params = {
+		'group_name': name,
+		'description': description,
+		'user_management_permission': user_permissions,
+		'resource_management_permission': resource_permissions,
+		'reservation_management_permission': reservation_permissions,
+		'group_id': group_id
+	}
+	return send_request(method, params, url)
+
+def get_groups(group_id = None):
+	url = 'https://colab-sbx-202.oit.duke.edu/group';
+	method = "GET";
+	params = {}
+	if group_id:
+		params['group_id'] = group_id
+	return send_request(method, params, url)
