@@ -25,8 +25,11 @@ var node_modules_routes = require('./routes/node_modules');
 var style_routes = require('./routes/styles');
 var initialize_tables = require('./services/initialize_tables');
 var create_admin = require('./services/create_admin');
+var shibboleth = require('./services/shibboleth.js');
 
 app.use(body_parser.json());
+// Added for Duke Shibboleth POST
+app.use(body_parser.urlencoded({ extended: true }));
 app.use(cookie_parser());
 app.use(session({
     secret: 'ssshhhhh',
@@ -35,6 +38,7 @@ app.use(session({
     resave: false,
 	key: 'sid'
 }));
+
 
 app.use('/', views);
 app.use('/views', views);
@@ -45,6 +49,7 @@ app.use('/reservation', reservation_routes);
 app.use('/scripts', script_routes);
 app.use('/node_modules', node_modules_routes);
 app.use('/styles', style_routes);
+app.use('/', shibboleth);
 
 app.engine('html', require('ejs').renderFile);
 
