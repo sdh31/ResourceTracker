@@ -185,3 +185,16 @@ def update_reservations(resource_id, start, end, reservation_id):
 		params['reservation_id'] = reservation_id
 
 	return send_request(method, params, url)
+
+def create_group(name, description, user_permissions, resource_permissions, reservation_permissions, privacy):
+	url = 'https://colab-sbx-202.oit.duke.edu/group';
+	method = "PUT";
+
+	params = {
+		'name': name,
+		'description': description,
+		'user_management_permission': user_permissions,
+		'resource_management_permission': resource_permissions,
+		'reservation_management_permission': reservation_permissions,
+		'is_private': privacy
+	}

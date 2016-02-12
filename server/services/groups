@@ -1,0 +1,31 @@
+var db_sql = require('./db_wrapper');
+var squel = require('squel');
+var group_queries = require('./query_builders/group_query_builder');
+
+function make_group_private(group, is_private){
+	group['is_private'] = is_private;
+}
+
+function create_group(group, callback){
+	var create_query = group_queries.buildQueryCreateGroups(group);
+	console.log(create_query);
+	var row_count = 0;
+	db_sql.connection.query(create_query)
+	    .on('result', function (row) {
+	    	row_count ++;
+	        callback({error: false, results: row});
+	     })
+	    .on('error', function (err) {
+	        callback({error: true, error: err});
+	     })
+	    .on('end', function (){
+	        if(row_count == 0){
+	        	callback({error: true, error: err});
+	        }
+	    });
+}
+
+module.exports = {
+	make_group_private:make_group_private,
+	create_group:create_group
+}

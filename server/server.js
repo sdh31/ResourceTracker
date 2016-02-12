@@ -23,6 +23,7 @@ var reservation_routes = require('./routes/reservations');
 var script_routes = require('./routes/scripts');
 var node_modules_routes = require('./routes/node_modules');
 var style_routes = require('./routes/styles');
+var group_routes = require('./routes/groups')
 var initialize_tables = require('./services/initialize_tables');
 var create_admin = require('./services/create_admin');
 
@@ -42,6 +43,7 @@ app.use('/tag', tag_routes);
 app.use('/user', user_routes);
 app.use('/resource', resource_routes);
 app.use('/reservation', reservation_routes);
+//app.use('/group', group_routes);
 app.use('/scripts', script_routes);
 app.use('/node_modules', node_modules_routes);
 app.use('/styles', style_routes);

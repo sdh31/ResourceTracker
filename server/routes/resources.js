@@ -25,7 +25,7 @@ router.put('/', auth.is('user'), function(req, res, next){
         if (result.error == true){
             res.sendStatus(400);
         } else {
-            res.sendStatus(200);
+            res.status(200).json(result.results);
         }
     }
 
@@ -37,7 +37,7 @@ router.put('/', auth.is('user'), function(req, res, next){
             if ("tags" in req.body && req.body.tags.length > 0) {
                 tag_service.create_tag(resource_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
             } else {
-                res.sendStatus(200);
+                res.status(200).json(result.results);
             }
         }
     }
