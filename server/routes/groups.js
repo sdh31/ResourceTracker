@@ -63,7 +63,7 @@ router.delete('/', function(req,res,next){
 
 
 router.put('/user', function(req,res,next){
-    var delete_group_callback = function(result){
+    var add_user_callback = function(result){
         if(result.error == true){
             res.status(400).json(result.err);
         }
@@ -72,11 +72,36 @@ router.put('/user', function(req,res,next){
         }
 
     }
+    group_service.add_user_to_group(req.body, add_user_callback)
 
 
 });
 
 router.delete('/user', function(req,res,next){
+    var remove_user_callback = function(result){
+        if(result.error == true){
+            res.status(400).json(result.err);
+        }
+        else{
+            res.status(200).json(result.results);
+        }
+    }
+
+    group_service.remove_user_from_group(req.query, remove_user_callback);
+
+});
+
+router.get('/user', function(req,res,next){
+    var get_user_callback = function(result){
+        if(result.error == true){
+            res.status(400).json(result.err);
+        }
+        else{
+            res.status(200).json(result.results);
+        }
+    }
+
+    group_service.get_users_in_group(req.query, get_user_callback);
 
 });
 

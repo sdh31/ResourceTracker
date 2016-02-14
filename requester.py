@@ -229,3 +229,29 @@ def get_groups(group_id = None):
 	if group_id:
 		params['group_id'] = group_id
 	return send_request(method, params, url)
+
+def add_user_to_group(username, group_id):
+	url = 'https://colab-sbx-202.oit.duke.edu/group/user';
+	method = "PUT";
+	params = {
+		"group_id": group_id,
+		"username": username
+	}
+	return send_request(method, params, url)
+
+def remove_user_from_group(username, group_id):
+	url = 'https://colab-sbx-202.oit.duke.edu/group/user';
+	method = "DELETE";
+	params = {
+		"group_id": group_id,
+		"username": username
+	}
+	return send_request(method, params, url)
+
+def get_users_in_group(group_id):
+	url = 'https://colab-sbx-202.oit.duke.edu/group/user';
+	method = "GET";
+	params = {
+		"group_id": group_id
+	}
+	return send_request(method, params, url)

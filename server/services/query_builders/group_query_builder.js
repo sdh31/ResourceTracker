@@ -1,4 +1,4 @@
-var squel = require('squel');
+var squel = require('squel').useFlavour('mysql');;
 
 var group_table = "permission_group";
 var group_id = "group_id";
@@ -8,6 +8,10 @@ var user_permission = "user_management_permission";
 var resource_permission = "resource_management_permission";
 var reservation_permission = "reservation_management_permission";
 var private_group = "is_private"
+
+var user_group_table = "user_group";
+var user_group_user = "user_id";
+var user_group_group = "group_id"
 
 module.exports.buildQueryCreateGroups = function(group){
     var query = squel.insert()
@@ -61,4 +65,36 @@ module.exports.buildQueryGetGroups = function(group){
         query = query.where(group_id + "= ?", group.group_id)
     }
     return query.toString()
+}
+
+module.exports.buildQueryAddUserToGroup = function(group){  
+    return squel.insert()
+        .into(user_group_table)
+        .fromQuery(
+            ['user_id', user_group_group],
+            squel.select()
+                .fields(['user_id', group.group_id.toString()])
+                .from('user')
+                .where('username = ?', group.username)
+        )
+        .toString()
+}
+
+module.exports.buildQueryRemoveUserFromGroup = function(group){
+    return squel.delete()
+        .target(user_group_table)
+        .from(user_group_table)
+        .join("user", null, user_group_table + '.' + user_group_user + '= user.user_id')
+        .where('user.username = ?', group.username)
+        .where(user_group_table + '.' + user_group_group + '= ?', group.group_id)
+        .toString();
+}
+
+module.exports.buildQueryGetUsersFromGroup = function(group){
+    return squel.select()
+        .from(user_group_table)
+        .fields(['username', user_group_table + '.' + user_group_user, user_group_table + '.' + user_group_group])
+        .join("user", null, user_group_table + '.' + user_group_user + '= user.user_id')
+        .where(user_group_table + '.' + user_group_group + '=?', group.group_id)
+        .toString()
 }

@@ -38,6 +38,7 @@ print r.json.loads(res.content)['results']
 res = r.create_group("fungroup", "nope", True, True, True, False)
 print res.status_code
 group_id = r.json.loads(res.content)['insertId']
+print group_id
 
 res = r.get_groups(group_id)
 print r.json.loads(res.content)
@@ -48,10 +49,20 @@ print res.status_code
 res = r.get_groups(group_id)
 print r.json.loads(res.content)
 
-res = r.delete_group(group_id)
+res = r.add_user_to_group("admin", group_id)
 print res.status_code
+
+res = r.get_users_in_group(group_id)
+print r.json.loads(res.content)
+
+res = r.remove_user_from_group("admin", group_id)
+print res.status_code
+
+#res = r.delete_group(group_id)
+#print res.status_code
 
 res = r.get_groups(group_id)
 print r.json.loads(res.content)
+
 
 
