@@ -7,7 +7,9 @@ angular.module('resourceTracker')
             $scope.user = {
                 username: '',
                 password: '',
-                permission_level: '',
+                resource_management_permission: '',
+                reservation_management_permission: '',
+                user_management_permission: '',
                 loggedIn: false
             };
         };
@@ -16,6 +18,16 @@ angular.module('resourceTracker')
         $rootScope.googleChartLoaded = { value: false };
 
         $scope.initializeUser();
+
+        // check if the user already has an active session, if so redirect them to the contact page
+        $http.get('/user').then(function(response) {
+            if (!response.data.noSession) {
+                console.log(response.data);
+                $scope.user = response.data;
+                $scope.user.loggedIn = true;
+                $scope.goToContactPage();
+            }
+        });
 
         $scope.invalidLoginAlert = "Incorrect username or password";
 
@@ -28,8 +40,9 @@ angular.module('resourceTracker')
             var signInUrl = '/user/signin';
             $http.post(signInUrl, $scope.user).then(function(response) {
                 $scope.clearError();
+                console.log(response.data);
+                $scope.user = response.data;
                 $scope.user.loggedIn = true;
-                $scope.user.permission_level = response.data.permission_level;
                 if ($scope.user.permission_level == 'admin') {
                     $scope.goToRegisterPage();
                 } else {

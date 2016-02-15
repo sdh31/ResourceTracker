@@ -7,13 +7,11 @@ var user_query_builder = require('./query_builders/user_query_builder');
 
 function create_user(user, callback){
     //Creates user given all parameters
-
-    var user_id = 0;
     
     var createUserCallback = function() {
         user.is_private = 1;
-        user.group_name = user_id + "_group";
-        user.group_description = user_id + "_group";
+        user.name = user.username + "_group";
+        user.description = user.username + "_group";
         group_service.create_group(user, createGroupCallback);
     };
 
@@ -32,7 +30,6 @@ function create_user(user, callback){
 
             db_sql.connection.query(createUserQuery)
                 .on('result', function (row) {
-                    user_id = row.insertId;
                     createUserCallback();
                 })
                 .on('error', function (err) {
@@ -48,7 +45,7 @@ function get_user_permissions(user, callback) {
     var username = user.username;
 
     if (username == null) {
-        callback(callback({error: true, err: err, empty: false}));
+        callback({error: true, err: "", empty: false});
         return;
     }
 
@@ -105,7 +102,7 @@ function get_user_permissions(user, callback) {
             if (rowCount == 0) {
                 callback({error: error, empty: true});
             } else {
-                callback({error: error, userInfo: userInfo});
+                callback({error: error, user: userInfo});
             }
          }
     );

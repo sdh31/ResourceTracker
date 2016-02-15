@@ -12,14 +12,18 @@ router.get('/', auth.is('user'), function(req, res, next){
             console.log("NO USER WITH THAT USERNAME");
             res.send(JSON.stringify(result));
         } else {
-            result.password = "";
-            res.send(JSON.stringify(result));
+            result.user.password = "";
+            res.send(JSON.stringify(result.user));
         }
     }
 
-    var username = req.session.user.username;
-    var is_shibboleth = req.session.user.is_shibboleth;
-    user_service.get_user_permissions({username: username, is_shibboleth: is_shibboleth}, getUserCallback);
+    if (!req.session.user || !('username' in req.session.user) || !('is_shibboleth' in req.session.user)) {
+        res.send({noSession: true});
+    } else {
+        var username = req.session.user.username;
+        var is_shibboleth = req.session.user.is_shibboleth;
+        user_service.get_user_permissions({username: username, is_shibboleth: is_shibboleth}, getUserCallback);
+    }
 });
 
 router.put('/', auth.is('admin'), function(req, res, next){
@@ -77,12 +81,11 @@ router.post('/signin', function(req, res, next){
     var comparePasswordsCallback = function(result, user) {
         if (result == true) {
             // might needa change this for redirects?
+            user.password = '';
             req.session.isValid = true;
             req.session.user = user;
-            req.session.user.is_shibboleth = 0;
-            var signInResponse = {};
-            //signInResponse.permission_level = user.permission_level;
-            res.send(signInResponse);
+
+            res.send(user);
 
         } else {
             res.sendStatus(403);
@@ -93,7 +96,7 @@ router.post('/signin', function(req, res, next){
         if (result.error == true) {
             res.sendStatus(403);
         } else {
-            user_service.compare_passwords(password, result.userInfo, comparePasswordsCallback);
+            user_service.compare_passwords(password, result.user, comparePasswordsCallback);
         }
     }
 
