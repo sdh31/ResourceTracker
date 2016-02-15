@@ -4,6 +4,7 @@ var app = express();
 var router = express.Router();
 var PropertiesReader = require('properties-reader');
 var properties = PropertiesReader('/home/bitnami/server.conf');
+var user_service = require('../services/users');
 // SHIBBOLETH CONFIGURATION
 
 var serverCert = fs.readFileSync('/opt/bitnami/apache2/conf/server.crt', 'utf8');
@@ -85,19 +86,55 @@ router.post('/Shibboleth.sso/SAML2/POST', function(req, res, next) {
     var cleanDoc = new dom().parseFromString(decryptedData)
     
     var eduPersonPrincipalName_node = xpath.select("//*[@FriendlyName='eduPersonPrincipalName']", cleanDoc);
-    var email = "EMAIL: " + eduPersonPrincipalName_node[0].firstChild.firstChild.data;
+    var email_address = eduPersonPrincipalName_node[0].firstChild.firstChild.data;
 
     var givenName_node = xpath.select("//*[@FriendlyName='givenName']", cleanDoc);
-    var firstName = "FIRST NAME: " + givenName_node[0].firstChild.firstChild.data;
+    var first_name = givenName_node[0].firstChild.firstChild.data;
 
     var sn_node = xpath.select("//*[@FriendlyName='sn']", cleanDoc);
-    var lastName = "LAST NAME: " + sn_node[0].firstChild.firstChild.data;
+    var last_name = sn_node[0].firstChild.firstChild.data;
 
-    console.log(email + firstName + lastName);
+    var username = email_address.substring(0, email_address.indexOf('@'));
 
-    req.session.user = email;
-    // lets log them in and then redirect them back to the home page
-    res.redirect('/#/');
+    // check if shibboleth user already exists in local database
+    // if they do set req.session.user to that user and redirect back to homepage
+    // otherwise create the user in DB and redirect back to homepage
+    
+    var createUserCallback = function(result) {
+        if (result.error) {
+            console.log("damn, ya hate to hear that");
+        } else {
+            req.session.isValid = true;
+            req.session.user = {};
+            req.session.user.username = username;
+            req.session.user.is_shibboleth = 1;
+            res.redirect('/#/');
+        }
+    };
+
+    var checkIfUserExistsCallback = function(result) {
+        if (result.empty) {
+            var thisUser = {
+                username: username,
+                email_address: email_address,
+                first_name: first_name,
+                last_name: last_name,
+                password: '',
+                is_shibboleth: 1,
+                emails_enabled: 1
+            };
+            
+            user_service.create_user(thisUser, createUserCallback);
+        } else {
+            req.session.isValid = true;
+            req.session.user = {};
+            req.session.user.username = username;
+            req.session.user.is_shibboleth = 1;
+            res.redirect('/#/');
+        }
+    };
+    
+    user_service.get_user_permissions({username: username, is_shibboleth: 1}, checkIfUserExistsCallback);
 });
 
 router.get('/login/fail', 

@@ -7,11 +7,11 @@ var description = "group_description";
 var user_permission = "user_management_permission";
 var resource_permission = "resource_management_permission";
 var reservation_permission = "reservation_management_permission";
-var private_group = "is_private"
+var private_group = "is_private";
 
 var user_group_table = "user_group";
 var user_group_user = "user_id";
-var user_group_group = "group_id"
+var user_group_group = "group_id";
 
 module.exports.buildQueryCreateGroups = function(group){
     var query = squel.insert()
@@ -40,6 +40,7 @@ module.exports.buildQueryDeleteGroups = function(group){
 }
 
 module.exports.buildQueryUpdateGroups = function(group){
+	// TODO: make setting group_name and group_description optional
     var query  = squel.update()
         .table(group_table)
         .where(group_id + "=?", group.group_id)

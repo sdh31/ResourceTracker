@@ -8,14 +8,18 @@ router.get('/', auth.is('user'), function(req, res, next){
     var getUserCallback = function(result){
         if (result.error) {
             res.send(403);
+        } else if (result.empty) {
+            console.log("NO USER WITH THAT USERNAME");
+            res.send(JSON.stringify(result));
         } else {
             result.password = "";
             res.send(JSON.stringify(result));
         }
     }
 
-    var username=req.session.user.username; 
-    user_service.get_user(username, getUserCallback);
+    var username = req.session.user.username;
+    var is_shibboleth = req.session.user.is_shibboleth;
+    user_service.get_user_permissions({username: username, is_shibboleth: is_shibboleth}, getUserCallback);
 });
 
 router.put('/', auth.is('admin'), function(req, res, next){
@@ -28,7 +32,8 @@ router.put('/', auth.is('admin'), function(req, res, next){
         }
     }
 
-    if(!('username' in req.body) || !('password' in req.body) || !('permission_level' in req.body)){
+    // TODO: need to add permissions here
+    if(!('username' in req.body) || !('password' in req.body)){
         res.sendStatus(401);
     } else {
         user_service.create_user(req.body, createUserCallback);
@@ -74,8 +79,9 @@ router.post('/signin', function(req, res, next){
             // might needa change this for redirects?
             req.session.isValid = true;
             req.session.user = user;
+            req.session.user.is_shibboleth = 0;
             var signInResponse = {};
-            signInResponse.permission_level = user.permission_level;
+            //signInResponse.permission_level = user.permission_level;
             res.send(signInResponse);
 
         } else {
@@ -87,11 +93,11 @@ router.post('/signin', function(req, res, next){
         if (result.error == true) {
             res.sendStatus(403);
         } else {
-            user_service.compare_passwords(password, result, comparePasswordsCallback);
+            user_service.compare_passwords(password, result.userInfo, comparePasswordsCallback);
         }
     }
 
-    user_service.get_user(username, getUserCallback);
+    user_service.get_user_permissions({username: username, is_shibboleth: 0}, getUserCallback);
 });
 
 router.post('/signout', auth.is('user'), function(req, res, next){

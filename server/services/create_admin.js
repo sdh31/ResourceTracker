@@ -5,10 +5,12 @@ exports.createAdmin = function(err) {
 	var admin = {
 		username: 'admin',
 		password: 'Treeadmin',
-		permission_level: 'admin',
-		firstName: 'admin',
-		lastName: 'admin',
-		email: 'admin@admin.com'
+		user_management_permission: 1,
+		resource_management_permission: 1,
+		reservation_management_permission: 1,
+		first_name: 'admin',
+		last_name: 'admin',
+		email_address: 'admin@admin.com'
 	};
 	
 	var createAdminUserCallback = function (result) {

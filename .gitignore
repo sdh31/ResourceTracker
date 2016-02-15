@@ -2,4 +2,5 @@
 .py
 .sh
 *.js~
-
+*.html~
+*.sql~

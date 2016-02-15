@@ -26,7 +26,7 @@ var style_routes = require('./routes/styles');
 var group_routes = require('./routes/groups')
 var initialize_tables = require('./services/initialize_tables');
 var create_admin = require('./services/create_admin');
-var shibboleth = require('./services/shibboleth.js');
+var shibboleth = require('./routes/shibboleth');
 
 app.use(body_parser.json());
 // Added for Duke Shibboleth POST
