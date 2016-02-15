@@ -28,7 +28,7 @@ angular.module('resourceTracker')
             var signInUrl = '/user/signin';
             $http.post(signInUrl, $scope.user).then(function(response) {
                 $scope.clearError();
-				$scope.user.loggedIn = true;
+                $scope.user.loggedIn = true;
                 $scope.user.permission_level = response.data.permission_level;
                 if ($scope.user.permission_level == 'admin') {
                     $scope.goToRegisterPage();
@@ -36,15 +36,15 @@ angular.module('resourceTracker')
                     $scope.goToManageReservationPage();
                 }
             }, function(error) {
-				$scope.addError($scope.invalidLoginAlert);
-				clearFields();
+                $scope.addError($scope.invalidLoginAlert);
+                clearFields();
             });
         };
 
-		var clearFields = function() {
-			$scope.user.username = '';
-			$scope.user.password = '';
-		};
+        var clearFields = function() {
+            $scope.user.username = '';
+            $scope.user.password = '';
+        };
 
 
         $scope.clearError = function() {
