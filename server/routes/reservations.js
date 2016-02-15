@@ -25,7 +25,7 @@ router.get('/', auth.is('user'), function(req, res, next){
         request_callback);
 });
 
-router.put('/', auth.is('user'), function(req, res, next){
+router.put('/', function(req, res, next){
 
     var request_callback = function(result){
         if(result.error == true){

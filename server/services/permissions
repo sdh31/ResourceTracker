@@ -1,0 +1,36 @@
+var db_sql = require('./db_wrapper');
+var squel = require('squel');
+
+function create_group(group, callback){
+	//var getConflictingReservationsQuery = reservation_query_builder.buildQueryForGetConflictingReservations(reservation);
+	console.log(getConflictingReservationsQuery);
+
+	db_sql.connection.query(getConflictingReservationsQuery)
+	
+	    .on('result', function (row) {
+	        callback({error: false, results: row});
+	     })
+	    .on('error', function (err) {
+	        
+	     })
+	    .on('end', function (err){
+	        
+	    });
+}
+
+
+function create_group(group, callback){
+	//var getConflictingReservationsQuery = reservation_query_builder.buildQueryForGetConflictingReservations(reservation);
+	console.log(getConflictingReservationsQuery);
+
+	db_sql.connection.query(getConflictingReservationsQuery)
+	    .on('result', function (row) {
+	        
+	     })
+	    .on('error', function (err) {
+	        
+	     })
+	    .on('end', function (err){
+	        
+	    });
+}

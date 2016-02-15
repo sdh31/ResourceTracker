@@ -36,7 +36,7 @@ function create_resource(resource, callback){
 	db_sql.connection.query(createResourceQuery)
 		.on('result', function (row) {
             rowCount++;
-            callback(row);
+            callback({error:false, results: row});
         })
         .on('error', function (err) {
             callback({error: true, err: err});

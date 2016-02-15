@@ -19,13 +19,13 @@ router.get('/', auth.is('user'), function(req, res, next){
     res_service.get_resource_by_id(req.query, getResourceCallback);
 });
 
-router.put('/', auth.is('user'), function(req, res, next){
+router.put('/', function(req, res, next){
   
     var create_tag_resource_callback = function(result) {
         if (result.error == true){
             res.sendStatus(400);
         } else {
-            res.sendStatus(200);
+            res.status(200).json(result.results);
         }
     }
 
@@ -33,11 +33,12 @@ router.put('/', auth.is('user'), function(req, res, next){
         if(result.error == true) {
             res.sendStatus(400);
         } else {
-            var resource_id = result.insertId;
+            var resource_id = result.results.insertId;
             if ("tags" in req.body && req.body.tags.length > 0) {
                 tag_service.create_tag(resource_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
             } else {
-                res.sendStatus(200);
+
+                res.status(200).json(result.results);
             }
         }
     }
