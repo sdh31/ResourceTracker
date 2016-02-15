@@ -2,23 +2,16 @@
 	<div class="panel-body">
 		<form >
 			<fieldset class="form-group">
-				<input type="text" class="form-control" placeholder="Enter First Name" ng-model="newUser.firstName">
+				<input type="text" class="form-control" placeholder="Enter First Name" ng-model="newUser.first_name">
 			</fieldset>
 			<fieldset class="form-group">
-				<input type="text" class="form-control" placeholder="Enter Last Name" ng-model="newUser.lastName">
+				<input type="text" class="form-control" placeholder="Enter Last Name" ng-model="newUser.last_name">
 			</fieldset>
 			<fieldset class="form-group">
 				<input type="text" class="form-control" placeholder="Enter Username" ng-model="newUser.username">
 			</fieldset>
 			<fieldset class="form-group">
 				<input type="text" class="form-control" placeholder="Enter Email Address" ng-model="newUser.email">
-			</fieldset>
-			<fieldset class="form-group">
-				<select class="form-control" ng-model="newUser.permission_level">
-			         <option value="" ng-selected="true"> -- Permission Level -- </option>
-			         <option ng-repeat="role in permission_levels" value="{{role}}"
-			          		 ng-selected="{{newUser.permission_level === role}}">{{role}}</option>
-			    </select>
 			</fieldset>
 			<fieldset class="form-group">
 				<input type="password" class="form-control" placeholder="Enter Password" ng-model="newUser.password">

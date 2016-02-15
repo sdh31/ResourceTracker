@@ -1,0 +1,57 @@
+<div class="modal-dialog" ng-controller="EditGroupCtrl">
+    <div class="modal-content">
+      <div class="modal-header"><h4 class="modal-title">{{selectedGroup.group_name}}</h4></div>
+
+
+
+     <div class="modal-body container">
+     	<div class="row">
+     		<div class="col-sm-4" style="padding-right:20px; border-right: 1px solid #ccc;">
+	      		<label>Reservation Management  <input type="checkbox" ng-model="reservationPerm"></label><br/>
+		        <label>Resource Management     <input type="checkbox" ng-model="resourcePerm"></label><br/>
+		        <label>User Management         <input type="checkbox" ng-model="userPerm"></label><br/>
+                <button type="button"
+                        class="btn btn-default btn-md"
+                        ng-click="updatePermissions()">Update Permissions!</button><br/><br/>
+      		</div>
+      		<div class="col-sm-4">
+                <h5> Current Members </h5>
+                <div ng-repeat="user in usersInGroup track by $index">
+                    <!-- should probably display First Last (netid) here -->
+                    <label>
+                        {{getUserDisplayName(user)}}
+                        <a class="glyphicon glyphicon-circle-arrow-right"
+                           ng-show="user.username != 'admin'"
+                           ng-click="goToUserFromGroup($index)"></a>
+                    </label><br/>
+                </div>
+      		</div>
+      	</div>
+        <div class="row">
+            <div class="col-sm-4" style="padding-right:20px; border-right: 1px solid #ccc;">
+                <span ng-dropdown-multiselect="" options="usersToAddDropdownData" selected-model="usersToAddToGroup"
+                      extra-settings="{enableSearch: true}"
+                      translation-texts="{buttonDefaultText: 'Select Users to Add'}"></span>
+                <button type="button"
+                        class="btn btn-default btn-md"
+                        ng-click="addUsersToGroup()">Add Users!</button></br></br>
+                <span ng-dropdown-multiselect="" options="usersToRemoveDropdownData" selected-model="usersToRemoveFromGroup"
+                      extra-settings="{enableSearch: true}"
+                      translation-texts="{buttonDefaultText: 'Select Users to Remove'}"></span>
+                <button type="button"
+                        class="btn btn-default btn-md"
+                        ng-click="removeUsersFromGroup()">Remove Users!</button>
+            </div>
+        </div>
+     </div>
+
+
+      <div class="modal-footer">
+        <span class="alert alert-success animate-hide" style="width:40%;" ng-show="showEditGroupSuccess">Success!
+                <a class="glyphicon glyphicon-ok"></a>
+        </span>
+        <button type="button" class="btn btn-danger" ng-click="deleteGroup()">Delete Group</button>
+      	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+</div>

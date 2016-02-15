@@ -8,25 +8,22 @@ angular.module('resourceTracker')
         
         var initializeNewUser = function() {
             $scope.newUser =  {
-                firstName: '',
-                lastName: '',
+                first_name: '',
+                last_name: '',
                 username: '',
                 email: '',
-                permission_level: '',
                 password: '',
                 confirmPassword: '',
+                isShibboleth: false
             };
         };
 
         initializeNewUser();
 
-        $scope.permission_levels = ['admin', 'user'];
-
         var registerAlerts = {  firstNameAlert: 'Please enter a first name.',
                                 lastNameAlert: 'Please enter a last name.',
                                 usernameAlert: 'Please enter a username.',
                                 emailAlert: 'Please enter an email address.',
-                                permissionLevelAlert: 'Please select a permission level',
                                 passwordLengthAlert: 'Password length is too short.',
                                 passwordMatchAlert: 'Passwords do not match.',
                                 failedRegisterAlert: 'Error when registering user.'
@@ -49,12 +46,10 @@ angular.module('resourceTracker')
   	     };
 
          var validate = function() {
-            var validFields = validateNonEmptyField($scope.newUser.firstName,         registerAlerts.firstNameAlert) &&
-                              validateNonEmptyField($scope.newUser.lastName,          registerAlerts.lastNameAlert) &&
+            var validFields = validateNonEmptyField($scope.newUser.first_name,         registerAlerts.firstNameAlert) &&
+                              validateNonEmptyField($scope.newUser.last_name,          registerAlerts.lastNameAlert) &&
                               validateNonEmptyField($scope.newUser.username,          registerAlerts.usernameAlert) &&
-                              validateNonEmptyField($scope.newUser.email,             registerAlerts.emailAlert) &&
-                              validateNonEmptyField($scope.newUser.permission_level,  registerAlerts.permissionLevelAlert);
-
+                              validateNonEmptyField($scope.newUser.email,             registerAlerts.emailAlert);
             validFields = validFields && validatePassword();
             return validFields;
          };

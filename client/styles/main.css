@@ -42,3 +42,32 @@ textarea {
   width: 450px;
 }
 
+.cursor tr {
+    cursor: pointer;
+}
+
+body .modal-dialog {
+    /* new custom width */
+    width: 800px;
+    /* must be half of the width, minus scrollbar on the left (30px) */
+}
+
+.animate-hide {
+  transition: all linear 0.5s;
+  line-height: 20px;
+  opacity: 1;
+  padding: 10px;
+  border: 1px solid black;
+  background: white;
+}
+
+.animate-hide.ng-hide {
+  line-height: 0;
+  opacity: 0;
+  padding: 0 10px;
+}
+
+/* centered columns styles */
+.row-centered {
+    text-align:center;
+}
