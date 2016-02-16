@@ -45,7 +45,6 @@ module.exports.buildQueryUpdateGroups = function(group){
         .table(group_table)
         .where(group_id + "=?", group.group_id)
         if(group_name in group){
-            console.log('here')
             query = query.set(group_name, group.group_name)
         }
         if(description in group){
