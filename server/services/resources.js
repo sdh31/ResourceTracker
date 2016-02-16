@@ -23,7 +23,7 @@ function get_resource_by_id(resource, callback){
                 callback({error: true, err: err});
             }
     });
-}
+};
 
 function create_resource(resource, callback){
     /*
@@ -84,7 +84,30 @@ id:id of resource to delete
         .on('end', function (){
             deleteResource(resource.resource_id, callback);
         });
-}
+};
+
+function addGroupPermissionToResource(body, callback) {
+
+    if (body.group_ids.length != body.resource_permissions.length) {
+        callback({error: true});
+        return;
+    }
+    
+    var addGroupPermissionToResourceQuery = resource_query_builder.buildQueryForAddGroupPermissionToResource(body);
+    console.log(addGroupPermissionToResourceQuery);
+    var error = false;
+    var insertId = -1;
+    db_sql.connection.query(addGroupPermissionToResourceQuery)
+        .on('result', function (row) {
+            insertId = row.insertId;
+        })
+        .on('error', function (err) {
+            error = true;
+        })
+        .on('end', function (){
+            callback({insertId: insertId, error: error});
+        });
+};
 
 var deleteResource = function(resource_id, callback) {
 
@@ -126,5 +149,6 @@ module.exports = {
 	get_resource_by_id: get_resource_by_id,
 	create_resource: create_resource,
     update_resource_by_id: update_resource_by_id,
-    delete_resource_by_id:delete_resource_by_id
+    delete_resource_by_id:delete_resource_by_id,
+    addGroupPermissionToResource: addGroupPermissionToResource
 };

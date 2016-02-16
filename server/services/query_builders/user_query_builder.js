@@ -65,3 +65,8 @@ module.exports.buildQueryForDeleteUser = function(username) {
                 .where("username = '" + username + "'")
                 .toString();
 };
+
+module.exports.buildQueryForGetAllUsers = function() {
+
+    return squel.select().from("user").toString();
+};

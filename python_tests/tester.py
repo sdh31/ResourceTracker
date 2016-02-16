@@ -52,14 +52,14 @@ res = r.get_groups()
 print len(r.json.loads(res.content)) == 2
 print r.json.loads(res.content)['results'][1]['group_name'] == 'nopegroup'
 
-res = r.add_user_to_group("admin", group_id)
+res = r.add_users_to_group([1], group_id)
 print res.status_code < 300
 
 res = r.get_users_in_group(group_id)
 print len(r.json.loads(res.content)['results']) == 1
 print r.json.loads(res.content)['results'][0]['username'] == 'admin'
 
-res = r.remove_user_from_group("admin", group_id)
+res = r.remove_users_from_group([1], group_id)
 print res.status_code < 300
 
 res = r.delete_group(group_id)
@@ -67,6 +67,15 @@ print res.status_code < 300
 
 res = r.get_groups()
 print len(r.json.loads(res.content)['results']) == 1
+
+res = r.get_all_users()
+print len(r.json.loads(res.content)['users']) == 1
+
+res = r.create_user('rahul', 'rahul123')
+print res.status_code < 300
+
+res = r.get_all_users()
+print len(r.json.loads(res.content)['users']) == 2
 
 
 

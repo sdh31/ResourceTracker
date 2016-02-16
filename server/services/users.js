@@ -8,6 +8,7 @@ var user_query_builder = require('./query_builders/user_query_builder');
 function create_user(user, callback){
     //Creates user given all parameters
     
+	var user_id = 0; 
     var createUserCallback = function() {
         user.is_private = 1;
         user.name = user.username + "_group";
@@ -18,9 +19,9 @@ function create_user(user, callback){
     var createGroupCallback = function(result) {
         var info = {
             group_id: result.results.insertId,
-            username: user.username
+            user_ids: [user_id]
         };
-        group_service.add_user_to_group(info, callback);
+        group_service.add_users_to_group(info, callback);
     };
 
     bcrypt.genSalt(10, function(err, salt) {
@@ -30,6 +31,7 @@ function create_user(user, callback){
 
             db_sql.connection.query(createUserQuery)
                 .on('result', function (row) {
+					user_id = row.insertId;
                     createUserCallback();
                 })
                 .on('error', function (err) {
@@ -209,6 +211,7 @@ function update_user(body, callback) {
         });
     } else {
         query = query.toString();
+        // TODO: this seems weird, on end shouldn't take a row
         db_sql.connection.query(query)
             .on('end', function (row) {
                 row.password = "";
@@ -220,7 +223,25 @@ function update_user(body, callback) {
         );
         
     }
-}
+};
+
+function get_all_users(callback) {
+    var getAllUsersQuery = user_query_builder.buildQueryForGetAllUsers();
+    console.log(getAllUsersQuery);
+    var error = false;
+    var users = [];
+    db_sql.connection.query(getAllUsersQuery)
+        .on('result', function (row) {
+            row.password = "";
+            users.push(row);
+        })
+        .on('error', function (err) {
+            error = true;
+        })
+        .on('end', function (row) {
+            callback({error: error, users: users});
+        });
+};
 
 function compare_passwords(password, user, callback) {
     bcrypt.compare(password, user.password, function(err, res) {
@@ -234,5 +255,6 @@ module.exports = {
     get_user_permissions: get_user_permissions,
     delete_user: delete_user,
     update_user: update_user,
+    get_all_users: get_all_users,
     compare_passwords: compare_passwords
 }

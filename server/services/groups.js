@@ -67,11 +67,11 @@ function get_groups_by_id(group, callback){
 	    });
 }
 
-function add_user_to_group(group, callback){
-	var create_query = group_queries.buildQueryAddUserToGroup(group)
+function add_users_to_group(group, callback){
+	var addUsersToGroupQuery = group_queries.buildQueryAddUsersToGroup(group)
 	row_to_return = [];
-	console.log(create_query);
-	db_sql.connection.query(create_query)
+	console.log(addUsersToGroupQuery);
+	db_sql.connection.query(addUsersToGroupQuery)
 	    .on('result', function (row) {
 	    	row_to_return.push(row)
 	     })
@@ -83,11 +83,11 @@ function add_user_to_group(group, callback){
 	    });
 }
 
-function remove_user_from_group(group, callback){
-	var delete_query = group_queries.buildQueryRemoveUserFromGroup(group)
+function remove_users_from_group(group, callback){
+	var removeUsersFromGroupQuery = group_queries.buildQueryRemoveUsersFromGroup(group)
 	row_to_return = [];
-	console.log(delete_query);
-	db_sql.connection.query(delete_query)
+	console.log(removeUsersFromGroupQuery);
+	db_sql.connection.query(removeUsersFromGroupQuery)
 	    .on('result', function (row) {
 	    	row_to_return.push(row)
 	     })
@@ -126,7 +126,7 @@ module.exports = {
 	toggle_group_privacy:toggle_group_privacy,
 	get_groups_by_id:get_groups_by_id,
 	update_group_by_id:update_group_by_id,
-	add_user_to_group:add_user_to_group,
-	remove_user_from_group:remove_user_from_group,
+	add_users_to_group:add_users_to_group,
+	remove_users_from_group:remove_users_from_group,
 	get_users_in_group:get_users_in_group
 }
