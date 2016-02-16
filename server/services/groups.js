@@ -2,7 +2,6 @@ var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var group_queries = require('./query_builders/group_query_builder');
 
-
 function create_group(group, callback){
 	var create_query = group_queries.buildQueryCreateGroups(group);
 	console.log(create_query);
