@@ -19,6 +19,11 @@ router.get('/', function(req,res,next){
 });
 
 router.put('/', function(req,res,next){
+        if(!('name' in req.body) ){
+        res.status(400).json({err: 'no group name specified'});
+    }
+    group_service.toggle_group_privacy(req.body, true);
+
     var create_group_callback = function(result){
         if(result.error == true){
             res.status(400).json(result.err);
@@ -27,12 +32,20 @@ router.put('/', function(req,res,next){
             res.status(200).json(result.results);
         }
     }
-    if(!('name' in req.body) ){
-        res.status(400).json({err: 'no group name specified'});
-    }
-    group_service.toggle_group_privacy(req.body, true);
 
-    group_service.create_group(req.body, create_group_callback);
+    var user_permission_callback = function(results){
+        if(results.error == true){
+            res.status(400).json(result.err)
+        }
+        else if(results.auth == false){
+            res.sendStatus(403);
+        }
+        else{
+            group_service.create_group(req.body, create_group_callback);
+        }
+    }
+    
+    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
 
 });
 
@@ -45,7 +58,20 @@ router.post('/', function(req,res,next){
             res.status(200).json(result.results);
         }
     }
-    group_service.update_group_by_id(req.body, update_group_callback);
+
+    var user_permission_callback = function(results){
+        if(results.error == true){
+            res.status(400).json(result.err)
+        }
+        else if(results.auth == false){
+            res.sendStatus(403);
+        }
+        else{
+            group_service.update_group_by_id(req.body, update_group_callback);
+        }
+    }
+    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
+    
 });
 
 router.delete('/', function(req,res,next){
@@ -58,8 +84,18 @@ router.delete('/', function(req,res,next){
         }
     }
 
-    group_service.delete_group_by_id(req.query, delete_group_callback);
-
+    var user_permission_callback = function(results){
+        if(results.error == true){
+            res.status(400).json(result.err)
+        }
+        else if(results.auth == false){
+            res.sendStatus(403);
+        }
+        else{
+            group_service.delete_group_by_id(req.query, delete_group_callback);
+        }
+    }
+    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
 });
 
 
@@ -101,7 +137,19 @@ router.delete('/user', function(req,res,next){
         }
     }
 
-    group_service.remove_user_from_group(req.query, remove_user_callback);
+    var user_permission_callback = function(results){
+        if(results.error == true){
+            res.status(400).json(result.err)
+        }
+        else if(results.auth == false){
+            res.sendStatus(403);
+        }
+        else{
+             group_service.remove_user_from_group(req.query, remove_user_callback);
+        }
+    }
+
+    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
 
 });
 
