@@ -17,7 +17,7 @@ exports.createAdmin = function(err) {
 		if (result.error == true) {
 			console.log('admin already created');
 		} else {
-			console.log('admin successfully created');
+			console.log('admin successfully created')
 		}
 	};
 
