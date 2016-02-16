@@ -44,8 +44,13 @@ module.exports.buildQueryUpdateGroups = function(group){
     var query  = squel.update()
         .table(group_table)
         .where(group_id + "=?", group.group_id)
-        .set(group_name, group.group_name)
-        .set(description, group.description)
+        if(group_name in group){
+            console.log('here')
+            query = query.set(group_name, group.group_name)
+        }
+        if(description in group){
+            query = query.set(description, group.description)
+        }
          if(user_permission in group){
             query = query.set(user_permission, group.user_management_permission)
         }
