@@ -3,10 +3,11 @@ var router = express.Router();
 var res_service = require('../services/resources');
 var tag_service = require('../services/tags');
 var auth = require('../services/authorization');
+var perm_service = require('../services/permissions');
 
 // returns the resource specified by resource_id
 // req.query should have a field "resource_id"
-router.get('/', auth.is('user'), function(req, res, next){
+router.get('/', function(req, res, next){
   
     var getResourceCallback = function (result) {
         if (result.error == true){
@@ -43,10 +44,23 @@ router.put('/', function(req, res, next){
         }
     }
 
-    res_service.create_resource(req.body, create_resource_callback);
+    var resource_permission_callback = function(results){
+        if(results.error == true){
+            res.status(400).json(result.err)
+        }
+        else if(results.auth == false){
+            res.sendStatus(403);
+        }
+        else{
+             res_service.create_resource(req.body, create_resource_callback);
+        }
+    }
+
+    perm_service.check_reservation_management_permission(1, req.session.user, resource_permission_callback);
+
 });
 
-router.post('/', auth.is('user'), function(req, res, next){
+router.post('/', function(req, res, next){
   
     var update_resource_callback = function(result){
         if (result.error == true){
@@ -56,7 +70,20 @@ router.post('/', auth.is('user'), function(req, res, next){
         }
     }
 
-    res_service.update_resource_by_id(req.body, update_resource_callback);
+    var resource_permission_callback = function(results){
+        if(results.error == true){
+            res.status(400).json(result.err)
+        }
+        else if(results.auth == false){
+            res.sendStatus(403);
+        }
+        else{
+             res_service.update_resource_by_id(req.body, update_resource_callback);
+        }
+    }
+
+    check_reservation_management_permission(1, req.session.user, resource_permission_callback);
+
 });
 
 router.delete('/', auth.is('user'), function(req, res, next){

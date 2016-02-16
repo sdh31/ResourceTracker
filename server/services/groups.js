@@ -40,6 +40,7 @@ function update_group_by_id(group, callback){
 
 function delete_group_by_id(group, callback){
 	var delete_query = group_queries.buildQueryDeleteGroups(group)
+	console.log(delete_query)
 	db_sql.connection.query(delete_query)
 	    
 	    .on('error', function (err) {

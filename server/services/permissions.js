@@ -13,25 +13,22 @@ function check_user_management_permission(min_permission_level, user, callback){
 	       	if (row.user_management_permission > max_user_permission){
 	       		max_user_permission = row.user_management_permission;
 	       	}
-	       	console.log(row.user_management_permission)
 	     })
 	    .on('error', function (err) {
 	        results = {error: true, err: err};
 	     })
 	    .on('end', function (err){
 	        if (max_user_permission >= min_permission_level){
-	        	console.log("authorized");
 	        	results = {error:false, auth: true}
 	        }
 	        else if(!('error' in results)){
-	        	console.log("unauthorized")
-	        	results = {error:false, auth: true};
+	        	results = {error:false, auth: false};
 	        }
 	        callback(results)
 	    });
 }
 
-function check_reservation_management_permission(min_permission_level, user, params, callback){
+function check_reservation_management_permission(min_permission_level, user, callback){
 	var getReservationPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
 	console.log(getReservationPermissionQuery);
 	var max_reservation_permission = 0;
@@ -43,20 +40,20 @@ function check_reservation_management_permission(min_permission_level, user, par
 	       	}
 	     })
 	    .on('error', function (err) {
-	        callback({error:true, err:err})
+	        results = {error: true, err: err};
 	     })
 	    .on('end', function (err){
 	        if (max_reservation_permission >= min_permission_level){
-	        	console.log("authorized");
-	        	authorized_callback(user, params, request_callback)
+	        	results = {error:false, auth: true}
 	        }
-	        else{
-	        	callback({error:true, err:"User does not have reservation management permissions"});
+	        else if(!('error' in results)){
+	        	results = {error:false, auth: false};
 	        }
+	        callback(results)
 	    });
 }
 
-function check_resource_management_permission(min_permission_level, user, params, callback){
+function check_resource_management_permission(min_permission_level, user){
 	var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
 		console.log(getResourcePermissionQuery);
 		var max_resource_permission = 0;
@@ -67,17 +64,18 @@ function check_resource_management_permission(min_permission_level, user, params
 		       		max_resource_permission = row.resource_management_permission;
 		       	}
 		     })
-		    .on('error', function (err) {
-		        callback({error:true, err:err})
-		     })
-		    .on('end', function (err){
-		        if (max_resource_permission >= min_permission_level){
-		        	authorized_callback(user, params, request_callback)
-		        }
-		        else{
-		        	callback({error:true, err:"User does not have reservation management permissions"});
-		        }
-		    });
+		.on('error', function (err) {
+	        results = {error: true, err: err};
+	     })
+	    .on('end', function (err){
+	        if (max_resource_permission >= min_permission_level){
+	        	results = {error:false, auth: true}
+	        }
+	        else if(!('error' in results)){
+	        	results = {error:false, auth: false};
+	        }
+	        callback(results)
+	    });
 }
 
 
