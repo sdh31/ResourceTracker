@@ -27,7 +27,8 @@ res = r.create_reservation(resource_id, 3, 4)
 print res.status_code
 
 res = r.get_reservations(resource_id, 0, 99999)
-print r.json.loads(res.content)['results']
+print r.json.loads(res.content)['results'][0]['start_time'] == 5
+print r.json.loads(res.content)['results'][0]['end_time'] == 10
 
 res = r.update_reservations(resource_id, 5, 10, reservation_id)
 print res.status_code
