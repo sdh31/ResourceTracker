@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var group_service = require('../services/groups');
+var perm_service = require('../services/permissions');
 
 router.get('/', function(req,res,next){
     var get_group_callback = function(result){
@@ -72,7 +73,20 @@ router.put('/user', function(req,res,next){
         }
 
     }
-    group_service.add_user_to_group(req.body, add_user_callback)
+    var user_permission_callback = function(results){
+        if(results.error == true){
+            res.status(400).json(result.err)
+        }
+        else if(results.auth == false){
+            res.sendStatus(403);
+        }
+        else{
+            group_service.add_user_to_group(req.body, add_user_callback)
+        }
+    }
+    
+
+    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
 
 
 });
@@ -100,9 +114,9 @@ router.get('/user', function(req,res,next){
             res.status(200).json(result.results);
         }
     }
-
     group_service.get_users_in_group(req.query, get_user_callback);
 
 });
+
 
 module.exports = router;

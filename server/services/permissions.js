@@ -1,0 +1,89 @@
+var db_sql = require('./db_wrapper');
+var squel = require('squel');
+var permission_queries = require('./query_builders/permission_query_builder');
+
+function check_user_management_permission(min_permission_level, user, callback){
+	var getUserPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
+	console.log(getUserPermissionQuery);
+	var max_user_permission = 0;
+	var results = {};
+
+	db_sql.connection.query(getUserPermissionQuery)
+	    .on('result', function (row) {
+	       	if (row.user_management_permission > max_user_permission){
+	       		max_user_permission = row.user_management_permission;
+	       	}
+	       	console.log(row.user_management_permission)
+	     })
+	    .on('error', function (err) {
+	        results = {error: true, err: err};
+	     })
+	    .on('end', function (err){
+	        if (max_user_permission >= min_permission_level){
+	        	console.log("authorized");
+	        	results = {error:false, auth: true}
+	        }
+	        else if(!('error' in results)){
+	        	console.log("unauthorized")
+	        	results = {error:false, auth: true};
+	        }
+	        callback(results)
+	    });
+}
+
+function check_reservation_management_permission(min_permission_level, user, params, callback){
+	var getReservationPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
+	console.log(getReservationPermissionQuery);
+	var max_reservation_permission = 0;
+
+	db_sql.connection.query(getReservationPermissionQuery)
+	    .on('result', function (row) {
+	       	if (row.reservation_management_permission > max_reservation_permission){
+	       		max_reservation_permission = row.reservation_management_permission;
+	       	}
+	     })
+	    .on('error', function (err) {
+	        callback({error:true, err:err})
+	     })
+	    .on('end', function (err){
+	        if (max_reservation_permission >= min_permission_level){
+	        	console.log("authorized");
+	        	authorized_callback(user, params, request_callback)
+	        }
+	        else{
+	        	callback({error:true, err:"User does not have reservation management permissions"});
+	        }
+	    });
+}
+
+function check_resource_management_permission(min_permission_level, user, params, callback){
+	var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
+		console.log(getResourcePermissionQuery);
+		var max_resource_permission = 0;
+
+		db_sql.connection.query(getResourcePermissionQuery)
+		    .on('result', function (row) {
+		       	if (row.resource_management_permission > max_resource_permission){
+		       		max_resource_permission = row.resource_management_permission;
+		       	}
+		     })
+		    .on('error', function (err) {
+		        callback({error:true, err:err})
+		     })
+		    .on('end', function (err){
+		        if (max_resource_permission >= min_permission_level){
+		        	authorized_callback(user, params, request_callback)
+		        }
+		        else{
+		        	callback({error:true, err:"User does not have reservation management permissions"});
+		        }
+		    });
+}
+
+
+
+module.exports = {
+	check_user_management_permission: check_user_management_permission,
+	check_resource_management_permission: check_resource_management_permission,
+	check_reservation_management_permission: check_reservation_management_permission
+}
