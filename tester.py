@@ -43,14 +43,14 @@ print group_id
 res = r.get_groups(group_id)
 print r.json.loads(res.content)
 
-res = r.update_group(group_id, "nopegroup", "fun", False, False, True)
+res = r.update_group(group_id, "nopegroup", "fun", True, True, True)
 print res.status_code
 
 res = r.get_groups(group_id)
 print r.json.loads(res.content)
 
 res = r.add_user_to_group("admin", group_id)
-print res.status_code
+print res.status_code 
 
 res = r.get_users_in_group(group_id)
 print r.json.loads(res.content)
@@ -58,8 +58,11 @@ print r.json.loads(res.content)
 res = r.remove_user_from_group("admin", group_id)
 print res.status_code
 
-#res = r.delete_group(group_id)
-#print res.status_code
+res = r.get_users_in_group(group_id)
+print r.json.loads(res.content)
+
+res = r.delete_group(group_id)
+print res.status_code
 
 res = r.get_groups(group_id)
 print r.json.loads(res.content)
