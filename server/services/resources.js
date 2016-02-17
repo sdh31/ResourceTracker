@@ -9,7 +9,6 @@ function get_resource_by_id(resource, callback){
     return resource specified by resource_id in resource.resource_id
     */
 	var getResourceByIdQuery = resource_query_builder.buildQueryForGetResourceById(resource);
-	console.log(getResourceByIdQuery);
     basic_db_utility.performSingleRowDBOperation(getResourceByIdQuery, callback);
 };
 
@@ -19,7 +18,6 @@ function create_resource(resource, callback){
     resource: dictionary of all parameters, as stored in the json body of a request    
     */
 	var createResourceQuery = resource_query_builder.buildQueryForCreateResource(resource);
-    console.log(createResourceQuery);
     basic_db_utility.performSingleRowDBOperation(createResourceQuery, callback);
 }
 
@@ -29,7 +27,6 @@ Update specified fields of specified resource
 resource: dictionary of fields TO UPDATE, and the id of specified resource
 */
 	var updateResourceQuery = resource_query_builder.buildQueryForUpdateResource(resource);
-    console.log(updateResourceQuery);
     basic_db_utility.performSingleRowDBOperation(updateResourceQuery, callback);
 }
 
@@ -62,14 +59,12 @@ function addGroupPermissionToResource(body, callback) {
     }
     
     var addGroupPermissionToResourceQuery = resource_query_builder.buildQueryForAddGroupPermissionToResource(body);
-    console.log(addGroupPermissionToResourceQuery);
     basic_db_utility.performSingleRowDBOperation(addGroupPermissionToResourceQuery, callback);
 };
 
 var deleteResource = function(resource_id, callback) {
 
     var deleteResourceQuery = resource_query_builder.buildQueryForDeleteResource(resource_id);
-    console.log(deleteResourceQuery);
     basic_db_utility.performSingleRowDBOperation(deleteResourceQuery, callback);
 }
 

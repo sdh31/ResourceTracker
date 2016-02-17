@@ -8,7 +8,7 @@ router.get('/', auth.is('user'), function(req, res, next){
         if(result.error == true){
             res.status(400).json(result);
         } else{
-            res.send(result);
+            res.status(200).json(result);
         }
     };
 
@@ -28,7 +28,7 @@ router.get('/', auth.is('user'), function(req, res, next){
 router.put('/', function(req, res, next){
 
     var request_callback = function(result){
-        if(result.error == true){
+        if(result.error){
             res.status(403).json(result);
         } else{
             res.status(200).json(result);

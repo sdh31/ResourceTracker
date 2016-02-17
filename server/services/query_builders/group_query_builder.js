@@ -100,7 +100,7 @@ module.exports.buildQueryRemoveUsersFromGroup = function(group){
 module.exports.buildQueryGetUsersFromGroup = function(group){
     return squel.select()
         .from(user_group_table)
-        .fields(['username', user_group_table + '.' + user_group_user, user_group_table + '.' + user_group_group])
+        .fields(['username', 'first_name', 'last_name', user_group_table + '.' + user_group_user, user_group_table + '.' + user_group_group])
         .join("user", null, user_group_table + '.' + user_group_user + '= user.user_id')
         .where(user_group_table + '.' + user_group_group + '=?', group.group_id)
         .toString()

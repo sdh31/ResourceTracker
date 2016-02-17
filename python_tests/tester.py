@@ -7,10 +7,19 @@ session_response = r.login_to_session('admin', 'Treeadmin')
 print session_response.status_code < 300
 r.session = session_response.cookies
 
+print '#### update admin user to have new email ####'
+res = r.update_user(username="admin",email_address="ashwin.kommajesula@gmail.com")
+print res.status_code < 300
+
+print '#### get all users in DB, make sure theres only 1 and that the username == admin ####'
+res = r.get_all_users()
+print len(r.json.loads(res.content)['results']) == 1
+print r.json.loads(res.content)['results'][0]['email_address'] == 'ashwin.kommajesula@gmail.com'
+
 print '#### create resource with tags ####'
 res = r.create_resource("my resource", "huh", 1, ['ant', 'eater', 'shit'])
 print res.status_code < 300
-resource_id = r.json.loads(res.content)['insert_id']
+resource_id = r.json.loads(res.content)['insertId']
 
 print '#### create resource without tags ####'
 res = r.create_resource("notags", "notags", 1, [])
@@ -33,7 +42,6 @@ print r.json.loads(res.content)['results']['name'] == "my resource edited"
 print '#### create reservation ####'
 res = r.create_reservation(resource_id, 1, 2)
 print res.status_code < 300
-
 reservation_id = r.json.loads(res.content)['insertId']
 
 print '#### create an aliasing reservation ####'
@@ -67,10 +75,10 @@ print res.status_code < 300
 group_id = r.json.loads(res.content)['results']['insertId']
 
 print '#### get groups and check if there are 2 ####'
-res = r.get_groups(group_id)
+res = r.get_groups()
 #Check is 2 because of admin users private group
-print len(r.json.loads(res.content)) == 2
-print r.json.loads(res.content)['results'][0]['group_name'] == "fungroup"
+print len(r.json.loads(res.content)['results']) == 2
+print r.json.loads(res.content)['results'][1]['group_name'] == "fungroup"
 
 print '#### update group ####'
 res = r.update_group(group_id, "nopegroup", "fun", False, False, True)
@@ -78,7 +86,7 @@ print res.status_code < 300
 
 print '#### make sure update has persisted ####'
 res = r.get_groups()
-print len(r.json.loads(res.content)) == 2
+print len(r.json.loads(res.content)['results']) == 2
 print r.json.loads(res.content)['results'][1]['group_name'] == 'nopegroup'
 
 print '#### add the admin user to the group ####'
@@ -89,6 +97,7 @@ print '#### make sure that the admin user has been successfully added ####'
 res = r.get_users_in_group(group_id)
 print len(r.json.loads(res.content)['results']) == 1
 print r.json.loads(res.content)['results'][0]['username'] == 'admin'
+print r.json.loads(res.content)['results'][0]['first_name'] == 'admin'
 
 print '#### remove the admin user from the group ####'
 res = r.remove_users_from_group([1], group_id)
@@ -102,10 +111,15 @@ print '#### get groups and make sure the group was deleted ####'
 res = r.get_groups()
 print len(r.json.loads(res.content)['results']) == 1
 
+print '#### update admin user to have new email ####'
+res = r.update_user(username="admin", email_address="admin@admin.com")
+print res.status_code < 300
+
 print '#### get all users in DB, make sure theres only 1 and that the username == admin ####'
 res = r.get_all_users()
-print len(r.json.loads(res.content)['users']) == 1
-print r.json.loads(res.content)['users'][0]['username'] == 'admin'
+print len(r.json.loads(res.content)['results']) == 1
+print r.json.loads(res.content)['results'][0]['username'] == 'admin'
+print r.json.loads(res.content)['results'][0]['email_address'] == 'admin@admin.com'
 
 # creating local users cooks us as of now because when they get deleted the private group they are a part of isnt deleted
 

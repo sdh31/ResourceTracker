@@ -59,12 +59,18 @@ def create_user(username, password):
 	}
 	return send_request(method, params, url)
 
-def update_user(username, password = None):
+def update_user(username, newUsername = None, password = None, email_address = None):
 	url = baseUrl + '/user'
 	method = "POST"
-	params['username'] = username
-	if password:
-		params['password'] = password
+	params = {
+        'username': username
+    }
+        if password:
+		    params['password'] = password
+        if email_address:
+            params['email_address'] = email_address
+        if newUsername:
+		    params['newUsername'] = newUsername
 
 	return send_request(method, params, url)
 

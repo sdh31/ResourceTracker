@@ -22,10 +22,13 @@ router.get('/', function(req, res, next){
 
 router.put('/', function(req, res, next){
   
+    var resource_id = 0;
     var create_tag_resource_callback = function(result) {
         if (result.error){
             res.sendStatus(400);
         } else {
+            // not sure how we should handle this situation, ideally this method doesn't do multiple things
+            result.results.insertId = resource_id;
             res.status(200).json(result.results);
         }
     }
@@ -34,7 +37,7 @@ router.put('/', function(req, res, next){
         if(result.error) {
             res.sendStatus(400);
         } else {
-            var resource_id = result.results.insertId;
+            resource_id = result.results.insertId;
             if ("tags" in req.body && req.body.tags.length > 0) {
                 tag_service.create_tag(resource_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
             } else {

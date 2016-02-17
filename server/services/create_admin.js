@@ -10,7 +10,7 @@ exports.createAdmin = function(err) {
 		reservation_management_permission: 1,
 		first_name: 'admin',
 		last_name: 'admin',
-		email_address: 'ashwin.kommajesula@gmail.com'
+		email_address: 'admin@admin.com'
 	};
 	
 	var createAdminUserCallback = function (result) {
