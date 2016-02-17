@@ -38,17 +38,16 @@ router.put('/', function(req, res, next){
             if ("tags" in req.body && req.body.tags.length > 0) {
                 tag_service.create_tag(resource_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
             } else {
-
                 res.status(200).json(result.results);
             }
         }
     }
 
     var resource_permission_callback = function(results){
-        if(results.error == true){
+        if(results.error){
             res.status(400).json(result.err)
         }
-        else if(results.auth == false){
+        else if(!results.auth){
             res.sendStatus(403);
         }
         else{
@@ -66,7 +65,7 @@ router.post('/', function(req, res, next){
         if (result.error){
             res.sendStatus(400);
         } else {
-            res.sendStatus(200);
+            res.status(200).json(result);
         }
     }
 
@@ -89,10 +88,10 @@ router.post('/', function(req, res, next){
 router.delete('/', auth.is('user'), function(req, res, next){
   
     var delete_resource_callback = function(result){
-        if (result.error){
-          res.sendStatus(400);
+       if (result.error){
+            res.sendStatus(400);
         } else {
-            res.sendStatus(200);
+            res.status(200).json(result);
         }
     }
 
@@ -121,11 +120,22 @@ router.put('/addPermission', function(req, res, next) {
         if (result.error){
             res.sendStatus(400);
         } else {
-            res.sendStatus(200);
+            res.status(200).json(result);
         }
     };
-    // TODO: need to add permission check
-    res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);
+
+    var resource_permission_callback = function(results){
+        if (results.error){
+            res.status(400).json(result.err)
+        }
+        else if (!results.auth){
+            res.sendStatus(403);
+        } else{
+             res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);
+        }
+    }
+
+    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
 });
 
 module.exports = router;

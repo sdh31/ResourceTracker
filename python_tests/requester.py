@@ -99,7 +99,7 @@ def get_resource_by_id(id):
 	method = "GET"
 
 	params = {
-	    'id': id
+	    'resource_id': id
 	}
 
 	return send_request(method, params, url)
@@ -137,7 +137,9 @@ def delete_resource(id):
 	url = baseUrl + '/resource'
 	method = "DELETE"
 
-	params['resource_id'] = id
+	params = {
+        'resource_id': id
+    }
 
 	return send_request(method, params, url)
 

@@ -1,7 +1,8 @@
-var db_sql = require('./db_wrapper');
 var tag_service = require('../services/tags');
 var agenda = require('./agenda');
 var resource_query_builder = require('./query_builders/resource_query_builder');
+var basic_db_utility = require('./basic_db_utility');
+var db_sql = require('./db_wrapper');
 
 function get_resource_by_id(resource, callback){
     /*
@@ -9,20 +10,7 @@ function get_resource_by_id(resource, callback){
     */
 	var getResourceByIdQuery = resource_query_builder.buildQueryForGetResourceById(resource);
 	console.log(getResourceByIdQuery);
-    var rowCount = 0;
-	db_sql.connection.query(getResourceByIdQuery)
-        .on('result', function (row) {
-            rowCount++;
-            callback(row);
-        })
-        .on('error', function (err) {
-            callback({error: true, err: err});
-        })
-        .on('end', function (err){
-            if (rowCount == 0){
-                callback({error: true, err: err});
-            }
-    });
+    basic_db_utility.performSingleRowDBOperation(getResourceByIdQuery, callback);
 };
 
 function create_resource(resource, callback){
@@ -32,20 +20,7 @@ function create_resource(resource, callback){
     */
 	var createResourceQuery = resource_query_builder.buildQueryForCreateResource(resource);
     console.log(createResourceQuery);
-    var rowCount = 0;
-	db_sql.connection.query(createResourceQuery)
-		.on('result', function (row) {
-            rowCount++;
-            callback({error:false, results: row});
-        })
-        .on('error', function (err) {
-            callback({error: true, err: err});
-        })
-        .on('end', function (err) {
-            if (rowCount == 0){
-                callback({error: true, err: err});
-            }
-        });
+    basic_db_utility.performSingleRowDBOperation(createResourceQuery, callback);
 }
 
 function update_resource_by_id(resource, callback){
@@ -55,14 +30,7 @@ resource: dictionary of fields TO UPDATE, and the id of specified resource
 */
 	var updateResourceQuery = resource_query_builder.buildQueryForUpdateResource(resource);
     console.log(updateResourceQuery);
-	db_sql.connection.query(updateResourceQuery)
-		.on('result', function (row) {
-            callback(row);
-        })
-        .on('error', function (err) {
-            console.log(err)
-            callback({error: true, err: err});
-        });
+    basic_db_utility.performSingleRowDBOperation(updateResourceQuery, callback);
 }
 
 function delete_resource_by_id(resource, callback){
@@ -95,32 +63,14 @@ function addGroupPermissionToResource(body, callback) {
     
     var addGroupPermissionToResourceQuery = resource_query_builder.buildQueryForAddGroupPermissionToResource(body);
     console.log(addGroupPermissionToResourceQuery);
-    var error = false;
-    var insertId = -1;
-    db_sql.connection.query(addGroupPermissionToResourceQuery)
-        .on('result', function (row) {
-            insertId = row.insertId;
-        })
-        .on('error', function (err) {
-            error = true;
-        })
-        .on('end', function (){
-            callback({insertId: insertId, error: error});
-        });
+    basic_db_utility.performSingleRowDBOperation(addGroupPermissionToResourceQuery, callback);
 };
 
 var deleteResource = function(resource_id, callback) {
 
-    var deleteQuery = resource_query_builder.buildQueryForDeleteResource(resource_id);
-    console.log(deleteQuery);
-    
-    db_sql.connection.query(deleteQuery)
-        .on('error', function (err) {
-            callback({error: true, err: err});
-        })
-        .on('end', function (){
-            callback({error: false});
-        });
+    var deleteResourceQuery = resource_query_builder.buildQueryForDeleteResource(resource_id);
+    console.log(deleteResourceQuery);
+    basic_db_utility.performSingleRowDBOperation(deleteResourceQuery, callback);
 }
 
 var notifyUserOnReservationDelete = function(row) {

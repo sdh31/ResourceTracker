@@ -15,6 +15,11 @@ resource_id = r.json.loads(res.content)['insert_id']
 print '#### create resource without tags ####'
 res = r.create_resource("notags", "notags", 1, [])
 print res.status_code < 300
+no_tags_id = r.json.loads(res.content)['insertId']
+
+print '#### delete resource without tags ####'
+res = r.delete_resource(no_tags_id)
+print res.status_code < 300
 
 print '#### update resource ####'
 res = r.update_resource(resource_id, "my resource edited", "huh edited")
@@ -23,7 +28,7 @@ print res.status_code < 300
 print '#### get updated resource ####'
 res = r.get_resource_by_id(resource_id)
 print res.status_code < 300
-print r.json.loads(res.content)['name'] == "my resource edited"
+print r.json.loads(res.content)['results']['name'] == "my resource edited"
 
 print '#### create reservation ####'
 res = r.create_reservation(resource_id, 1, 2)
