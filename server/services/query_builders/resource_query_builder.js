@@ -57,7 +57,6 @@ module.exports.buildQueryForDeleteResource = function(resource_id) {
     .toString();
 };
 
-
 //body contains resource_id, group_ids, resource_permissions
 module.exports.buildQueryForAddGroupPermissionToResource = function(body) {
 
@@ -72,3 +71,25 @@ module.exports.buildQueryForAddGroupPermissionToResource = function(body) {
         .setFieldsRows(rows_to_add)
         .toString();
 };
+
+// body contains resource_id, group_ids
+module.exports.buildQueryForRemoveGroupPermissionToResource = function(body) {
+
+    var expr = squel.delete().from("resource_group");
+
+    for(var i = 0; i < body.group_ids.length; i++){
+        expr.where("group_id = " + body.group_ids[i] + " AND resource_id = " + body.resource_id);
+    }
+
+    return expr.toString();
+};
+
+// body contains resource_id
+module.exports.buildQueryForGetGroupPermissionToResource = function(body) {
+
+    return squel.select()
+            .from("resource_group")
+            .where("resource_id = " + body.resource_id)
+            .toString();
+};
+

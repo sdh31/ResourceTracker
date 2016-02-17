@@ -149,6 +149,39 @@ def delete_resource(id):
 
 	return send_request(method, params, url)
 
+def add_group_permission_to_resource(resource_id, group_ids, resource_permissions):
+	url = baseUrl + '/resource/addPermission'
+	method = "POST"
+
+	params = {
+        'resource_id': resource_id,
+		'group_ids': group_ids,
+		'resource_permissions': resource_permissions
+    }
+
+	return send_request(method, params, url)
+
+def remove_group_permission_to_resource(resource_id, group_ids):
+	url = baseUrl + '/resource/removePermission'
+	method = "POST"
+
+	params = {
+        'resource_id': resource_id,
+		'group_ids': group_ids
+    }
+
+	return send_request(method, params, url)
+
+def get_group_permission_to_resource(resource_id):
+	url = baseUrl + '/resource/getPermission'
+	method = "GET"
+
+	params = {
+        'resource_id': resource_id
+    }
+
+	return send_request(method, params, url)
+
 def add_tag(resource_id, tags):
 	url = baseUrl + '/tag'
 	method = "PUT"

@@ -99,6 +99,24 @@ print len(r.json.loads(res.content)['results']) == 1
 print r.json.loads(res.content)['results'][0]['username'] == 'admin'
 print r.json.loads(res.content)['results'][0]['first_name'] == 'admin'
 
+print '#### add view permission to the group for the resource with tags ####'
+res = r.add_group_permission_to_resource(resource_id, [group_id], ['view'])
+print res.status_code < 300
+
+print '#### get permissions for resource with tags and make sure we good ####'
+res = r.get_group_permission_to_resource(resource_id)
+print res.status_code < 300
+print r.json.loads(res.content)['results'][0]['group_id'] == group_id
+
+print '#### remove view permission to the group for the resource with tags ####'
+res = r.remove_group_permission_to_resource(resource_id, [group_id])
+print res.status_code < 300
+
+print '#### get permissions for resource with tags and make sure theres nothing ####'
+res = r.get_group_permission_to_resource(resource_id)
+print res.status_code < 300
+print len(r.json.loads(res.content)['results']) == 0
+
 print '#### remove the admin user from the group ####'
 res = r.remove_users_from_group([1], group_id)
 print res.status_code < 300
@@ -120,6 +138,10 @@ res = r.get_all_users()
 print len(r.json.loads(res.content)['results']) == 1
 print r.json.loads(res.content)['results'][0]['username'] == 'admin'
 print r.json.loads(res.content)['results'][0]['email_address'] == 'admin@admin.com'
+
+print '#### cleanup by deleting the resource that we created ####'
+res = r.delete_resource(resource_id)
+print res.status_code < 300
 
 # creating local users cooks us as of now because when they get deleted the private group they are a part of isnt deleted
 

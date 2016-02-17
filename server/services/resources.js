@@ -62,6 +62,20 @@ function addGroupPermissionToResource(body, callback) {
     basic_db_utility.performSingleRowDBOperation(addGroupPermissionToResourceQuery, callback);
 };
 
+function removeGroupPermissionToResource(body, callback) {
+    
+    var removeGroupPermissionToResourceQuery = resource_query_builder.buildQueryForRemoveGroupPermissionToResource(body);
+    basic_db_utility.performSingleRowDBOperation(removeGroupPermissionToResourceQuery, callback);
+    
+};
+
+function getGroupPermissionToResource(body, callback) {
+    
+    var getGroupPermissionToResourceQuery = resource_query_builder.buildQueryForGetGroupPermissionToResource(body);
+    basic_db_utility.performMultipleRowDBOperation(getGroupPermissionToResourceQuery, callback);
+    
+};
+
 var deleteResource = function(resource_id, callback) {
 
     var deleteResourceQuery = resource_query_builder.buildQueryForDeleteResource(resource_id);
@@ -95,5 +109,7 @@ module.exports = {
 	create_resource: create_resource,
     update_resource_by_id: update_resource_by_id,
     delete_resource_by_id:delete_resource_by_id,
-    addGroupPermissionToResource: addGroupPermissionToResource
+    addGroupPermissionToResource: addGroupPermissionToResource,
+    removeGroupPermissionToResource: removeGroupPermissionToResource,
+    getGroupPermissionToResource: getGroupPermissionToResource
 };
