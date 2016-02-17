@@ -1,5 +1,6 @@
 var db_sql = require('./db_wrapper');
 var tag_query_builder = require('./query_builders/tag_query_builder');
+var basic_db_utility = require('./basic_db_utility');
 
 function create_resource_tag_link(resource_id, tag_ids, callback){
     /*
@@ -8,14 +9,7 @@ function create_resource_tag_link(resource_id, tag_ids, callback){
     tag_ids: list of ids' of tags being added
     */
     var createResourceTagLinkQuery = tag_query_builder.buildQueryForCreateResourceTagLink(resource_id, tag_ids);
-    
-    db_sql.connection.query(createResourceTagLinkQuery)
-        .on('error', function (err) {
-            callback({error: true, err: err});
-        })
-        .on('end', function () {
-            callback({error: false, results: {insert_id: resource_id}});
-        });
+    basic_db_utility.performSingleRowDBOperation(createResourceTagLinkQuery, callback);
 }
 
 
@@ -135,14 +129,7 @@ function get_all_tags(callback) {
 function remove_tag_from_object(tag_info, callback){
     
     var removetagFromObjectQuery = tag_query_builder.buildQueryForRemoveTagFromObject(tag_info);
-
-    db_sql.connection.query(removetagFromObjectQuery)
-        .on('error', function (err) {
-            callback({error: true, err: err});
-        })
-        .on('end', function (){
-            callback({error: false});
-        });
+    basic_db_utility.performSingleRowDBOperation(removetagFromObjectQuery, callback);
 };
 
 function organizeResources(resources) {

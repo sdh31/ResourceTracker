@@ -5,7 +5,7 @@ var perm_service = require('../services/permissions');
 
 router.get('/', function(req,res,next){
     var get_group_callback = function(result){
-        if(result.error == true){
+        if(result.error){
             res.status(400).json(result);
         }
         else{
@@ -25,7 +25,7 @@ router.put('/', function(req,res,next){
     group_service.toggle_group_privacy(req.body, false);
 
     var create_group_callback = function(result){
-        if(result.error == true){
+        if(result.error){
             res.status(400).json(result);
         }
         else{
@@ -34,10 +34,10 @@ router.put('/', function(req,res,next){
     }
 
     var user_permission_callback = function(results){
-        if(results.error == true){
+        if(results.error){
             res.status(400).json(result)
         }
-        else if(results.auth == false){
+        else if(!results.auth){
             res.sendStatus(403);
         }
         else{
@@ -51,7 +51,7 @@ router.put('/', function(req,res,next){
 
 router.post('/', function(req,res,next){
     var update_group_callback = function(result){
-        if(result.error == true){
+        if(result.error){
             res.status(400).json(result);
         }
         else{
@@ -60,10 +60,10 @@ router.post('/', function(req,res,next){
     }
 
     var user_permission_callback = function(results){
-        if(results.error == true){
+        if(results.error){
             res.status(400).json(result)
         }
-        else if(results.auth == false){
+        else if(!results.auth){
             res.sendStatus(403);
         }
         else{
@@ -76,7 +76,7 @@ router.post('/', function(req,res,next){
 
 router.delete('/', function(req,res,next){
     var delete_group_callback = function(result){
-        if(result.error == true){
+        if(result.error){
             res.status(400).json(result);
         }
         else{
@@ -85,7 +85,7 @@ router.delete('/', function(req,res,next){
     }
 
     var user_permission_callback = function(results){
-        if(results.error == true){
+        if(results.error){
             res.status(400).json(result)
         }
         else if(results.auth == false){
@@ -98,10 +98,11 @@ router.delete('/', function(req,res,next){
     perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
 });
 
+// req.body should have user_ids and group_id
 
-router.put('/user', function(req,res,next){
+router.post('/addUsers', function(req,res,next){
     var add_user_callback = function(result){
-        if(result.error == true){
+        if(result.error){
             res.status(400).json(result);
         }
         else{
@@ -109,27 +110,27 @@ router.put('/user', function(req,res,next){
         }
 
     }
+
     var user_permission_callback = function(results){
-        if(results.error == true){
+        if(results.error){
             res.status(400).json(result)
         }
         else if(results.auth == false){
             res.sendStatus(403);
         }
         else{
-            group_service.add_user_to_group(req.body, add_user_callback)
+            group_service.add_users_to_group(req.body, add_user_callback)
         }
     }
     
-
     perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
-
 
 });
 
-router.delete('/user', function(req,res,next){
+// req.body should have user_ids and group_id
+router.post('/removeUsers', function(req,res,next){
     var remove_user_callback = function(result){
-        if(result.error == true){
+        if(result.error){
             res.status(400).json(result);
         }
         else{
@@ -138,14 +139,14 @@ router.delete('/user', function(req,res,next){
     }
 
     var user_permission_callback = function(results){
-        if(results.error == true){
+        if(results.error){
             res.status(400).json(result)
         }
-        else if(results.auth == false){
+        else if(!results.auth){
             res.sendStatus(403);
         }
         else{
-             group_service.remove_user_from_group(req.query, remove_user_callback);
+             group_service.remove_users_from_group(req.body, remove_user_callback);
         }
     }
 
@@ -155,7 +156,7 @@ router.delete('/user', function(req,res,next){
 
 router.get('/user', function(req,res,next){
     var get_user_callback = function(result){
-        if(result.error == true){
+        if(result.error){
             res.status(400).json(result);
         }
         else{
@@ -166,5 +167,5 @@ router.get('/user', function(req,res,next){
 
 });
 
-
 module.exports = router;
+

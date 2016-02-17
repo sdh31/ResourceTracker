@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var user_service = require('../services/users');
 var auth = require('../services/authorization');
+var perm_service = require('../services/permissions');
 
 router.get('/', auth.is('user'), function(req, res, next){
     //read user
@@ -71,6 +72,29 @@ router.delete('/', auth.is('user'), function(req, res, next){
 
     var username = req.query["username"];
     user_service.delete_user(username, deleteUserCallback);
+});
+
+router.get('/all', function(req,res,next){
+    var getAllUsersCallback = function(result){
+        if(result.error){
+            res.status(400).json(result);
+        } else {
+            res.status(200).json(result);
+        }
+    }
+
+    var user_permission_callback = function(results){
+        if(results.error){
+            res.status(400).json(result);
+        } else if(!results.auth){
+            res.sendStatus(403);
+        } else {
+            user_service.get_all_users(getAllUsersCallback);
+        }
+    }
+    
+    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
+
 });
 
 router.post('/signin', function(req, res, next){

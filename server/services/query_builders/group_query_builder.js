@@ -72,33 +72,35 @@ module.exports.buildQueryGetGroups = function(group){
     return query.toString()
 }
 
-module.exports.buildQueryAddUserToGroup = function(group){  
+module.exports.buildQueryAddUsersToGroup = function(group){
+
+    var rows_to_add = [];
+    for(var i = 0; i < group.user_ids.length; i++){
+        var row = {"group_id": group.group_id, "user_id": group.user_ids[i]};
+        rows_to_add.push(row);
+    }
+
     return squel.insert()
         .into(user_group_table)
-        .fromQuery(
-            ['user_id', user_group_group],
-            squel.select()
-                .fields(['user_id', group.group_id.toString()])
-                .from('user')
-                .where('username = ?', group.username)
-        )
+        .setFieldsRows(rows_to_add)
         .toString()
 }
 
-module.exports.buildQueryRemoveUserFromGroup = function(group){
-    return squel.delete()
-        .target(user_group_table)
-        .from(user_group_table)
-        .join("user", null, user_group_table + '.' + user_group_user + '= user.user_id')
-        .where('user.username = ?', group.username)
-        .where(user_group_table + '.' + user_group_group + '= ?', group.group_id)
-        .toString();
+module.exports.buildQueryRemoveUsersFromGroup = function(group){
+    var expr = squel.delete().from(user_group_table);
+
+    for(var i = 0; i < group.user_ids.length; i++){
+        expr.where("user_id = " + group.user_ids[i] + " AND group_id = " + group.group_id);
+    }
+
+    return expr.toString();
+        
 }
 
 module.exports.buildQueryGetUsersFromGroup = function(group){
     return squel.select()
         .from(user_group_table)
-        .fields(['username', user_group_table + '.' + user_group_user, user_group_table + '.' + user_group_group])
+        .fields(['username', 'first_name', 'last_name', user_group_table + '.' + user_group_user, user_group_table + '.' + user_group_group])
         .join("user", null, user_group_table + '.' + user_group_user + '= user.user_id')
         .where(user_group_table + '.' + user_group_group + '=?', group.group_id)
         .toString()

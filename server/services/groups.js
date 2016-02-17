@@ -1,120 +1,43 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var group_queries = require('./query_builders/group_query_builder');
+var basic_db_utility = require('./basic_db_utility');
 
 function create_group(group, callback){
-	var create_query = group_queries.buildQueryCreateGroups(group);
-	console.log(create_query);
-	var row_count = 0;
-	var row_to_return;
-	db_sql.connection.query(create_query)
-	    .on('result', function (row) {
-	    	row_count ++;
-	    	row_to_return = row
-	     })
-	    .on('error', function (err) {
-	        callback({error: true, err: err});
-	     })
-	    .on('end', function (){
-	        if(row_count == 0){
-	        	callback({error: true, err: "Not created"});
-	        }
-	        else{
-	        	callback({error: false, results: row_to_return});
-	        }
-	    });
+	var createGroupQuery = group_queries.buildQueryCreateGroups(group);
+	basic_db_utility.performSingleRowDBOperation(createGroupQuery, callback);
 }
 
 function update_group_by_id(group, callback){
 	var update_query = group_queries.buildQueryUpdateGroups(group);
-	console.log(update_query)
-	db_sql.connection.query(update_query)
-	    
-	    .on('error', function (err) {
-	        callback({error: true, err: err});
-	     })
-	    .on('end', function (){
-	       callback({error: false, results: {delete_id: group.group_id}})
-	    });
+	basic_db_utility.performSingleRowDBOperation(update_query, callback);
 }
 
 function delete_group_by_id(group, callback){
 	var delete_query = group_queries.buildQueryDeleteGroups(group)
-	console.log(delete_query)
-	db_sql.connection.query(delete_query)
-	    
-	    .on('error', function (err) {
-	        callback({error: true, err: err});
-	     })
-	    .on('end', function (){
-	       callback({error: false, results: {delete_id: group.group_id}})
-	    });
+	basic_db_utility.performSingleRowDBOperation(delete_query, callback);
 }
 
 function get_groups_by_id(group, callback){
 	//If no id is specified, returns all groups
 	var get_query = group_queries.buildQueryGetGroups(group)
-	rows_to_return = []
-	db_sql.connection.query(get_query)
-	    .on('result', function (row) {
-	    	rows_to_return.push(row)
-	     })
-	    .on('error', function (err) {
-	        callback({error: true, err: err});
-	     })
-	    .on('end', function (){       
-	        callback({error: false, results: rows_to_return});
-	    });
+	basic_db_utility.performMultipleRowDBOperation(get_query, callback);
 }
 
-function add_user_to_group(group, callback){
-	var create_query = group_queries.buildQueryAddUserToGroup(group)
-	row_to_return = [];
-	console.log(create_query);
-	db_sql.connection.query(create_query)
-	    .on('result', function (row) {
-	    	row_to_return.push(row)
-	     })
-	    .on('error', function (err) {
-	        callback({error: true, err: err});
-	     })
-	    .on('end', function (){       
-	        callback({error: false, results: row_to_return});
-	    });
+function add_users_to_group(group, callback){
+	var addUsersToGroupQuery = group_queries.buildQueryAddUsersToGroup(group)
+	basic_db_utility.performSingleRowDBOperation(addUsersToGroupQuery, callback);
 }
 
-function remove_user_from_group(group, callback){
-	var delete_query = group_queries.buildQueryRemoveUserFromGroup(group)
-	row_to_return = [];
-	console.log(delete_query);
-	db_sql.connection.query(delete_query)
-	    .on('result', function (row) {
-	    	row_to_return.push(row)
-	     })
-	    .on('error', function (err) {
-	        callback({error: true, err: err});
-	     })
-	    .on('end', function (){       
-	        callback({error: false, results: row_to_return});
-	    });
+function remove_users_from_group(group, callback){
+	var removeUsersFromGroupQuery = group_queries.buildQueryRemoveUsersFromGroup(group)
+	basic_db_utility.performSingleRowDBOperation(removeUsersFromGroupQuery, callback);
 }
 
 function get_users_in_group(group, callback){
 	var get_query = group_queries.buildQueryGetUsersFromGroup(group)
-	row_to_return = [];
-	console.log(get_query);
-	db_sql.connection.query(get_query)
-	    .on('result', function (row) {
-	    	row_to_return.push(row)
-	     })
-	    .on('error', function (err) {
-	        callback({error: true, err: err});
-	     })
-	    .on('end', function (){       
-	        callback({error: false, results: row_to_return});
-	    });
+	basic_db_utility.performMultipleRowDBOperation(get_query, callback);
 }
-
 
 function toggle_group_privacy(group, is_private){
 	group['is_private'] = is_private;
@@ -126,7 +49,7 @@ module.exports = {
 	toggle_group_privacy:toggle_group_privacy,
 	get_groups_by_id:get_groups_by_id,
 	update_group_by_id:update_group_by_id,
-	add_user_to_group:add_user_to_group,
-	remove_user_from_group:remove_user_from_group,
+	add_users_to_group:add_users_to_group,
+	remove_users_from_group:remove_users_from_group,
 	get_users_in_group:get_users_in_group
 }

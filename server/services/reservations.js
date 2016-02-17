@@ -1,6 +1,7 @@
 var db_sql = require('./db_wrapper');
 var agenda = require('./agenda');
 var reservation_query_builder = require('./query_builders/reservation_query_builder');
+var basic_db_utility = require('./basic_db_utility');
 
 function get_conflicting_reservations(user, reservation, callback, no_conflict_callback){
     
@@ -65,14 +66,7 @@ function add_user_reservation_link(user, reservation, callback){
 function delete_reservation_by_id(reservation, callback){
 
     var deleteReservationByIdQuery = reservation_query_builder.buildQueryForDeleteReservationById(reservation);
-    console.log(deleteReservationByIdQuery);
-    db_sql.connection.query(deleteReservationByIdQuery)                
-        .on('error', function (err) {
-            callback({error: true, err: err})
-        })
-        .on('end', function (err){
-            callback({error: false})
-        });
+    basic_db_utility.performSingleRowDBOperation(deleteReservationByIdQuery, callback);
 }
 
 function update_reservation_by_id(user, reservation, callback){
