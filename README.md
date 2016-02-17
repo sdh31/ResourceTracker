@@ -59,6 +59,19 @@ Steps to Generate SSL Certificate for Server
         
         Then, restart apache with the command 'sudo /opt/bitnami/ctlscript.sh restart apache'. 
         Lastly, stop apache using the command 'sudo /opt/bitnami/ctlscript.sh stop apache'
+        
+
+Shibboleth
+
+        This is an interesting one....
+        1) Take a look at this site http://dev.colab.duke.edu/resource/shibboleth-tools
+        2) Download the source code, and run the installation script. This will install some files in /etc/shibboleth/
+                
+                sp-cert.pem
+                sp-key.pem
+                
+        3) Follow the rest of the instructions, which will make you make a request at https://idms-web.oit.duke.edu/spreg/sps
+        4) In our application, we issue a Shibboleth request, which redirects the user, and eventually POSTs to          '/Shibboleth.sso/SAML2/POST'
 
 Using Redis Store to store info for session handling
 
