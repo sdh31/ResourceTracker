@@ -53,7 +53,7 @@ function check_reservation_management_permission(min_permission_level, user, cal
 	    });
 }
 
-function check_resource_management_permission(min_permission_level, user){
+function check_resource_management_permission(min_permission_level, user, callback){
 	var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
 		console.log(getResourcePermissionQuery);
 		var max_resource_permission = 0;

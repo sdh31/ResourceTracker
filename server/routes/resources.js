@@ -11,9 +11,9 @@ router.get('/', function(req, res, next){
   
     var getResourceCallback = function (result) {
         if (result.error){
-            res.sendStatus(400)
+            res.sendStatus(400);
         } else {
-            res.send(JSON.stringify(result));
+            res.status(200).json(result);
         }
     };
 
@@ -71,10 +71,10 @@ router.post('/', function(req, res, next){
     }
 
     var resource_permission_callback = function(results){
-        if(results.error == true){
+        if(results.error){
             res.status(400).json(result.err)
         }
-        else if(results.auth == false){
+        else if(!results.auth){
             res.sendStatus(403);
         }
         else{
@@ -82,7 +82,7 @@ router.post('/', function(req, res, next){
         }
     }
 
-    check_reservation_management_permission(1, req.session.user, resource_permission_callback);
+    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
 
 });
 

@@ -59,14 +59,12 @@ def create_user(username, password):
 	}
 	return send_request(method, params, url)
 
-def update_user(username, password = None, permission_level = None):
+def update_user(username, password = None):
 	url = baseUrl + '/user'
 	method = "POST"
 	params['username'] = username
 	if password:
 		params['password'] = password
-	if permission_level:
-		params['permission_level'] = permission_level
 
 	return send_request(method, params, url)
 
@@ -90,7 +88,19 @@ def delete_user(username):
 	url = baseUrl + '/user'
 	method = "DELETE"
 
-	params['username'] = username
+	params = {
+        'username': username
+    }
+
+	return send_request(method, params, url)
+
+def get_resource_by_id(id):
+	url = baseUrl + '/resource'
+	method = "GET"
+
+	params = {
+	    'id': id
+	}
 
 	return send_request(method, params, url)
 
@@ -110,8 +120,10 @@ def create_resource(name, description, max_users, tags = None):
 def update_resource(id, name = None, description = None, max_users = None):
 	url = baseUrl + '/resource'
 	method = "POST"
-
-	params['resource_id'] = id
+    
+	params = {
+        'resource_id': id
+    }
 	if name:
 		params['name'] = name
 	if description:

@@ -4,6 +4,7 @@ var bcrypt = require('bcrypt');
 var tag_service = require('./tags');
 var group_service = require('./groups');
 var user_query_builder = require('./query_builders/user_query_builder');
+var random_string = '110ec58a-a0f2-4ac4-8393-c866d813b8d1';
 
 function create_user(user, callback){
     //Creates user given all parameters
@@ -11,8 +12,8 @@ function create_user(user, callback){
 	var user_id = 0; 
     var createUserCallback = function() {
         user.is_private = 1;
-        user.name = user.username + "_group";
-        user.description = user.username + "_group";
+        user.name = user.username + "_group_" + random_string;
+        user.description = user.username + "_group_" + random_string;
         group_service.create_group(user, createGroupCallback);
     };
 
