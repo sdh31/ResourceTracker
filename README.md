@@ -73,6 +73,13 @@ Shibboleth
         3) Follow the rest of the instructions, which will make you make a request at https://idms-web.oit.duke.edu/spreg/sps
         4) In our application, we issue a Shibboleth request, which redirects the user, and eventually POSTs to          '/Shibboleth.sso/SAML2/POST'
 
+Frontend Testing
+
+        Karma lets you run tests in your browse, Jasmine is a javascript testing framework. These work well with angular.
+        We're running frontend tests on port 1234, so on the server you have to open that up so its publicly reachable.
+        Use the command 'sudo iptables -I INPUT -p tcp --dport 1234 --syn -j ACCEPT' to do so.
+
+
 Using Redis Store to store info for session handling
 
 Can launch redis command line interface using redis-cli
