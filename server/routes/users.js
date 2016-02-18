@@ -62,15 +62,25 @@ router.post('/', auth.is('user'), function(req, res, next){
 });
 
 router.delete('/', auth.is('user'), function(req, res, next){
-    var deleteUserCallback = function(result) {
+    var username = req.query["username"];
+
+    var deletePrivateGroupCallback = function(result) {
         if (result.error) {
             res.sendStatus(403);
         } else {
             res.sendStatus(200);
         }
-    }
+    };
 
-    var username = req.query["username"];
+    var deleteUserCallback = function(result) {
+        if (result.error) {
+            res.sendStatus(403);
+        } else {
+            user_service.delete_private_group(username, deletePrivateGroupCallback);
+        }
+    };
+
+    
     user_service.delete_user(username, deleteUserCallback);
 });
 

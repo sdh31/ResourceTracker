@@ -8,13 +8,15 @@ exports.createAdmin = function(err) {
 		user_management_permission: 1,
 		resource_management_permission: 1,
 		reservation_management_permission: 1,
+        is_shibboleth: 0,
 		first_name: 'admin',
 		last_name: 'admin',
-		email_address: 'admin@admin.com'
+		email_address: 'admin@admin.com',
+        emails_enabled: 1
 	};
 	
 	var createAdminUserCallback = function (result) {
-		if (result.error == true) {
+		if (result.error) {
 			console.log('admin already created');
 		} else {
 			console.log('admin successfully created')

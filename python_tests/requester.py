@@ -110,15 +110,14 @@ def get_resource_by_id(id):
 
 	return send_request(method, params, url)
 
-def create_resource(name, description, max_users, tags = None):
+def create_resource(name, description, max_users):
 	url = baseUrl + '/resource'
 	method = "PUT"
 
 	params = {
 	'name': name,
 	'description':description,
-	'max_users': max_users,
-	'tags': tags
+	'max_users': max_users
 	}
 
 	return send_request(method, params, url)
@@ -186,17 +185,20 @@ def add_tag(resource_id, tags):
 	url = baseUrl + '/tag'
 	method = "PUT"
 
-	params['resource_id'] = resource_id
-	params['addedTags'] = tags
+	params = {
+		'resource_id': resource_id,
+		'addedTags': tags
+	}
 
 	return send_request(method, params, url)
 
 def remove_tags(resource_id, tags):
 	url = baseUrl + '/tag'
 	method = "POST"
-
-	params['resource_id'] = resource_id
-	params['deletedTags'] = tags
+	params = {
+		'resource_id': resource_id,
+		'deletedTags': tags
+	}
 
 	return send_request(method, params, url)
 

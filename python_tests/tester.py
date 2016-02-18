@@ -17,12 +17,15 @@ print len(r.json.loads(res.content)['results']) == 1
 print r.json.loads(res.content)['results'][0]['email_address'] == 'ashwin.kommajesula@gmail.com'
 
 print '#### create resource with tags ####'
-res = r.create_resource("my resource", "huh", 1, ['ant', 'eater', 'shit'])
+res = r.create_resource("my resource", "huh", 1)
 print res.status_code < 300
 resource_id = r.json.loads(res.content)['insertId']
 
+res = r.add_tag(resource_id, ['ant', 'eater', 'shit'])
+print res.status_code < 300
+
 print '#### create resource without tags ####'
-res = r.create_resource("notags", "notags", 1, [])
+res = r.create_resource("notags", "notags", 1)
 print res.status_code < 300
 no_tags_id = r.json.loads(res.content)['insertId']
 
@@ -42,7 +45,7 @@ print r.json.loads(res.content)['results']['name'] == "my resource edited"
 print '#### create reservation ####'
 res = r.create_reservation(resource_id, 1, 2)
 print res.status_code < 300
-reservation_id = r.json.loads(res.content)['insertId']
+reservation_id = r.json.loads(res.content)['results']['insertId']
 
 print '#### create an aliasing reservation ####'
 res = r.create_reservation(resource_id, 2, 3)
@@ -143,22 +146,20 @@ print '#### cleanup by deleting the resource that we created ####'
 res = r.delete_resource(resource_id)
 print res.status_code < 300
 
-# creating local users cooks us as of now because when they get deleted the private group they are a part of isnt deleted
+print '#### create another user ####' 
+res = r.create_user('rahul', 'rahul123')
+print res.status_code < 300
 
-#print 'create another user' 
-#res = r.create_user('rahul', 'rahul123')
-#print res.status_code < 300
+print '#### get all users in DB, make sure there are 2 now and that the second username == rahul ####'
+res = r.get_all_users()
+print len(r.json.loads(res.content)['results']) == 2
+print r.json.loads(res.content)['results'][1]['username'] == 'rahul'
 
-#print 'get all users in DB, make sure there are 2 now and that the second username == rahul'
-#res = r.get_all_users()
-#print len(r.json.loads(res.content)['users']) == 2
-#print r.json.loads(res.content)['users'][1]['username'] == 'rahul'
-
-#print 'delete user rahul from DB and check if only 1 user now exists'
-#res = r.delete_user('rahul')
-#print res.status_code < 300
-#res = r.get_all_users()
-#print len(r.json.loads(res.content)['users']) == 1
+print '#### delete user rahul from DB and check if only 1 user now exists ####'
+res = r.delete_user('rahul')
+print res.status_code < 300
+res = r.get_all_users()
+print len(r.json.loads(res.content)['results']) == 1
 
 
 
