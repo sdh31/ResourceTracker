@@ -23,12 +23,20 @@ function create_user(user, callback){
         group_service.create_group(user, createGroupCallback);
     };
 
+    var finalCallback = function(result) {
+        if (result.error) {
+            callback({error: true, err: result.err});
+        } else {
+            callback({error: false, err: '', insertId: user_id});
+        }
+    };
+
     var createGroupCallback = function(result) {
         var info = {
             group_id: result.results.insertId,
             user_ids: [user_id]
         };
-        group_service.add_users_to_group(info, callback);
+        group_service.add_users_to_group(info, finalCallback);
     };
 
     bcrypt.genSalt(10, function(err, salt) {

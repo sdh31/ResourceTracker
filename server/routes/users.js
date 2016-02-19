@@ -30,10 +30,10 @@ router.get('/', auth.is('user'), function(req, res, next){
 router.put('/', auth.is('admin'), function(req, res, next){
     //create user
     var createUserCallback = function(result){
-        if (result.error == true) {
+        if (result.error) {
             res.sendStatus(401);
         } else {
-            res.sendStatus(200);
+            res.status(200).json(result);
         }
     }
 

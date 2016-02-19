@@ -55,27 +55,27 @@ function check_reservation_management_permission(min_permission_level, user, cal
 
 function check_resource_management_permission(min_permission_level, user, callback){
 	var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
-		console.log(getResourcePermissionQuery);
-		var max_resource_permission = 0;
+	console.log(getResourcePermissionQuery);
+	var max_resource_permission = 0;
 
-		db_sql.connection.query(getResourcePermissionQuery)
-		    .on('result', function (row) {
-		       	if (row.resource_management_permission > max_resource_permission){
-		       		max_resource_permission = row.resource_management_permission;
-		       	}
-		     })
-		.on('error', function (err) {
-	        results = {error: true, err: err};
+	db_sql.connection.query(getResourcePermissionQuery)
+	    .on('result', function (row) {
+	       	if (row.resource_management_permission > max_resource_permission){
+	       		max_resource_permission = row.resource_management_permission;
+	       	}
 	     })
-	    .on('end', function (err){
-	        if (max_resource_permission >= min_permission_level){
-	        	results = {error:false, auth: true}
-	        }
-	        else if(!('error' in results)){
-	        	results = {error:false, auth: false};
-	        }
-	        callback(results)
-	    });
+	.on('error', function (err) {
+        results = {error: true, err: err};
+     })
+    .on('end', function (err){
+        if (max_resource_permission >= min_permission_level){
+        	results = {error:false, auth: true}
+        }
+        else if(!('error' in results)){
+        	results = {error:false, auth: false};
+        }
+        callback(results)
+    });
 }
 
 

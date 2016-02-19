@@ -42,7 +42,7 @@ router.put('/', function(req, res, next){
         }
     }
 
-    perm_service.check_reservation_management_permission(1, req.session.user, resource_permission_callback);
+    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
 });
 
 router.post('/', function(req, res, next){

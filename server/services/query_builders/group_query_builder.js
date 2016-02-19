@@ -76,6 +76,7 @@ module.exports.buildQueryAddUsersToGroup = function(group){
 
     var rows_to_add = [];
     for(var i = 0; i < group.user_ids.length; i++){
+        console.log(group.user_ids[i]);
         var row = {"group_id": group.group_id, "user_id": group.user_ids[i]};
         rows_to_add.push(row);
     }
@@ -87,13 +88,13 @@ module.exports.buildQueryAddUsersToGroup = function(group){
 }
 
 module.exports.buildQueryRemoveUsersFromGroup = function(group){
-    var expr = squel.delete().from(user_group_table);
+    var expr = squel.expr();
 
     for(var i = 0; i < group.user_ids.length; i++){
-        expr.where("user_id = " + group.user_ids[i] + " AND group_id = " + group.group_id);
+        expr.or("user_id = " + group.user_ids[i] + " AND group_id = " + group.group_id);
     }
 
-    return expr.toString();
+    return squel.delete().from(user_group_table).where(expr).toString();
         
 }
 
