@@ -22,8 +22,9 @@ angular.module('resourceTracker')
             $scope.usersToRemoveFromGroup = [];
 
             // grab all users in group and then populate multiselect
-	    	getUsersInGroup();
-	    	getUsersForMultiselect();
+	    	getUsersInGroup().then(function() {
+                getUsersForMultiselect();
+            });
     	};
 
         // Gets all users from db, and determines which users
@@ -178,7 +179,7 @@ angular.module('resourceTracker')
     		var groupId = $scope.selectedGroup.group_id;
     		var reqQuery = '/group/user' + '?group_id=' + groupId;
 
-    		$http.get(reqQuery).then(function(response) {
+    		var promise = $http.get(reqQuery).then(function(response) {
     			$scope.usersInGroup = [];
     			response.data.results.forEach(function(user) {
     				$scope.usersInGroup.push(user);
@@ -186,6 +187,7 @@ angular.module('resourceTracker')
     		}, function(error) {
     			console.log(error);
     		});
+            return promise;
     	};
 
         $scope.openEditGroupSuccess = function() {
