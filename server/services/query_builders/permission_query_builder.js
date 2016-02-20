@@ -18,7 +18,7 @@ var user_group_group = "group_id"
 
 
 module.exports.buildQueryForSystemPermissionChecks = function(user){
-    return query = squel.select()
+    return squel.select()
         .from(user_table)
         .field(user_permission)
         .field(resource_permission)
@@ -27,5 +27,12 @@ module.exports.buildQueryForSystemPermissionChecks = function(user){
         .join(user_group_table, null, user_group_table+'.'+user_id+'='+user_table+'.'+user_id)
         .join(group_table, null, user_group_table+'.'+group_id+'='+group_table+'.'+group_id)
         .where(user_group_table+'.'+user_id+'= ?', user.user_id)
-        .toString()
-}
+        .toString();
+};
+
+module.exports.buildQueryForCheckPermissionForResource = function (user_id, resource_id) {
+    return squel.select()
+        .from(user_group_table)
+        .where(user_id + " = " + user_id + " AND " + resource_id + " = " + resource_id)
+        .toString();
+};

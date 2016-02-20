@@ -1,6 +1,7 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var permission_queries = require('./query_builders/permission_query_builder');
+var basic_db_utility = require('./basic_db_utility');
 
 function check_user_management_permission(min_permission_level, user, callback){
 	var getUserPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
@@ -54,7 +55,7 @@ function check_reservation_management_permission(min_permission_level, user, cal
 }
 
 function check_resource_management_permission(min_permission_level, user, callback){
-	var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
+	var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user);
 	console.log(getResourcePermissionQuery);
 	var max_resource_permission = 0;
 
@@ -76,12 +77,16 @@ function check_resource_management_permission(min_permission_level, user, callba
         }
         callback(results)
     });
-}
+};
 
-
+function check_permission_for_resource(user_id, resource_id, callback) {
+    var checkPermissionForResourceQuery = permission_queries.buildQueryForCheckPermissionForResource(user_id, resource_id);
+    basic_db_utility.performSingleRowDBOperation(checkPermissionForResourceQuery, callback);
+};
 
 module.exports = {
 	check_user_management_permission: check_user_management_permission,
 	check_resource_management_permission: check_resource_management_permission,
-	check_reservation_management_permission: check_reservation_management_permission
+	check_reservation_management_permission: check_reservation_management_permission,
+    check_permission_for_resource: check_permission_for_resource
 }

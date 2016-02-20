@@ -224,6 +224,12 @@ function get_all_users(callback) {
     basic_db_utility.performMultipleRowDBOperation(getAllUsersQuery, callback);
 };
 
+function get_private_group(user_id, callback) {
+    var getPrivateGroupQuery = user_query_builder.buildQueryForGetPrivateGroup(user_id);
+    basic_db_utility.performSingleRowDBOperation(getPrivateGroupQuery, callback);
+
+};
+
 function compare_passwords(password, user, callback) {
     bcrypt.compare(password, user.password, function(err, res) {
         callback(res, user);
@@ -236,6 +242,7 @@ module.exports = {
     get_user_permissions: get_user_permissions,
     delete_user: delete_user,
     delete_private_group: delete_private_group,
+    get_private_group: get_private_group,
     update_user: update_user,
     get_all_users: get_all_users,
     compare_passwords: compare_passwords

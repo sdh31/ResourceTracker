@@ -4,6 +4,7 @@ var res_service = require('../services/resources');
 var tag_service = require('../services/tags');
 var auth = require('../services/authorization');
 var perm_service = require('../services/permissions');
+var user_service = require('../services/users');
 
 // returns the resource specified by resource_id
 // req.query should have a field "resource_id"
@@ -17,16 +18,48 @@ router.get('/', function(req, res, next){
         }
     };
 
-    res_service.get_resource_by_id(req.query, getResourceCallback);
+    var checkPermissionForResourceCallback = function (result) {
+        if (result.error) {
+            res.sendStatus(400);
+        } else if (result.results == {}) {
+            res.sendStatus(403);
+        } else {
+            res_service.get_resource_by_id(req.query, getResourceCallback);
+        }
+    };
+
+    perm_service.check_permission_for_resource(req.query.resource_id, req.session.user.user_id, checkPermissionForResourceCallback);
 });
 
 router.put('/', function(req, res, next){
-  
+
+    var resource_id = -1;
+
+    var addGroupPermissionCallback = function(result) {
+        if (result.error){
+            res.sendStatus(400);
+        } else {
+            result.results.insertId = resource_id;
+            res.status(200).json(result.results);
+        }
+    };
+
+    var getPrivateGroupCallback = function (result) {
+        if (result.error){
+            res.sendStatus(400);
+        } else {
+            var group_ids = [result.results.group_id];
+            var resource_permissions = ['view'];
+            res_service.addGroupPermissionToResource({resource_id: resource_id, group_ids: group_ids, resource_permissions: resource_permissions}, addGroupPermissionCallback);
+        }
+    };
+
     var create_resource_callback = function(result) {
         if (result.error){
             res.sendStatus(400);
         } else {
-            res.status(200).json(result.results);
+            resource_id = result.results.insertId;
+            user_service.get_private_group(req.session.user.user_id, getPrivateGroupCallback);
         }
     }
 
