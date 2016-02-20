@@ -8,41 +8,107 @@ print session_response.status_code < 300
 r.session = session_response.cookies
 
 print '#### update admin user to have new email ####'
-res = r.update_user(username="admin",email_address="ashwin.kommajesula@gmail.com")
+res = r.update_user(username="admin",email_address="nikroy16@gmail.com")
 print res.status_code < 300
 
 print '#### get all users in DB, make sure theres only 1 and that the username == admin ####'
 res = r.get_all_users()
 print len(r.json.loads(res.content)['results']) == 1
-print r.json.loads(res.content)['results'][0]['email_address'] == 'ashwin.kommajesula@gmail.com'
+print r.json.loads(res.content)['results'][0]['email_address'] == 'nikroy16@gmail.com'
 
 print '#### create resource with tags ####'
-res = r.create_resource("my resource", "huh", 1, ['ant', 'eater', 'shit'])
+res = r.create_resource("YAAAAAAAM", "huh", 1)
 print res.status_code < 300
 resource_id = r.json.loads(res.content)['insertId']
 
+res = r.add_tag(resource_id, ['ant', 'eater', 'shit'])
+print res.status_code < 300
+
+print '#### get permissions for resource with tags and make that the admin user has permission ####'
+res = r.get_group_permission_to_resource(resource_id)
+print res.status_code < 300
+print len(r.json.loads(res.content)['results']) == 1
+
 print '#### create resource without tags ####'
-res = r.create_resource("notags", "notags", 1, [])
+res = r.create_resource("YAAAAAMU", "notags", 1)
 print res.status_code < 300
 no_tags_id = r.json.loads(res.content)['insertId']
+
+print '#### get permissions for resource without tags and make that the admin user has permission ####'
+res = r.get_group_permission_to_resource(resource_id)
+print res.status_code < 300
+print len(r.json.loads(res.content)['results']) == 1
+
+print '#### create another user ####' 
+res = r.create_user('rahul', 'rahul123')
+print res.status_code < 300
+user_id = r.json.loads(res.content)['insertId']
+
+print '#### get all users in DB, make sure there are 2 now and that the second username == rahul ####'
+res = r.get_all_users()
+print len(r.json.loads(res.content)['results']) == 2
+print r.json.loads(res.content)['results'][1]['username'] == 'rahul'
+
+print '#### create a group ####'
+res = r.create_group("fungroup", "nope", True, True, True, False)
+print res.status_code < 300
+group_id = r.json.loads(res.content)['results']['insertId']
+
+print '#### get groups and check if there are 3 ####'
+res = r.get_groups()
+#Check is 3 because of users private groups
+print len(r.json.loads(res.content)['results']) == 3
+print r.json.loads(res.content)['results'][2]['group_name'] == "fungroup"
+
+print '#### update group ####'
+res = r.update_group(group_id, "nopegroup", "fun", False, False, True)
+print res.status_code < 300
+
+print '#### make sure update has persisted ####'
+res = r.get_groups()
+print len(r.json.loads(res.content)['results']) == 3
+print r.json.loads(res.content)['results'][2]['group_name'] == 'nopegroup'
+
+print '#### add admin and rahul to the group ####'
+res = r.add_users_to_group([1, user_id], group_id)
+print res.status_code < 300
+
+print '#### make sure that they have been successfully added ####'
+res = r.get_users_in_group(group_id)
+print len(r.json.loads(res.content)['results']) == 2
+print r.json.loads(res.content)['results'][0]['username'] == 'admin'
+print r.json.loads(res.content)['results'][0]['first_name'] == 'admin'
+
+print '#### add view permission to the group for the resource with tags ####'
+res = r.add_group_permission_to_resource(resource_id, [group_id], ['view'])
+print res.status_code < 300
+
+print '#### get permissions for resource with tags and make sure we good ####'
+res = r.get_group_permission_to_resource(resource_id)
+print res.status_code < 300
+print r.json.loads(res.content)['results'][1]['group_id'] == group_id
+
+print '#### add view permission to the group for the resource without tags ####'
+res = r.add_group_permission_to_resource(no_tags_id, [group_id], ['view'])
+print res.status_code < 300
 
 print '#### delete resource without tags ####'
 res = r.delete_resource(no_tags_id)
 print res.status_code < 300
 
-print '#### update resource ####'
-res = r.update_resource(resource_id, "my resource edited", "huh edited")
+print '#### update resource with tags ####'
+res = r.update_resource(resource_id, "YAAAAAAAAAAAAAAAAAAAAAM", "huh edited")
 print res.status_code < 300
 
 print '#### get updated resource ####'
 res = r.get_resource_by_id(resource_id)
 print res.status_code < 300
-print r.json.loads(res.content)['results']['name'] == "my resource edited"
+print r.json.loads(res.content)['results']['name'] == "YAAAAAAAAAAAAAAAAAAAAAM"
 
 print '#### create reservation ####'
 res = r.create_reservation(resource_id, 1, 2)
 print res.status_code < 300
-reservation_id = r.json.loads(res.content)['insertId']
+reservation_id = r.json.loads(res.content)['results']['insertId']
 
 print '#### create an aliasing reservation ####'
 res = r.create_reservation(resource_id, 2, 3)
@@ -69,39 +135,22 @@ res = r.get_reservations(resource_id, 0, 99999)
 print r.json.loads(res.content)['results'][0]['start_time'] == 5
 print r.json.loads(res.content)['results'][0]['end_time'] == 10
 
-print '#### create a group ####'
-res = r.create_group("fungroup", "nope", True, True, True, False)
-print res.status_code < 300
-group_id = r.json.loads(res.content)['results']['insertId']
-
-print '#### get groups and check if there are 2 ####'
-res = r.get_groups()
-#Check is 2 because of admin users private group
-print len(r.json.loads(res.content)['results']) == 2
-print r.json.loads(res.content)['results'][1]['group_name'] == "fungroup"
-
-print '#### update group ####'
-res = r.update_group(group_id, "nopegroup", "fun", False, False, True)
+print '#### remove view permission to the group for the resource with tags ####'
+res = r.remove_group_permission_to_resource(resource_id, [group_id])
 print res.status_code < 300
 
-print '#### make sure update has persisted ####'
-res = r.get_groups()
-print len(r.json.loads(res.content)['results']) == 2
-print r.json.loads(res.content)['results'][1]['group_name'] == 'nopegroup'
-
-print '#### add the admin user to the group ####'
-res = r.add_users_to_group([1], group_id)
+print '#### get permissions for resource with tags and make sure theres nothing ####'
+res = r.get_group_permission_to_resource(resource_id)
 print res.status_code < 300
-
-print '#### make sure that the admin user has been successfully added ####'
-res = r.get_users_in_group(group_id)
 print len(r.json.loads(res.content)['results']) == 1
-print r.json.loads(res.content)['results'][0]['username'] == 'admin'
-print r.json.loads(res.content)['results'][0]['first_name'] == 'admin'
 
-print '#### remove the admin user from the group ####'
-res = r.remove_users_from_group([1], group_id)
+print '#### remove the admin and rahul user from the group ####'
+res = r.remove_users_from_group([1, user_id], group_id)
 print res.status_code < 300
+
+print '#### make sure that the users have been successfully removed ####'
+res = r.get_users_in_group(group_id)
+print len(r.json.loads(res.content)['results']) == 0
 
 print '#### delete the group ####'
 res = r.delete_group(group_id)
@@ -109,35 +158,25 @@ print res.status_code < 300
 
 print '#### get groups and make sure the group was deleted ####'
 res = r.get_groups()
-print len(r.json.loads(res.content)['results']) == 1
+print len(r.json.loads(res.content)['results']) == 2
 
 print '#### update admin user to have new email ####'
 res = r.update_user(username="admin", email_address="admin@admin.com")
 print res.status_code < 300
 
-print '#### get all users in DB, make sure theres only 1 and that the username == admin ####'
+print '#### get all users in DB, make sure theres only 2 and that the username == admin ####'
 res = r.get_all_users()
-print len(r.json.loads(res.content)['results']) == 1
+print len(r.json.loads(res.content)['results']) == 2
 print r.json.loads(res.content)['results'][0]['username'] == 'admin'
 print r.json.loads(res.content)['results'][0]['email_address'] == 'admin@admin.com'
 
-# creating local users cooks us as of now because when they get deleted the private group they are a part of isnt deleted
+print '#### cleanup by deleting the resource that we created ####'
+res = r.delete_resource(resource_id)
+print res.status_code < 300
 
-#print 'create another user' 
-#res = r.create_user('rahul', 'rahul123')
-#print res.status_code < 300
-
-#print 'get all users in DB, make sure there are 2 now and that the second username == rahul'
-#res = r.get_all_users()
-#print len(r.json.loads(res.content)['users']) == 2
-#print r.json.loads(res.content)['users'][1]['username'] == 'rahul'
-
-#print 'delete user rahul from DB and check if only 1 user now exists'
-#res = r.delete_user('rahul')
-#print res.status_code < 300
-#res = r.get_all_users()
-#print len(r.json.loads(res.content)['users']) == 1
-
-
-
+print '#### delete user rahul from DB and check if only 1 user now exists ####'
+res = r.delete_user('rahul')
+print res.status_code < 300
+res = r.get_all_users()
+print len(r.json.loads(res.content)['results']) == 1
 

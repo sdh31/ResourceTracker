@@ -1,6 +1,7 @@
 var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var permission_queries = require('./query_builders/permission_query_builder');
+var basic_db_utility = require('./basic_db_utility');
 
 function check_user_management_permission(min_permission_level, user, callback){
 	var getUserPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
@@ -54,34 +55,38 @@ function check_reservation_management_permission(min_permission_level, user, cal
 }
 
 function check_resource_management_permission(min_permission_level, user, callback){
-	var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
-		console.log(getResourcePermissionQuery);
-		var max_resource_permission = 0;
+	var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user);
+	console.log(getResourcePermissionQuery);
+	var max_resource_permission = 0;
 
-		db_sql.connection.query(getResourcePermissionQuery)
-		    .on('result', function (row) {
-		       	if (row.resource_management_permission > max_resource_permission){
-		       		max_resource_permission = row.resource_management_permission;
-		       	}
-		     })
-		.on('error', function (err) {
-	        results = {error: true, err: err};
+	db_sql.connection.query(getResourcePermissionQuery)
+	    .on('result', function (row) {
+	       	if (row.resource_management_permission > max_resource_permission){
+	       		max_resource_permission = row.resource_management_permission;
+	       	}
 	     })
-	    .on('end', function (err){
-	        if (max_resource_permission >= min_permission_level){
-	        	results = {error:false, auth: true}
-	        }
-	        else if(!('error' in results)){
-	        	results = {error:false, auth: false};
-	        }
-	        callback(results)
-	    });
-}
+	.on('error', function (err) {
+        results = {error: true, err: err};
+     })
+    .on('end', function (err){
+        if (max_resource_permission >= min_permission_level){
+        	results = {error:false, auth: true}
+        }
+        else if(!('error' in results)){
+        	results = {error:false, auth: false};
+        }
+        callback(results)
+    });
+};
 
-
+function check_permission_for_resource(user_id, resource_id, callback) {
+    var checkPermissionForResourceQuery = permission_queries.buildQueryForCheckPermissionForResource(user_id, resource_id);
+    basic_db_utility.performSingleRowDBOperation(checkPermissionForResourceQuery, callback);
+};
 
 module.exports = {
 	check_user_management_permission: check_user_management_permission,
 	check_resource_management_permission: check_resource_management_permission,
-	check_reservation_management_permission: check_reservation_management_permission
+	check_reservation_management_permission: check_reservation_management_permission,
+    check_permission_for_resource: check_permission_for_resource
 }

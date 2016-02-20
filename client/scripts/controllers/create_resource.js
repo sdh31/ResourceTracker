@@ -38,6 +38,20 @@ angular.module('resourceTracker')
 		$scope.createResource = function() {
 			var self = this;
 			resourceService.createResource($scope.newResource).then(function(response) {
+                if ($scope.newResource.tags.length > 0) {
+                    $scope.addTags(response.data.insertId);
+                } else {
+                    $scope.addSuccess($scope.onCreateResourceSuccessMessage);
+				    initializeNewResource();
+                }
+			}, function(alertMessage) {
+				$scope.addError(alertMessage);
+			})
+		};
+
+        $scope.addTags = function(resource_id) {
+			var self = this;
+			resourceService.addTags(resource_id, $scope.newResource.tags).then(function(response) {
 				$scope.addSuccess($scope.onCreateResourceSuccessMessage);
 				initializeNewResource();
 			}, function(alertMessage) {

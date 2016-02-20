@@ -46,6 +46,7 @@ module.exports.buildQueryForGetUserPermissions = function(user) {
                 .field("user.user_id")
                 .field("user.password")
                 .field("user.is_shibboleth")
+                .field("user.emails_enabled")
                 .field("permission_group.group_id")
                 .field("permission_group.group_name")
                 .field("permission_group.user_management_permission")
@@ -66,6 +67,13 @@ module.exports.buildQueryForDeleteUser = function(username) {
                 .toString();
 };
 
+module.exports.buildQueryForDeletePrivateGroup = function(group_name) {
+    return squel.delete()
+            .from("permission_group")
+            .where("group_name = '" + group_name + "'")
+            .toString();
+};
+
 module.exports.buildQueryForGetAllUsers = function() {
 
     return squel.select()
@@ -75,5 +83,16 @@ module.exports.buildQueryForGetAllUsers = function() {
         .field("user.user_id")
         .field("user.email_address")      
         .from("user")
+        .toString();
+};
+
+module.exports.buildQueryForGetPrivateGroup = function(user_id) {
+
+    return squel.select()
+        .field("user_group.user_id")
+        .field("user_group.group_id")
+        .from("user_group")
+        .left_join("permission_group", null, "permission_group.group_id = user_group.group_id")
+        .where("user_id = " + user_id + " AND " + "is_private = 1")
         .toString();
 };

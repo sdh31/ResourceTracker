@@ -4,6 +4,7 @@ var res_service = require('../services/resources');
 var tag_service = require('../services/tags');
 var auth = require('../services/authorization');
 var perm_service = require('../services/permissions');
+var user_service = require('../services/users');
 
 // returns the resource specified by resource_id
 // req.query should have a field "resource_id"
@@ -17,32 +18,48 @@ router.get('/', function(req, res, next){
         }
     };
 
-    res_service.get_resource_by_id(req.query, getResourceCallback);
+    var checkPermissionForResourceCallback = function (result) {
+        if (result.error) {
+            res.sendStatus(400);
+        } else if (result.results == {}) {
+            res.sendStatus(403);
+        } else {
+            res_service.get_resource_by_id(req.query, getResourceCallback);
+        }
+    };
+
+    perm_service.check_permission_for_resource(req.query.resource_id, req.session.user.user_id, checkPermissionForResourceCallback);
 });
 
 router.put('/', function(req, res, next){
-  
-    var resource_id = 0;
-    var create_tag_resource_callback = function(result) {
+
+    var resource_id = -1;
+
+    var addGroupPermissionCallback = function(result) {
         if (result.error){
             res.sendStatus(400);
         } else {
-            // not sure how we should handle this situation, ideally this method doesn't do multiple things
             result.results.insertId = resource_id;
             res.status(200).json(result.results);
         }
-    }
+    };
+
+    var getPrivateGroupCallback = function (result) {
+        if (result.error){
+            res.sendStatus(400);
+        } else {
+            var group_ids = [result.results.group_id];
+            var resource_permissions = ['view'];
+            res_service.addGroupPermissionToResource({resource_id: resource_id, group_ids: group_ids, resource_permissions: resource_permissions}, addGroupPermissionCallback);
+        }
+    };
 
     var create_resource_callback = function(result) {
-        if(result.error) {
+        if (result.error){
             res.sendStatus(400);
         } else {
             resource_id = result.results.insertId;
-            if ("tags" in req.body && req.body.tags.length > 0) {
-                tag_service.create_tag(resource_id, req.body.tags, create_tag_resource_callback, tag_service.create_resource_tag_link);
-            } else {
-                res.status(200).json(result.results);
-            }
+            user_service.get_private_group(req.session.user.user_id, getPrivateGroupCallback);
         }
     }
 
@@ -58,8 +75,7 @@ router.put('/', function(req, res, next){
         }
     }
 
-    perm_service.check_reservation_management_permission(1, req.session.user, resource_permission_callback);
-
+    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
 });
 
 router.post('/', function(req, res, next){
@@ -117,7 +133,8 @@ router.get('/all', auth.is('user'), function(req, res, next) {
     tag_service.filter_by_tag([], [], 0, 0, getAllResourcesCallback);
 });
 
-router.put('/addPermission', function(req, res, next) {
+// req.body should have resource_id, group_ids, resource_permissions and group_ids.length == resource_permissions.length
+router.post('/addPermission', function(req, res, next) {
     
     var addGroupPermissionCallback = function(result){
         if (result.error){
@@ -141,4 +158,53 @@ router.put('/addPermission', function(req, res, next) {
     perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
 });
 
+// req.body should have resource_id, group_ids
+router.post('/removePermission', function(req, res, next) {
+    
+    var removeGroupPermissionCallback = function(result){
+        if (result.error){
+            res.sendStatus(400);
+        } else {
+            res.status(200).json(result);
+        }
+    };
+
+    var resource_permission_callback = function(results){
+        if (results.error){
+            res.status(400).json(result.err)
+        }
+        else if (!results.auth){
+            res.sendStatus(403);
+        } else{
+             res_service.removeGroupPermissionToResource(req.body, removeGroupPermissionCallback);
+        }
+    }
+
+    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
+});
+
+// req.query should have resource_id
+router.get('/getPermission', function(req, res, next) {
+    
+    var getGroupPermissionCallback = function(result){
+        if (result.error){
+            res.sendStatus(400);
+        } else {
+            res.status(200).json(result);
+        }
+    };
+
+    var resource_permission_callback = function(results){
+        if (results.error){
+            res.status(400).json(result.err)
+        }
+        else if (!results.auth){
+            res.sendStatus(403);
+        } else{
+             res_service.getGroupPermissionToResource(req.query, getGroupPermissionCallback);
+        }
+    }
+
+    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
+});
 module.exports = router;

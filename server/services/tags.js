@@ -13,55 +13,28 @@ function create_resource_tag_link(resource_id, tag_ids, callback){
 }
 
 
-function create_tag (res_id, tags, response_callback, tag_callback){
+function create_tag (tags, callback){
     /*
     Create tag object from tag name
-    res_id: resource id when creating a link b/w tag and resource
     tag: list of tag names to be used
-    response_callback: callback that sends final responses (status codes)
-    tag_callback: calback that continues the process of adding a tag (getting ids)
+    callback
     */
     
     var createTagsQuery = tag_query_builder.buildQueryForCreateTag(tags);
-    console.log(createTagsQuery);
-
-    db_sql.connection.query(createTagsQuery)
-        .on('error', function (err) {
-            if (err.code != "ER_DUP_ENTRY"){
-                response_callback({error: true, err: err});
-            }
-         })
-        .on('end', function () {
-            select_tag_ids(res_id, tags, response_callback, tag_callback);
-        });
+    basic_db_utility.performMultipleRowDBOperationIgnoreDuplicates(createTagsQuery, callback);
 }
 
-function select_tag_ids(resource_id, tags, response_callback, tag_callback){
+function select_tag_ids(tags, callback){
     /*
     Given series of tag names, find tag ids to match the names
     (necessary since we don't want duplicate tag names)
-    res_id: id of resource
+    
     tags: list of tag names
-    response_callback: callback to send responses (status codes)
-    tag_callback: continues process of adding tags with newfound tag_ids
+    callback
     */
     
     var selectTagIdsQuery = tag_query_builder.buildQueryForSelectTagIds(tags);
-    var tag_ids = [];
-
-    db_sql.connection.query(selectTagIdsQuery)
-        .on('result', function (row) {
-            tag_ids.push(row.tag_id);
-                    
-        })
-        .on('error', function (err) {
-            console.log(err)
-            response_callback({error: true, err: err});
-        })
-        .on('end', function () {
-            console.log(tag_ids)
-            tag_callback(resource_id, tag_ids, response_callback);
-        });
+    basic_db_utility.performMultipleRowDBOperation(selectTagIdsQuery, callback);
 }
 
 // this returns a list of resources that have the includedTags and do not have the excludedTags
@@ -75,7 +48,9 @@ function filter_by_tag (includedTags, excludedTags, start_time, end_time, callba
 	var resourcesFound = [];
 	var idsSeen = [];
     var excludedResourceIds = [];
-
+    
+    var error = false;
+    var err = '';
 	var includeCallback = function() {
 		db_sql.connection.query(includedQuery)
             .on('result', function (row) {
@@ -84,10 +59,11 @@ function filter_by_tag (includedTags, excludedTags, start_time, end_time, callba
 			    }
             })
             .on('error', function (err) {
-                callback({error: true, err: err});
+                error = true;
+                err = err;
             })
             .on('end', function () {
-                callback({resources: organizeResources(resourcesFound)});
+                callback({error: error, err: err, resources: organizeResources(resourcesFound)});
             });
 	}
 
@@ -98,11 +74,16 @@ function filter_by_tag (includedTags, excludedTags, start_time, end_time, callba
         .on('error', function (err) {
             // empty excluded query is totally ok
             if (err.code != 'ER_EMPTY_QUERY') {
-                callback({error: true, err: err});
+                error = true;
+                err = err;
             }
         })
         .on('end', function () {
-            includeCallback();
+            if (error) {
+                callback({error: error, err: err});
+            } else {
+                includeCallback();
+            }
         });
 }
 
@@ -111,6 +92,8 @@ function get_all_tags(callback) {
 	var getAllTagsQuery = tag_query_builder.buildQueryForGetAllTags();
 	var tags = [];
 	var seenTagIds = [];
+    var error = false;
+    var err = '';
 	db_sql.connection.query(getAllTagsQuery)
 		.on('result', function (row) {
 			if (seenTagIds.indexOf(row.tag_id) == -1) {
@@ -119,10 +102,11 @@ function get_all_tags(callback) {
 			}
 		})
 		.on('error', function (err) {
-			callback({error: true, err: err});
+			error = true;
+            err = err;
 		})
 		.on('end', function () {
-			callback({tags: tags})
+			callback({error: error, err: err, tags: tags})
 		});
 };
 
@@ -200,6 +184,7 @@ module.exports = {
     create_resource_tag_link:create_resource_tag_link,
     filter_by_tag:filter_by_tag,
 	get_all_tags: get_all_tags,
+    select_tag_ids: select_tag_ids,
     remove_tag_from_object:remove_tag_from_object,
 	organizeResources : organizeResources
 }

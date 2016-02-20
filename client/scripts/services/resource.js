@@ -32,12 +32,24 @@ angular.module('resourceTracker')
 
 			var resourceCreationFailedMessage = this.alertMessages.resourceCreationFailed;
 			$http.put('/resource', resource).then(function(response) {
-				deferred.resolve();
+				deferred.resolve(response);
 	        }, function(error) {
 				deferred.reject(resourceCreationFailedMessage);
 	        });
 	        return deferred.promise;
   	    };
+
+        this.addTags = function(resource_id, tags) {
+            var deferred = $q.defer();
+            console.log(resource_id);
+			var resourceCreationFailedMessage = this.alertMessages.resourceCreationFailed;
+			$http.put('/tag', {resource_id: resource_id, addedTags: tags}).then(function(response) {
+				deferred.resolve();
+	        }, function(error) {
+				deferred.reject(resourceCreationFailedMessage);
+	        });
+	        return deferred.promise;
+        };
 
 		this.removeTagFromResource = function(resource, tag_index) {
         	resource.tags.splice(tag_index, 1);

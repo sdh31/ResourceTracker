@@ -36,15 +36,36 @@ router.post('/filter', auth.is('user'), function(req, res, next){
 
 router.put('/', auth.is('user'), function(req, res, next){
 
-    var create_tag_resource_callback = function(result){
-        if (result.error == true){
+    var createResourceTagLinkCallback = function(result){
+        if (result.error){
             res.sendStatus(400);
         } else {
             res.sendStatus(200);
-        }
-        
+        } 
     }
-    tag_service.create_tag(req.body.resource_id, req.body.addedTags, create_tag_resource_callback, tag_service.create_resource_tag_link);
+
+    var selectTagIdsCallback = function(result) {
+        if (result.error) {
+            res.sendStatus(400);
+        } else {
+            var tag_ids = [];
+            for (var i = 0; i<result.results.length; i++) {
+                tag_ids.push(result.results[i].tag_id);
+            }
+            tag_service.create_resource_tag_link(req.body.resource_id, tag_ids, createResourceTagLinkCallback);
+        }
+
+    };
+
+    var createTagCallback = function(result) {
+        if (result.error) {
+            res.sendStatus(400);
+        } else {
+            tag_service.select_tag_ids(req.body.addedTags, selectTagIdsCallback);
+        }
+    };
+
+    tag_service.create_tag(req.body.addedTags, createTagCallback);
 });
 
 router.post('/', auth.is('user'), function(req, res, next){

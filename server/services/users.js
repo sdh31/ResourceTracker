@@ -11,11 +11,24 @@ function create_user(user, callback){
     //Creates user given all parameters
     
 	var user_id = 0; 
-    var createUserCallback = function() {
+    var createUserCallback = function(result) {
+        if (result.error) {
+            callback({error: true, err: result.err});
+            return;
+        }
+        user_id = result.results.insertId;
         user.is_private = 1;
         user.name = user.username + "_group_" + random_string;
         user.description = user.username + "_group_" + random_string;
         group_service.create_group(user, createGroupCallback);
+    };
+
+    var finalCallback = function(result) {
+        if (result.error) {
+            callback({error: true, err: result.err});
+        } else {
+            callback({error: false, err: '', insertId: user_id});
+        }
     };
 
     var createGroupCallback = function(result) {
@@ -23,23 +36,14 @@ function create_user(user, callback){
             group_id: result.results.insertId,
             user_ids: [user_id]
         };
-        group_service.add_users_to_group(info, callback);
+        group_service.add_users_to_group(info, finalCallback);
     };
 
     bcrypt.genSalt(10, function(err, salt) {
         bcrypt.hash(user.password, salt, function(err, hash) {
             // Store hash in your password DB.
             var createUserQuery = user_query_builder.buildQueryForCreateUser(user, hash);
-
-            db_sql.connection.query(createUserQuery)
-                .on('result', function (row) {
-					user_id = row.insertId;
-                    createUserCallback();
-                })
-                .on('error', function (err) {
-                    callback({error: true, err: err});
-                 }
-            );
+            basic_db_utility.performSingleRowDBOperation(createUserQuery, createUserCallback);
         });
     });
 }
@@ -85,6 +89,7 @@ function get_user_permissions(user, callback) {
                     email_address: row.email_address,
                     is_shibboleth: row.is_shibboleth,
                     password: row.password,
+                    emails_enabled: row.emails_enabled,
                     groups: [thisGroup],
                     resource_management_permission: row.resource_management_permission,
                     reservation_management_permission: row.reservation_management_permission,
@@ -168,6 +173,11 @@ function delete_user(username, callback) {
 
     var deleteUserQuery = user_query_builder.buildQueryForDeleteUser(username);
     basic_db_utility.performSingleRowDBOperation(deleteUserQuery, callback);
+};
+
+function delete_private_group(username, callback) {
+    var deletePrivateGroupQuery = user_query_builder.buildQueryForDeletePrivateGroup(username + "_group_" + random_string);
+    basic_db_utility.performSingleRowDBOperation(deletePrivateGroupQuery, callback);
 }
 
 function update_user(body, callback) {
@@ -175,8 +185,9 @@ function update_user(body, callback) {
     var newUsername = body.newUsername;
     var password = body.password;
     var email_address = body.email_address;
+    var emails_enabled = body.emails_enabled;
 
-    if ((username == null || username == "") || (newUsername == null && password == null && email_address == null)) {
+    if ((username == null || username == "") || (newUsername == null && password == null && email_address == null && emails_enabled == null)) {
         callback({error: true, err: "no username provided OR no fields given to update"});
         return;
     }
@@ -188,6 +199,10 @@ function update_user(body, callback) {
 
     if (email_address != null && email_address != "") {
         query.set("email_address", email_address);
+    }
+
+    if (emails_enabled != null && emails_enabled != "") {
+        query.set("emails_enabled", emails_enabled);
     }
 
     if (password != null && password != "") {
@@ -209,6 +224,12 @@ function get_all_users(callback) {
     basic_db_utility.performMultipleRowDBOperation(getAllUsersQuery, callback);
 };
 
+function get_private_group(user_id, callback) {
+    var getPrivateGroupQuery = user_query_builder.buildQueryForGetPrivateGroup(user_id);
+    basic_db_utility.performSingleRowDBOperation(getPrivateGroupQuery, callback);
+
+};
+
 function compare_passwords(password, user, callback) {
     bcrypt.compare(password, user.password, function(err, res) {
         callback(res, user);
@@ -220,6 +241,8 @@ module.exports = {
     get_user: get_user,
     get_user_permissions: get_user_permissions,
     delete_user: delete_user,
+    delete_private_group: delete_private_group,
+    get_private_group: get_private_group,
     update_user: update_user,
     get_all_users: get_all_users,
     compare_passwords: compare_passwords
