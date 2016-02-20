@@ -1,0 +1,21 @@
+<div class="modal-dialog" ng-controller="EditUserCtrl">
+    <div class="modal-content">
+      <div class="modal-header"><h4 class="modal-title">{{getUserDisplayName(selectedUser)}}</h4></div>
+
+     <div class="modal-body container">
+     	<label>Reservation Management  <input type="checkbox" ng-model="user_ReservationPerm"></label><br/>
+     	<label>Resource Management     <input type="checkbox" ng-model="user_ResourcePerm"></label><br/>
+     	<label>User Management         <input type="checkbox" ng-model="user_UserPerm"></label><br/><br/>
+        <button type="button"
+                class="btn btn-default btn-md"
+                ng-click="updatePermissions()">Update Permissions!</button><br/><br/>
+     </div>
+
+      <div class="modal-footer">
+        <span class="alert alert-success animate-hide" style="width:40%;" ng-show="showEditUserSuccess">Success!
+                <a class="glyphicon glyphicon-ok"></a>
+        </span>
+      	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+</div>

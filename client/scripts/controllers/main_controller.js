@@ -3,8 +3,8 @@
 angular.module('resourceTracker')
     .controller('MainCtrl', function ($scope, $http, $location, $window, $rootScope) {
 
-        $scope.initializeUser = function() {
-            $scope.user = {
+        var initializeUser = function() {
+             $scope.user = {
                 username: '',
                 password: '',
                 resource_management_permission: '',
@@ -14,20 +14,7 @@ angular.module('resourceTracker')
             };
         };
 
-
         $rootScope.googleChartLoaded = { value: false };
-
-        $scope.initializeUser();
-
-        // check if the user already has an active session, if so redirect them to the contact page
-        $http.get('/user').then(function(response) {
-            if (!response.data.noSession) {
-                console.log(response.data);
-                $scope.user = response.data;
-                $scope.user.loggedIn = true;
-                $scope.goToContactPage();
-            }
-        });
 
         $scope.invalidLoginAlert = "Incorrect username or password";
 
@@ -36,22 +23,45 @@ angular.module('resourceTracker')
         $scope.successMessage = { value: '' };
         $scope.alertMessage = { value: '' };
 
+        initializeUser();
+
+        // check if the user already has an active session, if so redirect them somewhere!
+        $http.get('/user').then(function(response) {
+            if (!response.data.noSession) {
+                populateUserWithLoginResponse(response);
+                $scope.user.loggedIn = true;
+                redirectBasedOnPermissions();
+            }
+        });
+
         $scope.login = function() {
             var signInUrl = '/user/signin';
             $http.post(signInUrl, $scope.user).then(function(response) {
                 $scope.clearError();
-                console.log(response.data);
-                $scope.user = response.data;
+                populateUserWithLoginResponse(response.data);
                 $scope.user.loggedIn = true;
-                if ($scope.user.permission_level == 'admin') {
-                    $scope.goToRegisterPage();
-                } else {
-                    $scope.goToManageReservationPage();
-                }
+                redirectBasedOnPermissions();
             }, function(error) {
                 $scope.addError($scope.invalidLoginAlert);
                 clearFields();
             });
+        };
+
+        var populateUserWithLoginResponse = function(data) {
+            $scope.user.first_name = data.first_name;
+            $scope.user.last_name = data.last_name;
+            $scope.user.username = data.username;
+            $scope.user.user_management_permission = data.user_management_permission & 1;
+            $scope.user.reservation_management_permission = data.reservation_management_permission & 1;
+            $scope.user.resource_management_permission = data.resource_management_permission & 1;
+        };
+
+        var redirectBasedOnPermissions = function() {
+            if ($scope.user.user_management_permission) {
+                $scope.goToSystemPermissionPage();
+            } else {
+                $scope.goToContactPage();
+            }
         };
 
         var clearFields = function() {
@@ -85,7 +95,7 @@ angular.module('resourceTracker')
         $scope.logout = function() {
             var signOutUrl = '/user/signout'; 
             $http.post(signOutUrl).then(function(response) {
-                $scope.initializeUser();
+                initializeUser();
                 $location.url('/');
                 // this is necessary - if you login as user, then logout, then log back in, the google timeline UI throws an error.
                 // this fixes the error as is restarts the entire state of the application
@@ -93,10 +103,6 @@ angular.module('resourceTracker')
             }, function(error) {
                 console.log('there is an error when logging out....');
             });
-        };
-
-        $scope.isAdmin = function() {
-            return $scope.user.permission_level == 'admin';
         };
 
         $scope.goToRegisterPage = function() {
@@ -117,6 +123,10 @@ angular.module('resourceTracker')
 
         $scope.goToManageReservationPage = function() {
             $location.url('/create_reservation');
+        };
+
+        $scope.goToSystemPermissionPage = function() {
+            $location.url('/system_permission');
         };
 
 });

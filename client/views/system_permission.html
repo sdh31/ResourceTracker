@@ -1,0 +1,49 @@
+<div class="input-group panel panel-default" id="login" aria-describedby="sizing-addon3">
+    <div class="panel-body">
+            <h5>Create a New Group</h5>
+            <input type="text" class="form-control" placeholder="Name of Group" ng-model="groupNameToCreate"><br><br>
+            <button class="btn btn-primary" ng-click="createNewGroup()">Create</button>
+    </div>
+</div><br>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 panel panel-default">
+            <div class="panel-body">
+                <table class="table table-hover cursor">
+                <thead>
+                    <tr>
+                        <th>Click to Manage Group</th>
+                    </tr>
+                </thead>
+                    <tr ng-repeat="group in publicGroupList track by $index" ng-click="selectGroup($index)">
+                        <td>{{ group.group_name }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-sm-6 panel panel-default">
+            <div class="panel-body">
+                <table class="table table-hover cursor">
+                <thead>
+                    <tr>
+                        <th>Click to Manage User</th>
+                    </tr>
+                </thead>
+                    <tr ng-repeat="user in absoluteUserList track by $index" ng-click="selectUser($index)">
+                        <td>{{getUserDisplayName(user)}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- this is the popup modal that corresponds to a clicked group -->
+<div modal-show="showEditGroupModal.value" class="modal fade">
+    <ng-include src="'views/edit_group.html'" ng-if="showEditGroupModal.value"></ng-include>
+</div>
+
+<div modal-show="showEditUserModal.value" class="modal fade">
+    <ng-include src="'views/edit_user.html'" ng-if="showEditUserModal.value"></ng-include>
+</div>
