@@ -108,7 +108,7 @@ router.post('/Shibboleth.sso/SAML2/POST', function(req, res, next) {
             req.session.user = {};
             req.session.user.username = username;
             req.session.user.is_shibboleth = 1;
-            req.session.user.user_id = result.results.insertId;
+            req.session.user.user_id = result.insertId;
             res.redirect('/#/');
         }
     };
@@ -128,7 +128,7 @@ router.post('/Shibboleth.sso/SAML2/POST', function(req, res, next) {
             user_service.create_user(thisUser, createUserCallback);
         } else {
             req.session.isValid = true;
-            req.session.user = result.results;
+            req.session.user = result.user;
             res.redirect('/#/');
         }
     };
