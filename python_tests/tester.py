@@ -39,6 +39,11 @@ res = r.get_group_permission_to_resource(resource_id)
 print res.status_code < 300
 print len(r.json.loads(res.content)['results']) == 1
 
+print '#### get all resources and make sure there are 2 ####'
+res = r.get_all_resources()
+print res.status_code < 300
+print len(r.json.loads(res.content)) == 2
+
 print '#### create another user ####' 
 res = r.create_user('rahul', 'rahul123')
 print res.status_code < 300

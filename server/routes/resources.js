@@ -5,6 +5,7 @@ var tag_service = require('../services/tags');
 var auth = require('../services/authorization');
 var perm_service = require('../services/permissions');
 var user_service = require('../services/users');
+var group_service = require('../services/groups');
 
 // returns the resource specified by resource_id
 // req.query should have a field "resource_id"
@@ -128,9 +129,21 @@ router.get('/all', auth.is('user'), function(req, res, next) {
 			console.log('we good, we got resources');
 			res.send(JSON.stringify(result.resources));
 		}
-  	}
-    
-    tag_service.filter_by_tag([], [], 0, 0, getAllResourcesCallback);
+  	};
+
+    var getAllGroupsForUserCallback = function(result){
+        if (result.error) {
+            res.sendStatus(400);
+        } else {
+            var group_ids = [];
+            for (var i = 0; i<result.results.length; i++) {
+                group_ids.push(result.results[i].group_id);
+            }
+            tag_service.filter_by_tag([], [], 0, 0, group_ids, getAllResourcesCallback);
+        }
+    };
+
+    group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
 
 // req.body should have resource_id, group_ids, resource_permissions and group_ids.length == resource_permissions.length

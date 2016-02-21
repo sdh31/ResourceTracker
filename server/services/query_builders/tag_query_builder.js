@@ -1,11 +1,18 @@
 var squel = require('squel').useFlavour('mysql');
 
-exports.buildQueryForIncludedTags = function(includedTags, start_time, end_time) {
-    var included_filter = squel.expr()
+exports.buildQueryForIncludedTags = function(includedTags, start_time, end_time, group_ids) {
+    var included_filter = squel.expr();
 	for (var i = 0; i < includedTags.length; i++){
         included_filter.or("tag_name = '" + includedTags[i] + "'");
     }
 
+    included_filter.and_begin();
+
+    for (var i = 0; i < group_ids.length; i++){
+        included_filter.or("permission_group.group_id = '" + group_ids[i] + "'");
+    }
+
+    included_filter.end();
     return squel.select()
         .field("resource.name")
         .field("resource.resource_id")
@@ -20,12 +27,17 @@ exports.buildQueryForIncludedTags = function(includedTags, start_time, end_time)
         .field("user.first_name")
         .field("user.last_name")
         .field("user.user_id")
+        .field("resource_group.resource_permission")
+        .field("permission_group.group_id")
 		.from("resource")
         .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")		
-        .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")		
+        .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")
+        .join("resource_group", null, "resource.resource_id = resource_group.resource_id")
+        .left_join("permission_group", null, "resource_group.group_id = permission_group.group_id")
         .left_join("reservation", null, "reservation.resource_id = resource.resource_id AND reservation.start_time <= " + end_time + " AND reservation.end_time >= " + start_time)        
         .left_join("user_reservation", null, "reservation.reservation_id = user_reservation.reservation_id")
         .left_join("user", null, "user_reservation.user_id = user.user_id")
+        
 		.where(included_filter).toString();
 };
 

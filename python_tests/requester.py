@@ -110,6 +110,14 @@ def get_resource_by_id(id):
 
 	return send_request(method, params, url)
 
+def get_all_resources():
+	url = baseUrl + '/resource/all'
+	method = "GET"
+
+	params = {}
+
+	return send_request(method, params, url)
+
 def create_resource(name, description, max_users):
 	url = baseUrl + '/resource'
 	method = "PUT"
