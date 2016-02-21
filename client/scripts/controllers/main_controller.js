@@ -28,7 +28,7 @@ angular.module('resourceTracker')
         // check if the user already has an active session, if so redirect them somewhere!
         $http.get('/user').then(function(response) {
             if (!response.data.noSession) {
-                populateUserWithLoginResponse(response);
+                populateUserWithLoginResponse(response.data);
                 $scope.user.loggedIn = true;
                 redirectBasedOnPermissions();
             }
