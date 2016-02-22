@@ -48,6 +48,8 @@ var samlStrategy = new saml.Strategy({
         }); 
 });
 
+
+
 passport.use(samlStrategy);
 app.use(passport.initialize());
 app.use(passport.session());
@@ -135,6 +137,18 @@ router.post('/Shibboleth.sso/SAML2/POST', function(req, res, next) {
     
     user_service.get_user_permissions({username: username, is_shibboleth: 1}, checkIfUserExistsCallback);
 });
+
+
+router.get('/signout-shib', function(req, res, next) {
+    req.session.destroy(function() {
+        res.type('text/plain');
+        res.send('YOU ARE LOGGED OUT');
+    });
+    var returnToUrl = 'https://colab-sbx-' + serverNumber + '.oit.duke.edu';
+
+    res.redirect('https://shib.oit.duke.edu/cgi-bin/logout.pl?logoutWithoutPrompt=1&returnto=' + returnToUrl);
+});
+
 
 router.get('/login/fail', 
     function(req, res) {

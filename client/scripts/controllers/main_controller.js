@@ -54,6 +54,7 @@ angular.module('resourceTracker')
             $scope.user.user_management_permission = data.user_management_permission & 1;
             $scope.user.reservation_management_permission = data.reservation_management_permission & 1;
             $scope.user.resource_management_permission = data.resource_management_permission & 1;
+            $scope.user.is_shibboleth = data.is_shibboleth & 1;
         };
 
         var redirectBasedOnPermissions = function() {
@@ -93,6 +94,12 @@ angular.module('resourceTracker')
         };
 
         $scope.logout = function() {
+            if ($scope.user.is_shibboleth) {
+                $window.location.href =
+                    $window.location.protocol + "//" + $window.location.hostname + "/signout-shib";
+                return;
+            }
+
             var signOutUrl = '/user/signout'; 
             $http.post(signOutUrl).then(function(response) {
                 initializeUser();
