@@ -13,8 +13,19 @@ router.get('/', function(req,res,next){
         }
     }
 
-    group_service.get_groups_by_id(req.query, get_group_callback)
+    var user_permission_callback = function(results){
+        if(results.error){
+            res.status(400).json(result)
+        }
+        else if(!results.auth){
+            res.sendStatus(403);
+        }
+        else{
+            group_service.get_groups_by_id(req.query, get_group_callback);
+        }
+    }
 
+    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
 
 });
 

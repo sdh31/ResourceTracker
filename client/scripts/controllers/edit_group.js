@@ -3,7 +3,7 @@
 
 // at this point, there is a $scope.selectedGroup set through user_management.js
 angular.module('resourceTracker')
-    .controller('EditGroupCtrl', function ($scope, $http, $timeout) {
+    .controller('EditGroupCtrl', function ($scope, $http, $timeout, $q) {
 
     	var initEditGroupController = function() {
             // initialize group permissions
@@ -146,8 +146,10 @@ angular.module('resourceTracker')
             var reqBody = {user_ids: user_ids, group_id: group_id};
 
             $http.post('/group/removeUsers', reqBody).then(function(response) {
-                $scope.openEditGroupSuccess();
-                initEditGroupController();
+                redirectUserIfPermissionChangedFromEditGroupPage().then(function() {
+                    $scope.openEditGroupSuccess();
+                    initEditGroupController();
+                });
             }, function(error) {
                 console.log(error);
             });
@@ -163,11 +165,13 @@ angular.module('resourceTracker')
 
             $http.post('/group', reqBody).then(function(response) {
                 // must reload all groups from parent controller..
-                $scope.getAllGroups().then(function() {
+                $scope.getAllGroups().then(function() {                    
                     $scope.openEditGroupSuccess();
                     // reselect group.. as permissions have changed
                     $scope.selectGroupByGroupId($scope.selectedGroup.group_id);
                     initEditGroupController();
+                }, function(error) {
+                    redirectUserIfPermissionChangedFromEditGroupPage();
                 });
             }, function(error) {
                 console.log(error);
@@ -189,6 +193,24 @@ angular.module('resourceTracker')
     		});
             return promise;
     	};
+
+        var redirectUserIfPermissionChangedFromEditGroupPage = function() {
+            var deferred = $q.defer();
+            // an error can occur when if user removed their own user_management_permission
+            $scope.getMaximumPermissionsForActiveUser().then(function(permissions) {
+                $scope.user.resource_management_permission = permissions.resource_management_permission;
+                $scope.user.reservation_management_permission = permissions.reservation_management_permission;
+                $scope.user.user_management_permission = permissions.user_management_permission;
+
+                if (!$scope.user.user_management_permission) {
+                    $scope.showEditGroupModal.value = false;
+                    $scope.goToContactPage();
+                    return;
+                }
+                deferred.resolve();
+            });
+            return deferred.promise;
+        };
 
         $scope.openEditGroupSuccess = function() {
             $scope.showEditGroupSuccess = true;

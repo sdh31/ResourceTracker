@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('resourceTracker')
-    .controller('SystemPermissionCtrl', function ($scope, $http) {
+    .controller('SystemPermissionCtrl', function ($scope, $http, $q) {
 
         $scope.initializePage = function() {
             $scope.groupNameToCreate = '';
@@ -24,7 +24,8 @@ angular.module('resourceTracker')
 
         // gets all groups from db
         $scope.getAllGroups = function() {
-            var promise = $http.get('/group').then(function(response) {
+            var deferred = $q.defer();
+            $http.get('/group').then(function(response) {
                 // clear out current groups
                 $scope.publicGroupList = [];
                 $scope.usernameToPrivateGroupMap = {};
@@ -33,7 +34,6 @@ angular.module('resourceTracker')
                     if (group.is_private == 1) {
                         var underscorePos = group.group_name.indexOf('_');
                         var username = group.group_name.substring(0, underscorePos); 
-
                         // we do not want any admin related groups in the UI
                         if (username == 'admin') {
                             return;
@@ -43,11 +43,11 @@ angular.module('resourceTracker')
                         $scope.publicGroupList.push(group);
                     }
                 });
-
+                deferred.resolve();
             }, function(error) {
-                console.log(error);
+                deferred.reject();
             });
-            return promise;
+            return deferred.promise;
         };
 
         // gets all users from db
@@ -104,6 +104,26 @@ angular.module('resourceTracker')
 
         $scope.getUserDisplayName = function(user) {
             return user.first_name + " " + user.last_name + " (" + user.username + ")";
+        };
+
+        // does so based on current session, RETURNS A PROMISE
+        $scope.getMaximumPermissionsForActiveUser = function() {
+            var deferred = $q.defer();
+            $http.get('/user').then(function(response) {
+                if (response.data.noSession) {
+                    deferred.reject();
+                } else {
+                    var permissions = {
+                        reservation_management_permission: response.data.reservation_management_permission & 1,
+                        resource_management_permission: response.data.resource_management_permission & 1,
+                        user_management_permission: response.data.user_management_permission & 1
+                    };
+                    deferred.resolve(permissions);
+                }
+            }, function(error) {
+                deferred.reject();
+            });
+            return deferred.promise;
         };
 
         $scope.initializePage();

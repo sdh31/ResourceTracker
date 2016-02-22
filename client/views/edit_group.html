@@ -3,7 +3,6 @@
       <div class="modal-header"><h4 class="modal-title">{{selectedGroup.group_name}}</h4></div>
 
 
-
      <div class="modal-body container">
      	<div class="row">
      		<div class="col-sm-4" style="padding-right:20px; border-right: 1px solid #ccc;">
@@ -11,7 +10,7 @@
 		        <label>Resource Management     <input type="checkbox" ng-model="resourcePerm"></label><br/>
 		        <label>User Management         <input type="checkbox" ng-model="userPerm"></label><br/>
                 <button type="button"
-                        class="btn btn-default btn-md"
+                        class="btn btn-primary btn-md"
                         ng-click="updatePermissions()">Update Permissions!</button><br/><br/>
       		</div>
       		<div class="col-sm-4">
@@ -33,13 +32,13 @@
                       extra-settings="{enableSearch: true}"
                       translation-texts="{buttonDefaultText: 'Select Users to Add'}"></span>
                 <button type="button"
-                        class="btn btn-default btn-md"
+                        class="btn btn-primary btn-md"
                         ng-click="addUsersToGroup()">Add Users!</button></br></br>
                 <span ng-dropdown-multiselect="" options="usersToRemoveDropdownData" selected-model="usersToRemoveFromGroup"
                       extra-settings="{enableSearch: true}"
                       translation-texts="{buttonDefaultText: 'Select Users to Remove'}"></span>
                 <button type="button"
-                        class="btn btn-default btn-md"
+                        class="btn btn-primary btn-md"
                         ng-click="removeUsersFromGroup()">Remove Users!</button>
             </div>
         </div>
