@@ -141,8 +141,6 @@ router.post('/Shibboleth.sso/SAML2/POST', function(req, res, next) {
 
 router.get('/signout-shib', function(req, res, next) {
     req.session.destroy(function() {
-        res.type('text/plain');
-        res.send('YOU ARE LOGGED OUT');
     });
     var returnToUrl = 'https://colab-sbx-' + serverNumber + '.oit.duke.edu';
 
