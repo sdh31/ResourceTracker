@@ -8,13 +8,13 @@ print session_response.status_code < 300
 r.session = session_response.cookies
 
 print '#### update admin user to have new email ####'
-res = r.update_user(username="admin",email_address="nikroy16@gmail.com")
+res = r.update_user(username="admin",email_address="ericichonglam17@gmail.com")
 print res.status_code < 300
 
 print '#### get all users in DB, make sure theres only 1 and that the username == admin ####'
 res = r.get_all_users()
 print len(r.json.loads(res.content)['results']) == 1
-print r.json.loads(res.content)['results'][0]['email_address'] == 'nikroy16@gmail.com'
+print r.json.loads(res.content)['results'][0]['email_address'] == 'ericichonglam17@gmail.com'
 
 print '#### create resource with tags ####'
 res = r.create_resource("YAAAAAAAM", "huh", 1)
@@ -137,8 +137,17 @@ print res.status_code < 300
 
 print '#### get reservations and check if updated values have persisted ####'
 res = r.get_reservations(resource_id, 0, 99999)
+print len(r.json.loads(res.content)['results']) == 2
 print r.json.loads(res.content)['results'][0]['start_time'] == 5
 print r.json.loads(res.content)['results'][0]['end_time'] == 10
+
+print '#### delete reservation ####'
+res = r.delete_reservation(reservation_id)
+print res.status_code < 300
+
+print '#### get reservations and check reservation has been deleted successfully ####'
+res = r.get_reservations(resource_id, 0, 99999)
+print len(r.json.loads(res.content)['results']) == 1
 
 print '#### remove view permission to the group for the resource with tags ####'
 res = r.remove_group_permission_to_resource(resource_id, [group_id])

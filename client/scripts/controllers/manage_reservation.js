@@ -62,12 +62,8 @@ angular.module('resourceTracker')
             getAllResources().then(function() {
                // if we are admin, then resource/reservations that we can modify are the list of all resources.
                 // if we are user, we must get all resource/reservations for that particular user
-                if ($scope.isAdmin()) {
-                    $scope.allUserResources = $scope.allResources;
-                } else {
-                    $scope.resourceReservationMap = {};
-                    getAllUserResources();
-                }
+                $scope.resourceReservationMap = {};
+                getAllUserResources();
             });
 
 
@@ -81,11 +77,10 @@ angular.module('resourceTracker')
             });
         };
 
-
         var getAllUserResources = function() {
-            $http.get('/user').then(function(response) {
+            $http.get('/resource/all').then(function(response) {
                 console.log(response);   
-                populateResourceArray(response.data.resources, $scope.allUserResources);
+                populateResourceArray(response.data, $scope.allUserResources);
             }, function(error) {
                 console.log(error);
             });

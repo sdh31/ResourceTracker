@@ -110,6 +110,7 @@ module.exports.buildQueryGetUsersFromGroup = function(group){
 module.exports.buildQueryForGetAllGroupsForUser = function(user) {
     return squel.select()
         .from(user_group_table)
+        .join(group_table, null, "user_group.group_id = permission_group.group_id")
         .where("user_id = " + user.user_id)
         .toString();
 }

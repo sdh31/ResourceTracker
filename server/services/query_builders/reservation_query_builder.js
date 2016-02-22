@@ -49,6 +49,14 @@ module.exports.buildQueryForDeleteReservationById = function(reservation) {
         .toString();
 };
 
+module.exports.buildQueryForGetReservationById = function(reservation) {
+    return squel.select()
+        .from("reservation")
+        .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
+        .where("reservation.reservation_id = " + reservation.reservation_id)
+        .toString();
+};
+
 var generate_conflict_expression = function(reservation){
     return squel.expr()
         .or_begin()

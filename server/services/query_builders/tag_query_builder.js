@@ -29,7 +29,7 @@ exports.buildQueryForIncludedTags = function(includedTags, start_time, end_time,
         .field("user.user_id")
         .field("resource_group.resource_permission")
         .field("permission_group.group_id")
-		.from("resource")
+        .from("resource")
         .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")		
         .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")
         .join("resource_group", null, "resource.resource_id = resource_group.resource_id")

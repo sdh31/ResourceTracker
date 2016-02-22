@@ -48,6 +48,15 @@ function get_all_groups_for_user(user, callback) {
 	basic_db_utility.performMultipleRowDBOperation(getAllGroupsForUser, callback);
 };
 
+function checkReservePermission(groups) {
+    for (var i = 0; i<groups.length; i++) {
+        if (groups[i].resource_permission == 'reserve') {
+            return true;
+        }
+    }
+    return false;
+};
+
 module.exports = {
 	delete_group_by_id:delete_group_by_id,
 	create_group:create_group,
@@ -57,5 +66,6 @@ module.exports = {
 	add_users_to_group:add_users_to_group,
 	remove_users_from_group:remove_users_from_group,
     get_all_groups_for_user: get_all_groups_for_user,
+    checkReservePermission: checkReservePermission,
 	get_users_in_group:get_users_in_group
 }

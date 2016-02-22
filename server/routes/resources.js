@@ -22,14 +22,27 @@ router.get('/', function(req, res, next){
     var checkPermissionForResourceCallback = function (result) {
         if (result.error) {
             res.sendStatus(400);
-        } else if (result.results == {}) {
+        } else if (result.results == []) {
             res.sendStatus(403);
         } else {
             res_service.get_resource_by_id(req.query, getResourceCallback);
         }
     };
 
-    perm_service.check_permission_for_resource(req.query.resource_id, req.session.user.user_id, checkPermissionForResourceCallback);
+    var getAllGroupsForUserCallback = function(result){
+        if (result.error) {
+            res.sendStatus(400);
+        } else {
+            var group_ids = [];
+            for (var i = 0; i<result.results.length; i++) {
+                group_ids.push(result.results[i].group_id);
+            }
+            perm_service.check_permission_for_resource(req.query.resource_id, group_ids, checkPermissionForResourceCallback);
+        }
+    };
+
+    // we first get all of the groups that the user is a part of so that we only show resources that they have view/reserve access on
+    group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
 
 router.put('/', function(req, res, next){
@@ -50,7 +63,8 @@ router.put('/', function(req, res, next){
             res.sendStatus(400);
         } else {
             var group_ids = [result.results.group_id];
-            var resource_permissions = ['view'];
+            // TODO: not sure if this should be 'view' or 'reserve'; helps with testing for it to be 'reserve' for now
+            var resource_permissions = ['reserve'];
             res_service.addGroupPermissionToResource({resource_id: resource_id, group_ids: group_ids, resource_permissions: resource_permissions}, addGroupPermissionCallback);
         }
     };
@@ -115,7 +129,17 @@ router.delete('/', auth.is('user'), function(req, res, next){
         }
     }
 
-    res_service.delete_resource_by_id(req.query, delete_resource_callback);
+    var resource_permission_callback = function(results){
+        if (results.error){
+            res.status(400).json(result.err);
+        } else if (!results.auth){
+            res.sendStatus(403);
+        } else {
+             res_service.delete_resource_by_id(req.query, delete_resource_callback);
+        }
+    }
+
+    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
 });
 
 router.get('/all', auth.is('user'), function(req, res, next) {
@@ -139,10 +163,11 @@ router.get('/all', auth.is('user'), function(req, res, next) {
             for (var i = 0; i<result.results.length; i++) {
                 group_ids.push(result.results[i].group_id);
             }
-            tag_service.filter_by_tag([], [], 0, 0, group_ids, getAllResourcesCallback);
+            tag_service.filter_by_tag([], [], 0, Number.MAX_VALUE, group_ids, getAllResourcesCallback);
         }
     };
 
+    // we first get all of the groups that the user is a part of so that we only show resources that they have view/reserve access on
     group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
 

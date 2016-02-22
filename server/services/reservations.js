@@ -8,6 +8,11 @@ function get_conflicting_reservations(reservation, callback){
     basic_db_utility.performMultipleRowDBOperation(getConflictingReservationsQuery, callback);
 }
 
+function get_reservation_by_id(reservation, callback){
+    var getReservationByIdQuery = reservation_query_builder.buildQueryForGetReservationById(reservation);
+    basic_db_utility.performSingleRowDBOperation(getReservationByIdQuery, callback);
+}
+
 function create_reservation(user, reservation, callback){
     var createReservationQuery = reservation_query_builder.buildQueryForCreateReservation(reservation);
     basic_db_utility.performSingleRowDBOperation(createReservationQuery, callback);
@@ -48,5 +53,6 @@ module.exports = {
     delete_reservation_by_id:delete_reservation_by_id,
     update_reservation_by_id:update_reservation_by_id,
     add_user_reservation_link:add_user_reservation_link,
+    get_reservation_by_id: get_reservation_by_id,
     scheduleEmailForReservation: scheduleEmailForReservation
 }
