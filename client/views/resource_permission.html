@@ -1,0 +1,41 @@
+<div class="container" style="max-width: 750px;">
+    <div class="row">
+        <div class="col-xs-6 panel panel-default">
+            <div class="panel-body">
+                <table class="table table-hover cursor">
+                <thead>
+                    <tr>
+                        <th>Click to Manage Group Resource Permissions</th>
+                    </tr>
+                </thead>
+                    <tr ng-repeat="group in publicGroupList track by $index" ng-click="selectGroup($index)">
+                        <td>{{ group.group_name }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="col-xs-6 panel panel-default">
+            <div class="panel-body">
+                <table class="table table-hover cursor">
+                <thead>
+                    <tr>
+                        <th>Click to Manage User Permissions</th>
+                    </tr>
+                </thead>
+                    <tr ng-repeat="user in absoluteUserList track by $index" ng-click="selectUser($index)">
+                        <td>{{getUserDisplayName(user)}}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- this is the popup modal that corresponds to a clicked group -->
+<div modal-show="showEditGroupModal.value" class="modal fade">
+    <ng-include src="'views/edit_group_resource_permission.html'" ng-if="showEditGroupModal.value"></ng-include>
+</div>
+
+<div modal-show="showEditUserModal.value" class="modal fade">
+    <ng-include src="'views/edit_user_resource_permission.html'" ng-if="showEditUserModal.value"></ng-include>
+</div>

@@ -188,6 +188,7 @@ angular.module('resourceTracker')
     			response.data.results.forEach(function(user) {
     				$scope.usersInGroup.push(user);
     			});
+                console.log($scope.usersInGroup);
     		}, function(error) {
     			console.log(error);
     		});

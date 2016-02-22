@@ -21,7 +21,7 @@ adminViews.forEach(function(adminView) {
 });
 
 // NO PERMISSION REQUIRED
-var permissionlessViews = ['index.html', 'login.html', 'contact.html', 'user_management.html'];
+var permissionlessViews = ['index.html', 'login.html', 'contact.html', 'user_management.html', 'resource_permission.html'];
 
 permissionlessViews.forEach(function(view) {
     router.get('/views/' + view, function (req, res) {
