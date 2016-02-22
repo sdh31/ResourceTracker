@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var tag_service = require('../services/tags');
+var group_service = require('../services/groups');
 var auth = require('../services/authorization');
 
 // this gets all tags
@@ -31,7 +32,19 @@ router.post('/filter', auth.is('user'), function(req, res, next){
     var start_time = req.body.start_time;
     var end_time = req.body.end_time;
 
-	tag_service.filter_by_tag(includedTags, excludedTags, start_time, end_time, filter_callback);
+    var getAllGroupsForUserCallback = function(result){
+        if (result.error) {
+            res.sendStatus(400);
+        } else {
+            var group_ids = [];
+            for (var i = 0; i<result.results.length; i++) {
+                group_ids.push(result.results[i].group_id);
+            }
+            tag_service.filter_by_tag(includedTags, excludedTags, start_time, end_time, group_ids, filter_callback);
+        }
+    };
+
+    group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
 
 router.put('/', auth.is('user'), function(req, res, next){

@@ -37,28 +37,52 @@ router.put('/', auth.is('admin'), function(req, res, next){
         }
     }
 
-    // TODO: need to add permissions here
-    if(!('username' in req.body) || !('password' in req.body)){
-        res.sendStatus(401);
-    } else {
-        user_service.create_user(req.body, createUserCallback);
+    var checkUserManagementPermissionCallback = function(results){
+        if (results.error){
+            res.status(400).json(result.err)
+        } else if (!results.auth){
+            res.sendStatus(403);
+        } else {
+            if(!('username' in req.body) || !('password' in req.body)){
+                res.sendStatus(401);
+            } else {
+                user_service.create_user(req.body, createUserCallback);
+            }
+        }
     }
+
+    perm_service.check_user_management_permission(1, req.session.user, checkUserManagementPermissionCallback);
 });
 
 router.post('/', auth.is('user'), function(req, res, next){
     //update user
 
     var updateUserCallback = function(result) {
-
-        if (result.error == true) {
+        if (result.error) {
             res.sendStatus(401);
         } else {
-            // send updated user info too?
             res.sendStatus(200);
         }
     }
 
-    user_service.update_user(req.body, updateUserCallback);
+    var checkUserManagementPermissionCallback = function(results){
+        if (results.error){
+            res.status(400).json(result.err)
+        } else if (!results.auth){
+            // if user does not have user management permission, check if they are trying to update themselves
+            if (req.body.username == req.session.user.username) {
+                user_service.update_user(req.body, updateUserCallback);
+            } else {
+                res.sendStatus(403);
+            }
+        } else {
+            // if they do have user management permission, just let them do what they gotta do
+            user_service.update_user(req.body, updateUserCallback);
+        }
+    }
+
+    /// first check if user has user management permission
+    perm_service.check_user_management_permission(1, req.session.user, checkUserManagementPermissionCallback);
 });
 
 router.delete('/', auth.is('user'), function(req, res, next){
@@ -80,8 +104,17 @@ router.delete('/', auth.is('user'), function(req, res, next){
         }
     };
 
-    
-    user_service.delete_user(username, deleteUserCallback);
+    var checkUserManagementPermissionCallback = function(results){
+        if (results.error){
+            res.status(400).json(result.err)
+        } else if (!results.auth){
+            res.sendStatus(403);
+        } else {
+            user_service.delete_user(username, deleteUserCallback);
+        }
+    }
+
+    perm_service.check_user_management_permission(1, req.session.user, checkUserManagementPermissionCallback);
 });
 
 router.get('/all', function(req,res,next){

@@ -39,9 +39,9 @@ function select_tag_ids(tags, callback){
 
 // this returns a list of resources that have the includedTags and do not have the excludedTags
 // each resource comes with a list of reservations that are between the start_time and end_time
-function filter_by_tag (includedTags, excludedTags, start_time, end_time, callback){
+function filter_by_tag (includedTags, excludedTags, start_time, end_time, group_ids, callback){
     
-	var includedQuery = tag_query_builder.buildQueryForIncludedTags(includedTags, start_time, end_time);
+	var includedQuery = tag_query_builder.buildQueryForIncludedTags(includedTags, start_time, end_time, group_ids);
 	var excludedQuery = tag_query_builder.buildQueryForExcludedTags(excludedTags);
 	console.log(excludedQuery);
 	console.log(includedQuery);
@@ -142,6 +142,9 @@ function organizeResources(resources) {
                 resourcesToSend[index].reservations.push(thisReservation);
                 seenReservations.push(thisResource.reservation_id);
             }
+            if (thisResource.resource_permission == 'reserve') {
+                resourcesToSend[index].resource_permission = 'reserve';
+            }
 		} else {
 			var tag = (thisResource.tag_name == null) ? [] : [thisResource.tag_name];
             var reservation = (thisResource.reservation_id == null) ? [] : [thisReservation];
@@ -153,7 +156,8 @@ function organizeResources(resources) {
 				max_users: thisResource.max_users,
 				tags: tag,
 				resource_id: thisResource.resource_id,
-                reservations: reservation
+                reservations: reservation,
+                resource_permission: thisResource.resource_permission
 			};
 			resourcesToSend.push(resource);
 		}

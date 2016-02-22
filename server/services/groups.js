@@ -43,6 +43,20 @@ function toggle_group_privacy(group, is_private){
 	group['is_private'] = is_private;
 }
 
+function get_all_groups_for_user(user, callback) {
+    var getAllGroupsForUser = group_queries.buildQueryForGetAllGroupsForUser(user)
+	basic_db_utility.performMultipleRowDBOperation(getAllGroupsForUser, callback);
+};
+
+function checkReservePermission(groups) {
+    for (var i = 0; i<groups.length; i++) {
+        if (groups[i].resource_permission == 'reserve') {
+            return true;
+        }
+    }
+    return false;
+};
+
 module.exports = {
 	delete_group_by_id:delete_group_by_id,
 	create_group:create_group,
@@ -51,5 +65,7 @@ module.exports = {
 	update_group_by_id:update_group_by_id,
 	add_users_to_group:add_users_to_group,
 	remove_users_from_group:remove_users_from_group,
+    get_all_groups_for_user: get_all_groups_for_user,
+    checkReservePermission: checkReservePermission,
 	get_users_in_group:get_users_in_group
 }

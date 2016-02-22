@@ -30,9 +30,19 @@ module.exports.buildQueryForSystemPermissionChecks = function(user){
         .toString();
 };
 
-module.exports.buildQueryForCheckPermissionForResource = function (user_id, resource_id) {
+module.exports.buildQueryForCheckPermissionForResource = function (resource_id, group_ids) {
+
+    var group_filter = squel.expr();
+    for (var i = 0; i < group_ids.length; i++){
+        group_filter.or("permission_group.group_id = '" + group_ids[i] + "'");
+    }
+
+    group_filter.and("resource.resource_id = " + resource_id);
+
     return squel.select()
-        .from(user_group_table)
-        .where(user_id + " = " + user_id + " AND " + resource_id + " = " + resource_id)
+        .from("permission_group")
+        .join("resource_group", null, "permission_group.group_id = resource_group.group_id")
+        .join("resource", null, "resource_group.resource_id = resource.resource_id")
+        .where(group_filter)
         .toString();
 };

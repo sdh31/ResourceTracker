@@ -33,6 +33,7 @@ function check_reservation_management_permission(min_permission_level, user, cal
 	var getReservationPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
 	console.log(getReservationPermissionQuery);
 	var max_reservation_permission = 0;
+    var results = {};
 
 	db_sql.connection.query(getReservationPermissionQuery)
 	    .on('result', function (row) {
@@ -58,6 +59,7 @@ function check_resource_management_permission(min_permission_level, user, callba
 	var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user);
 	console.log(getResourcePermissionQuery);
 	var max_resource_permission = 0;
+    var results = {};
 
 	db_sql.connection.query(getResourcePermissionQuery)
 	    .on('result', function (row) {
@@ -79,9 +81,9 @@ function check_resource_management_permission(min_permission_level, user, callba
     });
 };
 
-function check_permission_for_resource(user_id, resource_id, callback) {
-    var checkPermissionForResourceQuery = permission_queries.buildQueryForCheckPermissionForResource(user_id, resource_id);
-    basic_db_utility.performSingleRowDBOperation(checkPermissionForResourceQuery, callback);
+function check_permission_for_resource(resource_id, group_ids, callback) {
+    var checkPermissionForResourceQuery = permission_queries.buildQueryForCheckPermissionForResource(resource_id, group_ids);
+    basic_db_utility.performMultipleRowDBOperation(checkPermissionForResourceQuery, callback);
 };
 
 module.exports = {
