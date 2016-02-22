@@ -41,7 +41,6 @@ angular.module('resourceTracker')
 
         this.addTags = function(resource_id, tags) {
             var deferred = $q.defer();
-            console.log(resource_id);
 			var resourceCreationFailedMessage = this.alertMessages.resourceCreationFailed;
 			$http.put('/tag', {resource_id: resource_id, addedTags: tags}).then(function(response) {
 				deferred.resolve();

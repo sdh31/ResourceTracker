@@ -1,5 +1,5 @@
 
-describe('System Permission Controller -- ', function() {
+describe('System Permission Controller Test -- ', function() {
    var $httpBackend, $rootScope, initController;
 
    beforeEach(module('resourceTracker'));
