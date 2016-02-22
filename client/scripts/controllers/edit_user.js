@@ -3,7 +3,7 @@
 
 // at this point, there is a $scope.selectedGroup set through user_management.js
 angular.module('resourceTracker')
-    .controller('EditUserCtrl', function ($scope, $http, $timeout) {
+    .controller('EditUserCtrl', function ($scope, $http, $timeout, $location) {
 
     	var initEditUserController = function() {
             $scope.user_ReservationPerm = getPermissionForUser($scope.selectedUser, 'reservation_management_permission');
@@ -28,9 +28,26 @@ angular.module('resourceTracker')
                     $scope.openEditUserSuccess();
                     $scope.selectUserByUserId($scope.selectedUser.user_id);
                     initEditUserController();
+                }, function(error) {
+                    // an error can occur when if user removed their own user_management_permission
+                    redirectUserIfPermissionChangedFromEditUserPage();
                 });
             }, function(error) {
-                console.log(error);
+                console.log('error');
+            });
+        };
+
+        var redirectUserIfPermissionChangedFromEditUserPage = function() {
+            $scope.getMaximumPermissionsForActiveUser().then(function(permissions) {
+                $scope.user.resource_management_permission = permissions.resource_management_permission;
+                $scope.user.reservation_management_permission = permissions.reservation_management_permission;
+                $scope.user.user_management_permission = permissions.user_management_permission;
+
+                if (!$scope.user.user_management_permission) {
+                    $scope.showEditUserModal.value = false;
+                    $scope.goToContactPage();
+                    return;
+                }
             });
         };
 
