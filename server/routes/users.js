@@ -174,8 +174,17 @@ router.post('/signout', auth.is('user'), function(req, res, next){
 
     req.session.destroy(function() {
         res.type('text/plain');
-        res.status(200).json(results: 'YOU ARE LOGGED OUT');
+        res.status(200).json({results: 'YOU ARE LOGGED OUT'});
     });
 });
+
+router.post('/token', function(req, res, next){
+    var get_token_callback = function(result){
+        res.status(200).json(result)
+    }
+    perm_service.generate_api_auth_token(req.session.user, get_token_callback)
+});
+
+
 
 module.exports = router;

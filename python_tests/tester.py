@@ -11,8 +11,14 @@ print '#### update admin user to have new email ####'
 res = r.update_user(username="admin",email_address="ericichonglam17@gmail.com")
 print res.status_code < 300
 
+res = r.get_api_token()
+r.headers['Auth-Token'] = r.json.loads(res.content)['results']['token']
+print res.status_code
+print r.headers['Auth-Token']
+
 print '#### get all users in DB, make sure theres only 1 and that the username == admin ####'
 res = r.get_all_users()
+print res.content
 print len(r.json.loads(res.content)['results']) == 1
 print r.json.loads(res.content)['results'][0]['email_address'] == 'ericichonglam17@gmail.com'
 
@@ -193,4 +199,3 @@ res = r.delete_user('rahul')
 print res.status_code < 300
 res = r.get_all_users()
 print len(r.json.loads(res.content)['results']) == 1
-
