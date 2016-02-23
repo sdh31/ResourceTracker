@@ -16,6 +16,8 @@ r.headers['Auth-Token'] = r.json.loads(res.content)['results']['token']
 print res.status_code
 print r.headers['Auth-Token']
 
+r.session = ''
+
 print '#### get all users in DB, make sure theres only 1 and that the username == admin ####'
 res = r.get_all_users()
 print res.content

@@ -8,10 +8,12 @@ var jwt = require('jsonwebtoken');
 var secret_token = "so secret"
 
 function generate_api_auth_token(payload, callback){
-    var username = payload.username
+    var username = payload.username;
+    var user_id = payload.user_id;
     var timestamp = new Date().getTime()/1000;
     var payload = {
-        username: username
+        username: username,
+        user_id: user_id
     }
     var options = {
         expiresIn: "10 minutes",
@@ -23,12 +25,11 @@ function generate_api_auth_token(payload, callback){
 
 function verify_api_auth_token(token, callback){
     var decoded_token = jwt.verify(token, secret_token, function(err, decoded){
-    	console.log(decoded)
         if(decoded == undefined){
             callback({error: true, err: err});
         }
         else{
-            callback({error: false, username: decoded.username});
+            callback({error: false, user: decoded});
         }
     });
 
