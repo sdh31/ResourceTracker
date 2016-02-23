@@ -53,20 +53,7 @@ describe('Edit User Test -- ', function() {
 
         $rootScope.user_ReservationPerm = false;
         $rootScope.updatePermissions();
-
-
-        $httpBackend.when('GET', '/group').respond({
-            group_name: 'sdh31_group_110ec58a-a0f2-4ac4-8393-c866d813b8d1',
-            group_description: 'sdh31_group_110ec58a-a0f2-4ac4-8393-c866d813b8d1',
-            is_private: 1,
-            user_management_permission: true,
-            resource_management_permission: true,
-            reservation_management_permission: false,
-            group_id: 4
-        });
-
-        $httpBackend.expectGET('/group');
-        $httpBackend.flush();
+        
         $httpBackend.flush();
 
     });
