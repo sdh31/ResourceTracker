@@ -112,6 +112,10 @@ angular.module('resourceTracker')
             });
         };
 
+        $scope.getToken = function() {
+            $scope.showTokenModal.value = true;
+        };
+
         $scope.goToRegisterPage = function() {
             $location.url('/register')
         };

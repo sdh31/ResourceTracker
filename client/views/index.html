@@ -25,6 +25,7 @@
     <script src="scripts/controllers/system_permission.js"></script>
     <script src="scripts/controllers/edit_group.js"></script>
     <script src="scripts/controllers/edit_user.js"></script>
+    <script src="scripts/controllers/token_modal.js"></script>
 
     <link rel="stylesheet" href="styles/main.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
@@ -58,6 +59,7 @@
                 <li><button class="btn btn-default btn-sm" ng-show="user.resource_management_permission" ng-click="goToResourcePage()">Manage Resources</button></li>
                 <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="goToFilterReservationPage()">Filter Reservation</button></li>
                 <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="goToManageReservationPage()">Manage Reservations</button><li>
+                <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="getToken()">Get Token</button><li>
                 <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="logout()">Logout</button><li>
                 <li><button class="btn btn-default btn-sm" ng-click="goToContactPage()">Contact</button></li>
             </ul>
@@ -68,6 +70,11 @@
     </div>
 
     <div class="body" ng-view=""></div>
+
+    <!-- this is the popup modal that corresponds to clicking 'Get Token' -->
+    <div modal-show="showTokenModal.value" class="modal fade">
+        <ng-include src="'views/token_modal.html'" ng-if="showTokenModal.value"></ng-include>
+    </div>
 
 </body>    
 
