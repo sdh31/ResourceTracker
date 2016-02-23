@@ -24,6 +24,7 @@ module.exports.api_auth = function(req, res, next){
     }   
     else{
         req.signed_in = false
+        
         return next();
     }
 }

@@ -8,6 +8,8 @@ var privateKey = fs.readFileSync('/opt/bitnami/apache2/conf/server.key', 'utf8')
 var certificate = fs.readFileSync('/opt/bitnami/apache2/conf/server.crt', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
 
+var auth_middleware = require('./middleware/permission_middleware');
+
 var body_parser = require('body-parser');
 var cookie_parser = require('cookie-parser');
 var session = require('express-session');
@@ -28,10 +30,12 @@ var initialize_tables = require('./services/initialize_tables');
 var create_admin = require('./services/create_admin');
 var shibboleth = require('./routes/shibboleth');
 
+
 app.use(body_parser.json());
 // Added for Duke Shibboleth POST
 app.use(body_parser.urlencoded({ extended: true }));
 app.use(cookie_parser());
+
 app.use(session({
     secret: 'ssshhhhh',
     store: new redis_store({ host: 'localhost', port: 6379, client: client,ttl :  260}),
@@ -40,6 +44,7 @@ app.use(session({
 	key: 'sid'
 }));
 
+app.use(auth_middleware.api_auth);
 
 app.use('/', views);
 app.use('/views', views);
