@@ -174,7 +174,7 @@ router.post('/signout', auth.is('user'), function(req, res, next){
 
     req.session.destroy(function() {
         res.type('text/plain');
-        res.send('YOU ARE LOGGED OUT');
+        res.status(200).json(results: 'YOU ARE LOGGED OUT');
     });
 });
 

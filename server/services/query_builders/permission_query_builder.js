@@ -14,8 +14,7 @@ var private_group = "is_private"
 
 var user_group_table = "user_group";
 var user_group_user = "user_id";
-var user_group_group = "group_id"
-
+var user_group_group = "group_id";
 
 module.exports.buildQueryForSystemPermissionChecks = function(user){
     return squel.select()
