@@ -107,6 +107,20 @@ module.exports.buildQueryGetUsersFromGroup = function(group){
         .toString();
 }
 
+module.exports.buildQueryGetUsersFromGroups = function(group_ids){
+
+    var group_filter = squel.expr();
+	for (var i = 0; i < group_ids.length; i++){
+        group_filter.or("user_group.group_id = " + group_ids[i]);
+    }
+    return squel.select()
+        .from(user_group_table)
+        .fields(['username', 'first_name', 'last_name', user_group_table + '.' + user_group_user, user_group_table + '.' + user_group_group])
+        .join("user", null, user_group_table + '.' + user_group_user + '= user.user_id')
+        .where(group_filter)
+        .toString();
+}
+
 module.exports.buildQueryForGetAllGroupsForUser = function(user) {
     return squel.select()
         .from(user_group_table)
@@ -114,3 +128,16 @@ module.exports.buildQueryForGetAllGroupsForUser = function(user) {
         .where("user_id = " + user.user_id)
         .toString();
 }
+
+module.exports.buildQueryForGetAllGroupsForUsers = function(users) {
+    var user_filter = squel.expr();
+	for (var i = 0; i < users.length; i++){
+        user_filter.or("user_id = " + users[i].user_id);
+    }
+    return squel.select()
+        .from(user_group_table)
+        .join(group_table, null, "user_group.group_id = permission_group.group_id")
+        .where(user_filter)
+        .toString();
+}
+

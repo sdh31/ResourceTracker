@@ -39,6 +39,11 @@ function get_users_in_group(group, callback){
 	basic_db_utility.performMultipleRowDBOperation(get_query, callback);
 }
 
+function get_users_in_groups(group_ids, callback) {
+    var getUsersInGroupsQuery = group_queries.buildQueryGetUsersFromGroups(group_ids);
+    basic_db_utility.performMultipleRowDBOperation(getUsersInGroupsQuery, callback);
+}
+
 function toggle_group_privacy(group, is_private){
 	group['is_private'] = is_private;
 }
@@ -47,6 +52,11 @@ function get_all_groups_for_user(user, callback) {
     var getAllGroupsForUser = group_queries.buildQueryForGetAllGroupsForUser(user)
 	basic_db_utility.performMultipleRowDBOperation(getAllGroupsForUser, callback);
 };
+
+function get_all_groups_for_users(users, callback) {
+    var getAllGroupsForUsersQuery = group_queries.buildQueryForGetAllGroupsForUsers(users);
+    basic_db_utility.performMultipleRowDBOperation(getAllGroupsForUsersQuery, callback);
+}
 
 function checkReservePermission(groups) {
     for (var i = 0; i<groups.length; i++) {
@@ -66,6 +76,8 @@ module.exports = {
 	add_users_to_group:add_users_to_group,
 	remove_users_from_group:remove_users_from_group,
     get_all_groups_for_user: get_all_groups_for_user,
+    get_all_groups_for_users: get_all_groups_for_users,
     checkReservePermission: checkReservePermission,
-	get_users_in_group:get_users_in_group
+	get_users_in_group:get_users_in_group,
+    get_users_in_groups: get_users_in_groups
 }

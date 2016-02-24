@@ -47,6 +47,21 @@ function scheduleEmailForReservation(user, reservation) {
     }
 };
 
+function getAllReservationsOnResourceByUsers(resource_id, users, callback) {
+    var getAllReservationsOnResourceByUsersQuery = reservation_query_builder.buildQueryForGetAllReservationsOnResourceByUsers(resource_id, users);
+    basic_db_utility.performMultipleRowDBOperation(getAllReservationsOnResourceByUsersQuery, callback);
+};
+
+function getAllReservationsOnResourcesByUsers(resources, users, callback) {
+    var getAllReservationsOnResourcesByUsersQuery = reservation_query_builder.buildQueryForGetAllReservationsOnResourcesByUsers(resources, users);
+    basic_db_utility.performMultipleRowDBOperation(getAllReservationsOnResourcesByUsersQuery, callback);
+};
+
+function deleteReservationsById(reservations, callback) {
+    var deleteReservationsByIdQuery = reservation_query_builder.buildQueryForDeleteReservationsById(reservations);
+    basic_db_utility.performSingleRowDBOperation(deleteReservationsByIdQuery, callback);
+}
+
 module.exports = {
     get_conflicting_reservations:get_conflicting_reservations,
     create_reservation:create_reservation,
@@ -54,5 +69,8 @@ module.exports = {
     update_reservation_by_id:update_reservation_by_id,
     add_user_reservation_link:add_user_reservation_link,
     get_reservation_by_id: get_reservation_by_id,
-    scheduleEmailForReservation: scheduleEmailForReservation
+    getAllReservationsOnResourcesByUsers: getAllReservationsOnResourcesByUsers,
+    scheduleEmailForReservation: scheduleEmailForReservation,
+    getAllReservationsOnResourceByUsers: getAllReservationsOnResourceByUsers,
+    deleteReservationsById: deleteReservationsById
 }

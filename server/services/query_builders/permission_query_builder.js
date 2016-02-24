@@ -45,3 +45,25 @@ module.exports.buildQueryForCheckPermissionForResource = function (resource_id, 
         .where(group_filter)
         .toString();
 };
+
+module.exports.buildQueryForCheckPermissionForResources = function (resources, group_ids) {
+
+    var group_filter = squel.expr();
+    for (var i = 0; i < group_ids.length; i++){
+        group_filter.or("permission_group.group_id = " + group_ids[i]);
+    }
+
+    group_filter.and_begin();
+    for (i = 0; i < resources.length; i++){
+        group_filter.or("resource.resource_id = " + resources[i].resource_id);
+    }
+
+    group_filter.end();
+
+    return squel.select()
+        .from("permission_group")
+        .join("resource_group", null, "permission_group.group_id = resource_group.group_id")
+        .join("resource", null, "resource_group.resource_id = resource.resource_id")
+        .where(group_filter)
+        .toString();
+};
