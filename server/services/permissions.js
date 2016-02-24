@@ -2,6 +2,38 @@ var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var permission_queries = require('./query_builders/permission_query_builder');
 var basic_db_utility = require('./basic_db_utility');
+var jwt = require('jsonwebtoken');
+
+//This will need to be moved out of source control
+var secret_token = "so secret"
+
+function generate_api_auth_token(payload, callback){
+    var username = payload.username;
+    var user_id = payload.user_id;
+    var timestamp = new Date().getTime()/1000;
+    var payload = {
+        username: username,
+        user_id: user_id
+    }
+    var options = {
+        expiresIn: "10 minutes",
+    };
+    jwt.sign(payload, secret_token,options,function(token){
+        callback({results:{token: token}});
+    });
+}
+
+function verify_api_auth_token(token, callback){
+    var decoded_token = jwt.verify(token, secret_token, function(err, decoded){
+        if(decoded == undefined){
+            callback({error: true, err: err});
+        }
+        else{
+            callback({error: false, user: decoded});
+        }
+    });
+
+}
 
 function check_user_management_permission(min_permission_level, user, callback){
 	var getUserPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
@@ -90,5 +122,7 @@ module.exports = {
 	check_user_management_permission: check_user_management_permission,
 	check_resource_management_permission: check_resource_management_permission,
 	check_reservation_management_permission: check_reservation_management_permission,
-    check_permission_for_resource: check_permission_for_resource
+    check_permission_for_resource: check_permission_for_resource,
+    generate_api_auth_token: generate_api_auth_token,
+    verify_api_auth_token: verify_api_auth_token
 }

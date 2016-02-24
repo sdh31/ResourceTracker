@@ -5,16 +5,17 @@ requests.packages.urllib3.disable_warnings()
 
 
 headers = {
-		"Content-Type:":'application/json'
+		
 	}
 
 session = ''
-baseUrl = 'https://colab-sbx-212.oit.duke.edu'
+baseUrl = 'https://colab-sbx-202.oit.duke.edu'
 
 def send_request(method, params, url):
 	if method == 'GET' or method == 'DELETE':
 		response = requests.request(
 			method,
+			headers=headers,
 			url = url,
 			params = params,
 			cookies = session,
@@ -23,6 +24,7 @@ def send_request(method, params, url):
 	else:
 			response = requests.request(
 			method,
+			headers=headers,
 			url = url,
 			json = params,
 			cookies = session,
@@ -329,4 +331,11 @@ def get_users_in_group(group_id):
 	params = {
 		"group_id": group_id
 	}
+	return send_request(method, params, url)
+
+def get_api_token():
+	url = baseUrl + '/user/token'
+	method = "POST"
+	params = {}
+
 	return send_request(method, params, url)
