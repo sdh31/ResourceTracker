@@ -27,6 +27,15 @@ Database Structure
 
         MySQL Database Password: db
         Schema: https://docs.google.com/document/d/109pIj377dgMmYcTE61wDp8kBut4UyG9Q0pKHqRn_Pwc/edit
+        
+Server node_modules
+
+        Server side node modules SHOULD NOT be checked into source control
+        Update npm (you will have to do this since certain libraries required it):sudo npm install -g npm
+        make sure everything is installed:sudo npm install
+        install packages and save to package.json: npm install <pkg_name> --save-dev
+        add all existing packages to package.json: npm-collect --save
+        
 
 Steps to Generate SSL Certificate for Server
 
