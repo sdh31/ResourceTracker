@@ -118,6 +118,8 @@ Run Node Server on Reboot
         In addition, kill the apache server with 'sudo /opt/bitnami/ctlscript.sh stop apache'
         and make sure apache does not run on reboot with
         'sudo mv /opt/bitnami/apache2/scripts/ctl.sh /opt/bitnami/apache2/scripts/ctl.sh.disabled'
+        
+        You can now control the server with the command 'resource-tracker start' or 'resource-tracker stop'
 
 
 Using Redis Store to store info for session handling
