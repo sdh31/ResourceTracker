@@ -6,21 +6,15 @@ var perm_service = require('../services/permissions');
 var group_service = require('../services/groups');
 
 router.get('/', auth.is('user'), function(req, res, next){
-    var request_callback = function(result){
+    var getAllReservationsForUserCallback = function(result){
         if(result.error){
             res.status(400).json(result);
-        } else{
+        } else {
             res.status(200).json(result);
         }
     };
 
-    var query = req.query;
-
-    if(!("start_time" in query) || !("end_time" in query) || !("resource_id" in query)){
-        res.sendStatus(400);
-    }
-
-    reservation_service.get_conflicting_reservations(req.query, request_callback);
+    reservation_service.getAllReservationsForUser(req.session.user, getAllReservationsForUserCallback);
 });
 
 router.put('/', function(req, res, next){

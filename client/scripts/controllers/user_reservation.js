@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('resourceTracker')
-    .controller('ManageReservationCtrl', function ($scope, $http, $filter, modifyReservationsService) {
+    .controller('UserReservationCtrl', function ($scope, $http, $filter, modifyReservationsService) {
 
         $scope.clearError();
         $scope.clearSuccess();
@@ -34,15 +34,14 @@ angular.module('resourceTracker')
             $scope.reservationToModify = {};
 
             $scope.reservationSelected = false;
-            $scope.userInfo = '';
 
             getAllResources();
         };
 
         var getAllResources = function() {
-            return $http.get('/resource/all').then(function(response) {   
+            return $http.get('/reservation').then(function(response) {   
                 console.log(response.data);
-                populateResourceArray(response.data, $scope.allResources);
+                populateResourceArray(response.data.results, $scope.allResources);
             }, function(error) {
                 console.log(error);
             });
@@ -52,7 +51,12 @@ angular.module('resourceTracker')
             resourceData.forEach(function(resource) {
                 var resourceData = {id: resource.resource_id, label: resource.name};
                 resourceArray.push(resourceData);
-                $scope.resourceReservationMap[resourceData.id] = resource.reservations;
+                var thisReservation = {reservation_id: resource.reservation_id, start_time: resource.start_time, end_time: resource.end_time};
+                if ($scope.resourceReservationMap[resourceData.id]) {
+                    $scope.resourceReservationMap[resourceData.id].push(thisReservation);
+                } else {
+                    $scope.resourceReservationMap[resourceData.id] = [thisReservation];                
+                }
             });
         };
 
@@ -70,14 +74,13 @@ angular.module('resourceTracker')
                 var res_label = 'Start Time: ' + startTimeLabel + ' End Time: '   + endTimeLabel;
                 var resObj = {id: res_id, label: res_label};
                 $scope.allReservationsForSelectedResource.push(resObj);
-                $scope.reservationMap[res_id] = {start_time: startTime, end_time: endTime, userInfo: reservation.username};
+                $scope.reservationMap[res_id] = {start_time: startTime, end_time: endTime};
             });
         };
 
         $scope.onReservationSelect = function(item) {
             var id = item.id;
             $scope.reservationSelected = true;
-            $scope.userInfo = $scope.reservationMap[id].userInfo;
             $scope.newStartReservationTime = $scope.reservationMap[id].start_time;
             $scope.newEndReservationTime = $scope.reservationMap[id].end_time;
         };
@@ -106,5 +109,4 @@ angular.module('resourceTracker')
         };
 
         initializeResourceReservations();
-
      });

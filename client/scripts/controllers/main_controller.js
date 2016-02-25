@@ -136,6 +136,10 @@ angular.module('resourceTracker')
             $location.url('/manage_reservation');
         };
 
+        $scope.goToUserReservationPage = function() {
+            $location.url('/user_reservation');
+        };
+
         $scope.goToSystemPermissionPage = function() {
             $location.url('/system_permission');
         };

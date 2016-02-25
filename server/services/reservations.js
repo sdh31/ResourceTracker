@@ -60,6 +60,11 @@ function getAllReservationsOnResourcesByUsers(resources, users, callback) {
 function deleteReservationsById(reservations, callback) {
     var deleteReservationsByIdQuery = reservation_query_builder.buildQueryForDeleteReservationsById(reservations);
     basic_db_utility.performSingleRowDBOperation(deleteReservationsByIdQuery, callback);
+};
+
+function getAllReservationsForUser(user, callback) {
+    var getAllReservationsForUserQuery = reservation_query_builder.buildQueryForGetAllReservationsForUser(user);
+    basic_db_utility.performMultipleRowDBOperation(getAllReservationsForUserQuery, callback);
 }
 
 module.exports = {
@@ -72,5 +77,6 @@ module.exports = {
     getAllReservationsOnResourcesByUsers: getAllReservationsOnResourcesByUsers,
     scheduleEmailForReservation: scheduleEmailForReservation,
     getAllReservationsOnResourceByUsers: getAllReservationsOnResourceByUsers,
-    deleteReservationsById: deleteReservationsById
+    deleteReservationsById: deleteReservationsById,
+    getAllReservationsForUser: getAllReservationsForUser
 }
