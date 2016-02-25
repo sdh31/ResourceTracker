@@ -5,10 +5,9 @@
     <title></title>
 
     <!-- Standard Angular Libraries -->
-    
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-route.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular-animate.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-animate.js"></script>
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
@@ -48,17 +47,14 @@
     <script type="text/javascript" src="node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.js"></script>
 
 
+
 </head>
 
 <body ng-app="resourceTracker" ng-controller="MainCtrl">
+
     <div class="container">
         <div class="header">
             <ul class="nav nav-pills pull-right">
-                <li><button class="btn btn-default btn-sm" ng-show="user.user_management_permission" ng-click="goToSystemPermissionPage()">Manage System Permissions</button></li>
-                <li><button class="btn btn-default btn-sm" ng-show="user.user_management_permission" ng-click="goToRegisterPage()">Register Users</button></li>
-                <li><button class="btn btn-default btn-sm" ng-show="user.resource_management_permission" ng-click="goToResourcePage()">Manage Resources</button></li>
-                <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="goToFilterReservationPage()">Filter Reservation</button></li>
-                <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="goToManageReservationPage()">Manage Reservations</button><li>
                 <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="getToken()">Get Token</button><li>
                 <li><button class="btn btn-default btn-sm" ng-show="user.loggedIn" ng-click="logout()">Logout</button><li>
                 <li><button class="btn btn-default btn-sm" ng-click="goToContactPage()">Contact</button></li>
@@ -66,10 +62,53 @@
             <h3 class="text-muted">Resource Tracker - Hypotheticorp, LLC </h3>
             <span class="pull-right" ng-show="user.loggedIn && user.first_name.length > 0">Welcome, {{user.first_name}}</span>
         </div>
+
         <div class="footer"></div>
     </div>
 
-    <div class="body" ng-view=""></div>
+    <div class="row-fluid">
+        <div class="span3">
+            <div class="span3" style='position:fixed;'>
+                <!-- sidebar of page -->
+                <div class="tabbable tabs-left">
+                    <ul class="nav nav-tabs">
+                        <li ng-class="isTabSelected('/system_permission')"
+                            ng-show="user.user_management_permission"
+                            ng-click="goToSystemPermissionPage()">
+                            <a href="" data-toggle="tab">Manage System Permissions</a></li>
+
+                        <li ng-class="isTabSelected('/register')"
+                            ng-show="user.user_management_permission"
+                            ng-click="goToRegisterPage()">
+                            <a href="" data-toggle="tab">Register Users</a></li>
+
+                        <li ng-class="isTabSelected('/resource')"
+                            ng-show="user.resource_management_permission"
+                            ng-click="goToResourcePage()">
+                            <a href="" data-toggle="tab">Manage Resources</a></li>
+
+                        <li ng-class="isTabSelected('/filter_reservation')"
+                            ng-show="user.loggedIn"
+                            ng-click="goToFilterReservationPage()">
+                            <a href="" data-toggle="tab">Filter Reservations</a></li>
+
+                        <li ng-class="isTabSelected('/manage_reservation')"
+                            ng-show="user.loggedIn"
+                            ng-click="goToManageReservationPage()">
+                            <a href="" data-toggle="tab">Manage Reservations</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <div class='span9'>
+                <div class="body" ng-view=""></div>
+            </div>
+        </div>
+
+    </div>
+
+
 
     <!-- this is the popup modal that corresponds to clicking 'Get Token' -->
     <div modal-show="showTokenModal.value" class="modal fade">
