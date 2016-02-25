@@ -91,6 +91,34 @@ Frontend Testing
         Also, add /home/bitnami/ResourceTracker/client/node_modules/karma/bin to your PATH.
         Go to ~/ResourceTracker/client/ and run 'karma start'
 
+Run Node Server on Reboot
+
+        This one should probably only be used for our production server.
+        Go to /etc/init/ and create the file resource-tracker.conf
+        Inside, put the contents
+        
+        author      "name of author"
+        # Used to Be: Start on Startup
+        # until we found some mounts weren't ready yet while booting:
+        start on started mountall
+        stop on shutdown
+        # Automatically Respawn:
+        respawn
+        respawn limit 99 5
+        script
+        # Not sure why $HOME is needed, but we found that it is:
+        export HOME="/root"
+        exec  /opt/bitnami/nodejs/bin/node /home/bitnami/ResourceTracker/server/server.js >> /var/log/node.log 2>&1
+        end script
+        post-start script
+        # Optionally put a script here that will notifiy you node has (re)started
+        # /root/bin/hoptoad.sh "node.js has started!"
+        end script
+        
+        In addition, kill the apache server with 'sudo /opt/bitnami/ctlscript.sh stop apache'
+        and make sure apache does not run on reboot with
+        'sudo mv /opt/bitnami/apache2/scripts/ctl.sh /opt/bitnami/apache2/scripts/ctl.sh.disabled'
+
 
 Using Redis Store to store info for session handling
 
