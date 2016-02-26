@@ -8,11 +8,16 @@ module.exports.api_auth = function(req, res, next){
         if(results.error == false){
             req.session.isValid = true
             req['session']['user'] = results.user
+            console.log(req.session.user)
+        }
+        else{
+            console.log(results)
         }
         return next();
     }
 
     if(req.header("Auth-Token") != undefined){
+        console.log('token defined')
         var token = req.header("Auth-Token");
         perm_service.verify_api_auth_token(token, verify_token_callback);
     }   

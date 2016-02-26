@@ -4,6 +4,7 @@ var app = express();
 
 var fs = require('fs');
 var https = require('https');
+var swagger = require('swagger-express');
 var privateKey = fs.readFileSync('/opt/bitnami/apache2/conf/server.key', 'utf8');
 var certificate = fs.readFileSync('/opt/bitnami/apache2/conf/server.crt', 'utf8');
 var credentials = {key: privateKey, cert: certificate};
@@ -35,6 +36,21 @@ app.use(body_parser.json());
 // Added for Duke Shibboleth POST
 app.use(body_parser.urlencoded({ extended: true }));
 app.use(cookie_parser());
+
+app.use(swagger.init(app, {
+    apiVersion: '1.0',
+    swaggerVersion: '1.0',
+    swaggerURL: '/swagger',
+    swaggerJSON: '/api-docs.json',
+    swaggerUI: './public/swagger/',
+    basePath: 'http://localhost:3000',
+    info: {
+      title: 'Hypotheticorp Resource Manager: By Scuuuuuuuuuuuuuuuuuuu',
+      description: 'Resource amanger for all your resource managing needs'
+    },
+    apis: ['./api.js', './api.yml'],
+    middleware: function(req, res){}
+}));
 
 app.use(session({
     secret: 'ssshhhhh',

@@ -76,12 +76,15 @@ def update_user(username, newUsername = None, password = None, email_address = N
 
 	return send_request(method, params, url)
 
-def get_user(username):
+def get_user(username = None):
 	url = baseUrl + '/user'
 	method = "GET"
-
-	params['username'] = username
-
+	params = {}
+	if username:
+		params = {
+			'username': username
+		}
+	
 	return send_request(method, params, url)
 
 def get_all_users():
@@ -120,7 +123,7 @@ def get_all_resources():
 
 	return send_request(method, params, url)
 
-def create_resource(name, description, max_users):
+def create_resource(name, description, max_users=None):
 	url = baseUrl + '/resource'
 	method = "PUT"
 
