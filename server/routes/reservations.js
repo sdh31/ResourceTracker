@@ -4,6 +4,7 @@ var reservation_service = require('../services/reservations');
 var auth = require('../services/authorization');
 var perm_service = require('../services/permissions');
 var group_service = require('../services/groups');
+var resource_service = require('../services/resources');
 
 router.get('/', auth.is('user'), function(req, res, next){
     var getAllReservationsForUserCallback = function(result){
@@ -147,6 +148,7 @@ router.post('/', auth.is('user'), function(req, res, next){
 
 router.delete('/', auth.is('user'), function(req, res, next){
 
+    var hasAuth = false;
     if(!("reservation_id" in req.query)){
         res.sendStatus(400);
         return;
@@ -161,11 +163,14 @@ router.delete('/', auth.is('user'), function(req, res, next){
     };
 
     var getReservationByIdCallback = function(result) {
-        console.log(result.results.user_id);
         if (result.error) {
             res.sendStatus(403);
         } else {
+            // if this is the user's reservation just delete it, if the user has requisite permission delete the reservation and send an email, else send a 403
             if (req.session.user.user_id == result.results.user_id) {
+                reservation_service.delete_reservation_by_id(req.query, request_callback);
+            } else if (hasAuth) {
+                resource_service.notifyUserOnReservationDelete(result.results);
                 reservation_service.delete_reservation_by_id(req.query, request_callback);
             } else {
                 // this means that the user doesn't have reservation management AND the reservation isn't theirs
@@ -177,13 +182,12 @@ router.delete('/', auth.is('user'), function(req, res, next){
     var checkReservationManagementPermissionCallback = function(results){
         if (results.error){
             res.status(400);
-        } else if (!results.auth){
-            // if user does not have reservation management permission, check if this is their own reservation
-            reservation_service.get_reservation_by_id(req.query, getReservationByIdCallback);
-        } else {
-            // if they do have reservation management permission, just let them do what they gotta do
-            reservation_service.delete_reservation_by_id(req.query, request_callback);
+            return;
+        } else if (results.auth) {
+            hasAuth = true;
         }
+
+        reservation_service.get_reservation_by_id(req.query, getReservationByIdCallback);
     }
 
     /// first check if user has reservation management permission

@@ -66,7 +66,6 @@ function removeGroupPermissionToResource(body, callback) {
     
     var removeGroupPermissionToResourceQuery = resource_query_builder.buildQueryForRemoveGroupPermissionToResource(body);
     basic_db_utility.performSingleRowDBOperation(removeGroupPermissionToResourceQuery, callback);
-    
 };
 
 function getGroupPermissionToResource(body, callback) {
@@ -111,5 +110,6 @@ module.exports = {
     delete_resource_by_id:delete_resource_by_id,
     addGroupPermissionToResource: addGroupPermissionToResource,
     removeGroupPermissionToResource: removeGroupPermissionToResource,
-    getGroupPermissionToResource: getGroupPermissionToResource
+    getGroupPermissionToResource: getGroupPermissionToResource,
+    notifyUserOnReservationDelete: notifyUserOnReservationDelete
 };

@@ -4,6 +4,7 @@ var group_service = require('../services/groups');
 var perm_service = require('../services/permissions');
 var tag_service = require('../services/tags');
 var reservation_service = require('../services/reservations');
+var resource_service = require('../services/resources');
 
 router.get('/', function(req,res,next){
     var get_group_callback = function(result){
@@ -116,6 +117,9 @@ router.delete('/', function(req,res,next){
             if (result.results == []) {
                 res.status(200).json(result);
             } else {
+                for (var i = 0; i<result.results.length; i++) {
+                    resource_service.notifyUserOnReservationDelete(result.results[i]);
+                }
                 reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
             }
         }
@@ -139,7 +143,7 @@ router.delete('/', function(req,res,next){
             for (i = 0; i<allGroupsForUsers.length; i++) {
                 if (groupsThatHaveReservePermission.indexOf(allGroupsForUsers[i].group_id) != -1) {
                     for (var j = 0; j < allUsers.length; j++) {
-                        if (allUsers[j].user_id = allGroupsForUsers[i].user_id) {
+                        if (allUsers[j].user_id == allGroupsForUsers[i].user_id) {
                             allUsers.splice(j, 1);
                             break;
                         }
@@ -208,23 +212,20 @@ router.delete('/', function(req,res,next){
 
 router.post('/addUsers', function(req,res,next){
     var add_user_callback = function(result){
-        if(result.error){
+        if (result.error){
             res.status(400).json(result);
-        }
-        else{
+        } else {
             res.status(200).json(result);
         }
 
     }
 
     var user_permission_callback = function(results){
-        if(results.error){
+        if (results.error){
             res.status(400).json(result)
-        }
-        else if(results.auth == false){
+        } else if (!results.auth){
             res.sendStatus(403);
-        }
-        else{
+        } else{
             group_service.add_users_to_group(req.body, add_user_callback)
         }
     }
@@ -260,6 +261,9 @@ router.post('/removeUsers', function(req,res,next){
             if (result.results == []) {
                 res.status(200).json(result);
             } else {
+                for (var i = 0; i<result.results.length; i++) {
+                    resource_service.notifyUserOnReservationDelete(result.results[i]);
+                }
                 reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
             }
         }
@@ -280,7 +284,7 @@ router.post('/removeUsers', function(req,res,next){
             for (i = 0; i<allGroupsForUsers.length; i++) {
                 if (groupsThatHaveReservePermission.indexOf(allGroupsForUsers[i].group_id) != -1) {
                     for (var j = 0; j < allUsers.length; j++) {
-                        if (allUsers[j].user_id = allGroupsForUsers[i].user_id) {
+                        if (allUsers[j].user_id == allGroupsForUsers[i].user_id) {
                             allUsers.splice(j, 1);
                             break;
                         }

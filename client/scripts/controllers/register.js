@@ -11,7 +11,7 @@ angular.module('resourceTracker')
                 first_name: '',
                 last_name: '',
                 username: '',
-                email: '',
+                email_address: '',
                 password: '',
                 confirmPassword: '',
                 isShibboleth: false
@@ -49,7 +49,7 @@ angular.module('resourceTracker')
             var validFields = validateNonEmptyField($scope.newUser.first_name,         registerAlerts.firstNameAlert) &&
                               validateNonEmptyField($scope.newUser.last_name,          registerAlerts.lastNameAlert) &&
                               validateNonEmptyField($scope.newUser.username,          registerAlerts.usernameAlert) &&
-                              validateNonEmptyField($scope.newUser.email,             registerAlerts.emailAlert);
+                              validateNonEmptyField($scope.newUser.email_address,             registerAlerts.emailAlert);
             validFields = validFields && validatePassword();
             return validFields;
          };

@@ -53,6 +53,8 @@ module.exports.buildQueryForGetReservationById = function(reservation) {
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
+        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .join("user", null, "user_reservation.user_id = user.user_id")
         .where("reservation.reservation_id = " + reservation.reservation_id)
         .toString();
 };
@@ -68,6 +70,8 @@ module.exports.buildQueryForGetAllReservationsOnResourceByUsers = function(resou
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
+        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .join("user", null, "user_reservation.user_id = user.user_id")
         .where(user_filter)
         .toString();
 
@@ -88,6 +92,8 @@ module.exports.buildQueryForGetAllReservationsOnResourcesByUsers = function(reso
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
+        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .join("user", null, "user_reservation.user_id = user.user_id")
         .where(user_filter)
         .toString();
 };

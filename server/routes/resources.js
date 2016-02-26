@@ -241,6 +241,9 @@ router.post('/removePermission', function(req, res, next) {
             if (result.results == []) {
                 res.status(200).json(result);
             } else {
+                for (var i = 0; i<result.results.length; i++) {
+                    res_service.notifyUserOnReservationDelete(result.results[i]);
+                }
                 reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
             }
         }
@@ -261,7 +264,7 @@ router.post('/removePermission', function(req, res, next) {
             for (i = 0; i<allGroupsForUsers.length; i++) {
                 if (groupsThatHaveReservePermission.indexOf(allGroupsForUsers[i].group_id) != -1) {
                     for (var j = 0; j < allUsers.length; j++) {
-                        if (allUsers[j].user_id = allGroupsForUsers[i].user_id) {
+                        if (allUsers[j].user_id == allGroupsForUsers[i].user_id) {
                             allUsers.splice(j, 1);
                             break;
                         }
@@ -287,7 +290,7 @@ router.post('/removePermission', function(req, res, next) {
             for (var i = 0; i<result.results.length; i++) {
                 group_ids.push(result.results[i].group_id);
             }
-            
+
             perm_service.check_permission_for_resource(req.body.resource_id, group_ids, checkPermissionForResourceCallback);
         }
     };
