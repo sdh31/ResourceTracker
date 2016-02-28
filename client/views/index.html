@@ -27,6 +27,9 @@
     <script src="scripts/controllers/token_modal.js"></script>
     <script src="scripts/controllers/user_reservation.js"></script>
     <script src="scripts/services/modify_reservations.js"></script>
+    <script src="scripts/controllers/resource_permission.js"></script>
+    <script src="scripts/controllers/edit_group_resource_permission.js"></script>
+    <script src="scripts/controllers/edit_user_resource_permission.js"></script>
 
     <link rel="stylesheet" href="styles/main.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
@@ -78,6 +81,11 @@
                             ng-show="user.user_management_permission"
                             ng-click="goToSystemPermissionPage()">
                             <a href="" data-toggle="tab">Manage System Permissions</a></li>
+
+                        <li ng-class="isTabSelected('/resource_permission')"
+                            ng-show="user.resource_management_permission"
+                            ng-click="goToResourcePermissionPage()">
+                            <a href="" data-toggle="tab">Manage Resource Permissions</a></li>
 
                         <li ng-class="isTabSelected('/register')"
                             ng-show="user.user_management_permission"

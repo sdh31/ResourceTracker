@@ -144,6 +144,10 @@ angular.module('resourceTracker')
             $location.url('/system_permission');
         };
 
+        $scope.goToResourcePermissionPage = function() {
+            $location.url('/resource_permission');
+        };
+
         $scope.isTabSelected = function(loadedPage) {
             if ($location.path() == loadedPage) {
                 return 'active';
