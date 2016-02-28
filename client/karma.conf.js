@@ -11,6 +11,7 @@ module.exports = function(config) {
 				'scripts/controllers/main_controller.js',
 				'scripts/controllers/system_permission.js',
 				'scripts/controllers/create_resource.js',
+				'scripts/controllers/register.js',
 				'scripts/services/resource.js',
 				'tests/*.js']
 	});
