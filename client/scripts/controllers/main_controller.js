@@ -133,7 +133,7 @@ angular.module('resourceTracker')
         };
 
         $scope.goToManageReservationPage = function() {
-            $location.url('/create_reservation');
+            $location.url('/manage_reservation');
         };
 
         $scope.goToSystemPermissionPage = function() {
