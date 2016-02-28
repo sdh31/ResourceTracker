@@ -117,6 +117,11 @@ function check_resource_management_permission(min_permission_level, user, callba
     });
 };
 
+function get_all_system_permissions(user, callback){
+    var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user);
+    basic_db_utility.performSingleRowDBOperation(getResourcePermissionQuery, callback);
+}
+
 function check_permission_for_resource(resource_id, group_ids, callback) {
     var checkPermissionForResourceQuery = permission_queries.buildQueryForCheckPermissionForResource(resource_id, group_ids);
     basic_db_utility.performMultipleRowDBOperation(checkPermissionForResourceQuery, callback);
@@ -134,5 +139,6 @@ module.exports = {
     check_permission_for_resource: check_permission_for_resource,
     check_permission_for_resources: check_permission_for_resources,
     generate_api_auth_token: generate_api_auth_token,
-    verify_api_auth_token: verify_api_auth_token
+    verify_api_auth_token: verify_api_auth_token,
+    get_all_system_permissions: get_all_system_permissions
 }
