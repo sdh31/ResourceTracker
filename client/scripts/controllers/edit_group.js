@@ -90,8 +90,10 @@ angular.module('resourceTracker')
                 $scope.getAllGroups().then(function() {
                     $scope.showEditGroupModal.value = false;
                 });
+                updateUserPermissionsFromEditGroupPage().then(function() {
+                    initEditGroupController();
+                });
             }, function(error) {
-                console.log('Error deleting group');
                 console.log(error);
             });
         };
@@ -118,7 +120,9 @@ angular.module('resourceTracker')
 
         	$http.post('/group/addUsers', reqBody).then(function(response) {
                 $scope.openEditGroupSuccess();
-        		initEditGroupController();
+        		updateUserPermissionsFromEditGroupPage().then(function() {
+                    initEditGroupController();
+                });
         	}, function(error) {
         		console.log(error);
         	});
@@ -146,7 +150,7 @@ angular.module('resourceTracker')
             var reqBody = {user_ids: user_ids, group_id: group_id};
 
             $http.post('/group/removeUsers', reqBody).then(function(response) {
-                redirectUserIfPermissionChangedFromEditGroupPage().then(function() {
+                updateUserPermissionsFromEditGroupPage().then(function() {
                     $scope.openEditGroupSuccess();
                     initEditGroupController();
                 });
@@ -169,9 +173,11 @@ angular.module('resourceTracker')
                     $scope.openEditGroupSuccess();
                     // reselect group.. as permissions have changed
                     $scope.selectGroupByGroupId($scope.selectedGroup.group_id);
-                    initEditGroupController();
+                    updateUserPermissionsFromEditGroupPage().then(function() {
+                        initEditGroupController();
+                    });
                 }, function(error) {
-                    redirectUserIfPermissionChangedFromEditGroupPage();
+                    updateUserPermissionsFromEditGroupPage();
                 });
             }, function(error) {
                 console.log(error);
@@ -195,7 +201,7 @@ angular.module('resourceTracker')
             return promise;
     	};
 
-        var redirectUserIfPermissionChangedFromEditGroupPage = function() {
+        var updateUserPermissionsFromEditGroupPage = function() {
             var deferred = $q.defer();
             // an error can occur when if user removed their own user_management_permission
             $scope.getMaximumPermissionsForActiveUser().then(function(permissions) {
