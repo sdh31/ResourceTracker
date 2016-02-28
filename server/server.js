@@ -45,6 +45,7 @@ app.use(session({
 }));
 
 app.use(auth_middleware.api_auth);
+app.use(auth_middleware.populate_permissions);
 
 app.use('/', views);
 app.use('/views', views);
