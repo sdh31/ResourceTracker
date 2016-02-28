@@ -11,19 +11,22 @@ router.get('/', auth.is('user'), function(req, res, next){
             res.send(403);
         } else if (result.empty) {
             console.log("NO USER WITH THAT USERNAME");
-            res.send(JSON.stringify(result));
+            res.status(400).json(result);
         } else {
-            result.user.password = "";
-            res.send(JSON.stringify(result.user));
+            result.results.password = "";
+            res.status(200).json(result);
         }
     }
 
-    if (!req.session.user || !('username' in req.session.user) || !('is_shibboleth' in req.session.user)) {
-        res.send({noSession: true});
+    if (!req.session.user || !('username' in req.session.user)) {
+        res.status(401).json({noSession: true});
     } else {
         var username = req.session.user.username;
-        var is_shibboleth = req.session.user.is_shibboleth;
-        user_service.get_user_permissions({username: username, is_shibboleth: is_shibboleth}, getUserCallback);
+        //Allow this call to be made with arbitrary username as well
+        if("username" in req.query){
+            username = req.query.username
+        }
+        user_service.get_user_permissions({"username": username}, getUserCallback);
     }
 });
 
@@ -160,14 +163,15 @@ router.post('/signin', function(req, res, next){
     }
 
     var getUserCallback = function(result){
+        console.log(result)
         if (result.error == true) {
             res.sendStatus(403);
         } else {
-            user_service.compare_passwords(password, result.user, comparePasswordsCallback);
+            user_service.compare_passwords(password, result.results, comparePasswordsCallback);
         }
     }
 
-    user_service.get_user_permissions({username: username, is_shibboleth: 0}, getUserCallback);
+    user_service.get_user_permissions({username: username}, getUserCallback);
 });
 
 router.post('/signout', auth.is('user'), function(req, res, next){

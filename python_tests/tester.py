@@ -18,13 +18,17 @@ token = r.json.loads(res.content)['results']['token']
 print token != None
 r.headers['Auth-Token'] = token
 
+print '#### get current user ####'
+res = r.get_user()
+print r.json.loads(res.content)['results']['username'] == 'admin'
+
 print '#### get all users in DB, make sure theres only 1 and that the username == admin ####'
 res = r.get_all_users()
 print len(r.json.loads(res.content)['results']) == 1
 print r.json.loads(res.content)['results'][0]['email_address'] == 'jag.buddhavarapu@gmail.com'
 
 print '#### create resource with tags ####'
-res = r.create_resource("YAAAAAAAM", "huh", 1)
+res = r.create_resource("YAAAAAAAM", "huh")
 print res.status_code < 300
 resource_id = r.json.loads(res.content)['insertId']
 
