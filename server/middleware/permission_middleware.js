@@ -28,17 +28,20 @@ module.exports.api_auth = function(req, res, next){
 }
 
 module.exports.populate_permissions = function(req, res, next){
-    var get_permission_callback = function(results){
-        if (results.error){
+    var get_permission_callback = function(result){
+        if (result.error){
             set_permission_defaults();
-            console.log(results.err);
+            console.log(result.err);
             next();
         }
         else{
-            req.session.user.user_management_permission = results.user_management_permission;
-            req.session.user.resource_management_permission = results.resource_management_permission;
-            req.session.user.reservation_management_permission = results.reservation_management_permission;
+            console.log(result)
+            console.log("here")
+            req.session.user.user_management_permission = result.results.user_management_permission;
+            req.session.user.resource_management_permission = result.results.resource_management_permission;
+            req.session.user.reservation_management_permission = result.results.reservation_management_permission;
             next();
+            console.log(req.session.user)
         }
     }
     req.session.auth = true

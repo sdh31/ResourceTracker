@@ -163,7 +163,6 @@ router.post('/signin', function(req, res, next){
     }
 
     var getUserCallback = function(result){
-        console.log(result)
         if (result.error == true) {
             res.sendStatus(403);
         } else {
