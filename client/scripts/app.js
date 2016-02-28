@@ -23,7 +23,7 @@ angular
                 templateUrl: '/views/filter_reservation.html',
                 controller: 'FilterReservationCtrl'
             })
-            .when('/create_reservation', {
+            .when('/manage_reservation', {
                 templateUrl: '/views/manage_reservation.html',
                 controller: 'ManageReservationCtrl'
             })
