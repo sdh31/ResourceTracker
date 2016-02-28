@@ -227,7 +227,11 @@ function get_all_users(callback) {
 function get_private_group(user_id, callback) {
     var getPrivateGroupQuery = user_query_builder.buildQueryForGetPrivateGroup(user_id);
     basic_db_utility.performSingleRowDBOperation(getPrivateGroupQuery, callback);
+};
 
+function get_admin_group(callback) {
+    var getAdminGroupQuery = user_query_builder.buildQueryForGetAdminGroup();
+    basic_db_utility.performSingleRowDBOperation(getAdminGroupQuery, callback);
 };
 
 function compare_passwords(password, user, callback) {
@@ -245,5 +249,6 @@ module.exports = {
     get_private_group: get_private_group,
     update_user: update_user,
     get_all_users: get_all_users,
+    get_admin_group: get_admin_group,
     compare_passwords: compare_passwords
 }

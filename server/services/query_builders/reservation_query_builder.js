@@ -53,7 +53,70 @@ module.exports.buildQueryForGetReservationById = function(reservation) {
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
+        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .join("user", null, "user_reservation.user_id = user.user_id")
         .where("reservation.reservation_id = " + reservation.reservation_id)
+        .toString();
+};
+
+module.exports.buildQueryForGetAllReservationsOnResourceByUsers = function(resource_id, users) {
+
+    var user_filter = squel.expr();
+	for (var i = 0; i < users.length; i++){
+        user_filter.or("user_reservation.user_id = " + users[i].user_id);
+    }
+    user_filter.and("reservation.resource_id = " + resource_id);
+
+    return squel.select()
+        .from("reservation")
+        .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
+        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .join("user", null, "user_reservation.user_id = user.user_id")
+        .where(user_filter)
+        .toString();
+
+};
+
+module.exports.buildQueryForGetAllReservationsOnResourcesByUsers = function(resources, users) {
+    var user_filter = squel.expr();
+	for (var i = 0; i < users.length; i++){
+        user_filter.or("user_reservation.user_id = " + users[i].user_id);
+    }
+
+    user_filter.and_begin();
+    for (i = 0; i < resources.length; i++){
+        user_filter.or("reservation.resource_id = " + resources[i].resource_id);
+    }
+    user_filter.end();
+
+    return squel.select()
+        .from("reservation")
+        .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
+        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .join("user", null, "user_reservation.user_id = user.user_id")
+        .where(user_filter)
+        .toString();
+};
+
+module.exports.buildQueryForDeleteReservationsById = function(reservations) {
+    
+    var reservation_filter = squel.expr();
+	for (var i = 0; i < reservations.length; i++){
+        reservation_filter.or("reservation_id = " + reservations[i].reservation_id);
+    }
+
+    return squel.delete()
+        .from("reservation")
+        .where(reservation_filter)
+        .toString();
+};
+
+module.exports.buildQueryForGetAllReservationsForUser = function(user) {
+    return squel.select()
+        .from("reservation")
+        .join("user_reservation", null, "reservation.reservation_id = user_reservation.reservation_id")
+        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .where("user_reservation.user_id = " + user.user_id)
         .toString();
 };
 

@@ -8,7 +8,7 @@ print session_response.status_code < 300
 r.session = session_response.cookies
 
 print '#### update admin user to have new email ####'
-res = r.update_user(username="admin",email_address="ericichonglam17@gmail.com")
+res = r.update_user(username="admin",email_address="jag.buddhavarapu@gmail.com")
 print res.status_code < 300
 
 print '#### create API token ####'
@@ -20,9 +20,8 @@ r.headers['Auth-Token'] = token
 
 print '#### get all users in DB, make sure theres only 1 and that the username == admin ####'
 res = r.get_all_users()
-print res.content
 print len(r.json.loads(res.content)['results']) == 1
-print r.json.loads(res.content)['results'][0]['email_address'] == 'ericichonglam17@gmail.com'
+print r.json.loads(res.content)['results'][0]['email_address'] == 'jag.buddhavarapu@gmail.com'
 
 print '#### create resource with tags ####'
 res = r.create_resource("YAAAAAAAM", "huh", 1)

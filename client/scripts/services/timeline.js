@@ -54,7 +54,7 @@ angular.module('resourceTracker')
                                      "</div>";
 
                 var data = [];
-                data.push(resource.name);
+                data.push(resource.name + " (" + resource.resource_permission + " access)");
                 data.push('');              // this is necessary... it is a column label, google charts is weird and requires it.
                 data.push(resourceTooltip);
                 
@@ -74,7 +74,7 @@ angular.module('resourceTracker')
             });
             if (!existsReservation) {
                 var data = [];
-                data.push(resource.name);
+                data.push(resource.name + " (" + resource.resource_permission + " access)");
                 data.push('');
                 data.push('');
                 data.push(startTime);
@@ -110,7 +110,7 @@ angular.module('resourceTracker')
         var options = {
             timeline: { colorByRowLabel: false },
             avoidOverlappingGridLines: false,
-            width: 1200,
+            width: 1400,
             tooltip: { isHtml: true },
             colors: colorsChosen,
             backgroundColor: grayColor,

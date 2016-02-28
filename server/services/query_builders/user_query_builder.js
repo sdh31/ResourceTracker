@@ -96,3 +96,15 @@ module.exports.buildQueryForGetPrivateGroup = function(user_id) {
         .where("user_id = " + user_id + " AND " + "is_private = 1")
         .toString();
 };
+
+module.exports.buildQueryForGetAdminGroup = function() {
+
+    return squel.select()
+        .field("user_group.user_id")
+        .field("user_group.group_id")
+        .from("user_group")
+        .left_join("permission_group", null, "permission_group.group_id = user_group.group_id")
+        .left_join("user", null, "user_group.user_id = user.user_id")
+        .where("permission_group.is_private = 1 AND user.username = " + "'admin'")
+        .toString();
+};

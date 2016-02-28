@@ -13,7 +13,11 @@ function generate_api_auth_token(payload, callback){
     var timestamp = new Date().getTime()/1000;
     var payload = {
         username: username,
-        user_id: user_id
+        user_id: user_id,
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+        emails_enabled: payload.emails_enabled,
+        email_address: payload.email_address
     }
     var options = {
         expiresIn: "10 minutes",
@@ -118,11 +122,17 @@ function check_permission_for_resource(resource_id, group_ids, callback) {
     basic_db_utility.performMultipleRowDBOperation(checkPermissionForResourceQuery, callback);
 };
 
+function check_permission_for_resources(resources, group_ids, callback) {
+    var checkPermissionForResourcesQuery = permission_queries.buildQueryForCheckPermissionForResources(resources, group_ids);
+    basic_db_utility.performMultipleRowDBOperation(checkPermissionForResourcesQuery, callback);
+};
+
 module.exports = {
 	check_user_management_permission: check_user_management_permission,
 	check_resource_management_permission: check_resource_management_permission,
 	check_reservation_management_permission: check_reservation_management_permission,
     check_permission_for_resource: check_permission_for_resource,
+    check_permission_for_resources: check_permission_for_resources,
     generate_api_auth_token: generate_api_auth_token,
     verify_api_auth_token: verify_api_auth_token
 }

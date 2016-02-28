@@ -31,6 +31,10 @@ angular
                 templateUrl: '/views/system_permission.html',
                 controller: 'SystemPermissionCtrl'
             })
+            .when('/user_reservation', {
+                templateUrl: 'views/user_reservation.html',
+                controller: 'UserReservationCtrl'
+            })
             .otherwise({
       		    redirectTo: '/login'
       	   });
