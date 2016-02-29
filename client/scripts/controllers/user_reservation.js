@@ -5,6 +5,8 @@ angular.module('resourceTracker')
 
         $scope.clearError();
         $scope.clearSuccess();
+        $scope.onReservationInvalidStartDate = "Please select a valid start date.";
+        $scope.onReservationInvalidEndDate = "Please select a valid end date.";
 
         // this function initializes all global data on this page. 
         var initializeResourceReservations = function() {
@@ -90,7 +92,16 @@ angular.module('resourceTracker')
         };
 
         $scope.updateReservation = function() {
-			var self = this;
+            if (!$scope.newStartReservationTime) {
+                $scope.addError($scope.onReservationInvalidStartDate);
+                return;
+            }
+
+            if (!$scope.newEndReservationTime) {
+                $scope.addError($scope.onReservationInvalidEndDate);
+                return;
+            }
+            
 			modifyReservationsService.updateReservation($scope.newStartReservationTime.valueOf(), $scope.newEndReservationTime.valueOf(),
                 $scope.reservationToModify.id, $scope.resourceReservationToModify.id).then(function(successMessage) {
                 $scope.addSuccess(successMessage);
@@ -102,7 +113,6 @@ angular.module('resourceTracker')
 		};
 
         $scope.deleteReservation = function() {
-            var self = this;
 			modifyReservationsService.deleteReservation($scope.reservationToModify.id).then(function(successMessage) {
                 $scope.addSuccess(successMessage);
                 initializeResourceReservations();
