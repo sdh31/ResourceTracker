@@ -59,7 +59,7 @@ angular.module('resourceTracker')
             if ($scope.user.user_management_permission) {
                 $scope.goToSystemPermissionPage();
             } else {
-                $scope.goToContactPage();
+                $scope.goToUserReservationPage();
             }
         };
 
@@ -106,7 +106,12 @@ angular.module('resourceTracker')
                 // this fixes the error as is restarts the entire state of the application
                 $window.location.reload();
             }, function(error) {
-                console.log('there is an error when logging out....');
+                console.log('There is an error when logging out, so the session most likely timed out.');
+                initializeUser();
+                $location.url('/');
+                // this is necessary - if you login as user, then logout, then log back in, the google timeline UI throws an error.
+                // this fixes the error as is restarts the entire state of the application
+                $window.location.reload();
             });
         };
 

@@ -9,9 +9,11 @@ angular.module('resourceTracker')
         $scope.onReservationCreateSuccess = "Reservation Created!";
         $scope.onReservationCreateFailure = "Unable to create the reservation. The selected resource has already been reserved " +
                                             "during this time.";
-        $scope.onReservationCreateInPast = "Unable to create the reservation. Please select a time in the present or future."
-        $scope.onReservationStartAfterEnd = "Unable to create the reservation. Please select a start time before the end time."
-        $scope.onReservationNoResource = "Unable to create the reservation. Please select a resource to reserve."
+        $scope.onReservationCreateInPast = "Please select a time in the present or future.";
+        $scope.onReservationStartAfterEnd = "Please select a start time before the end time.";
+        $scope.onReservationNoResource = "Please select a resource to reserve.";
+        $scope.onReservationInvalidStartDate = "Please select a valid start date.";
+        $scope.onReservationInvalidEndDate = "Please select a valid end date.";
 
     	var currentTime = new Date();
     	$scope.startTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
@@ -43,6 +45,16 @@ angular.module('resourceTracker')
         getAllTags();
 
         $scope.filterReservations = function() {
+            if (!$scope.startTime) {
+                $scope.addError($scope.onReservationInvalidStartDate);
+                return;
+            }
+
+            if (!$scope.endTime) {
+                $scope.addError($scope.onReservationInvalidEndDate);
+                return;
+            }
+
             if ($scope.startTime >= $scope.endTime) {
                 $scope.addError($scope.timeRangeError);
                 return;
@@ -137,6 +149,16 @@ angular.module('resourceTracker')
         };
 
         $scope.createReservation = function() {
+            if (!$scope.startReservationTime) {
+                $scope.addError($scope.onReservationInvalidStartDate);
+                return;
+            }
+
+            if (!$scope.endReservationTime) {
+                $scope.addError($scope.onReservationInvalidEndDate);
+                return;
+            }
+
             var reservationData = {start_time: $scope.startReservationTime.valueOf(),
                 end_time: $scope.endReservationTime.valueOf(), resource_id: $scope.resourceToCreate.id};
             if(!validateCreateReservation(reservationData)){ 
