@@ -23,6 +23,7 @@ angular.module('resourceTracker')
         var registerAlerts = {  firstNameAlert: 'Please enter a first name.',
                                 lastNameAlert: 'Please enter a last name.',
                                 usernameAlert: 'Please enter a username.',
+                                usernameTooShortAlert: 'Please enter a username that is 7 or more alphanumeric characters long.',
                                 emailAlert: 'Please enter an email address.',
                                 passwordLengthAlert: 'Password length is too short.',
                                 passwordMatchAlert: 'Passwords do not match.',
@@ -51,6 +52,7 @@ angular.module('resourceTracker')
                               validateNonEmptyField($scope.newUser.username,          registerAlerts.usernameAlert) &&
                               validateNonEmptyField($scope.newUser.email_address,             registerAlerts.emailAlert);
             validFields = validFields && validatePassword();
+            validFields = validFields && validateUsernameLength();
             return validFields;
          };
 
@@ -69,6 +71,14 @@ angular.module('resourceTracker')
             }
             if ($scope.newUser.password != $scope.newUser.confirmPassword) {
                 $scope.addError(registerAlerts.passwordMatchAlert);
+                return false;
+            }
+            return true;
+         };
+
+         var validateUsernameLength = function() {
+            if ($scope.newUser.username.length < 7) {
+                $scope.addError(registerAlerts.usernameTooShortAlert);
                 return false;
             }
             return true;
