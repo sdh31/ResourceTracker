@@ -155,8 +155,9 @@ router.post('/signin', function(req, res, next){
 });
 
 router.post('/signout', auth.is('user'), function(req, res, next){
-    if(!perm_service.check_user_permission(req.session)){
-        res.status(403).json({err: "You are not signed in!"})
+    console.log("signing out")
+    if(!req.session.auth){
+        res.status(403).json({err: "You are not signed in!"});
         return;
     }
 
@@ -167,6 +168,7 @@ router.post('/signout', auth.is('user'), function(req, res, next){
 });
 
 router.post('/token', function(req, res, next){
+    console.log("creating token")
     if(!req.session.auth){
         res.status(403).json(perm_service.denied_error)
         return;
