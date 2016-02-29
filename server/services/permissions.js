@@ -90,6 +90,28 @@ function check_reservation_permission(session){
 }
 
 
+function check_user_permission(session){
+    if(session.auth && session.user.user_management_permission > 0){
+        return true;
+    }
+    return false;
+}
+
+function check_resource_permission(session){
+    if(session.auth && session.user.resource_management_permission > 0){
+        return true;
+    }
+    return false;
+}
+
+function check_reservation_permission(session){
+    if(session.auth && session.user.reservation_management_permission > 0){
+        return true;
+    }
+    return false;
+}
+
+
 function check_reservation_management_permission(min_permission_level, user, callback){
 	var getReservationPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
 	console.log(getReservationPermissionQuery);
