@@ -3,6 +3,7 @@ var router = express.Router();
 var tag_service = require('../services/tags');
 var group_service = require('../services/groups');
 var auth = require('../services/authorization');
+var perm_service = require('../services/permissions')
 
 // this gets all tags
 router.get('/', auth.is('user'), function(req, res, next){
