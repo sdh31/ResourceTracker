@@ -15,7 +15,7 @@ router.get('/', function(req,res,next){
             res.status(200).json(result);
         }
     }
-    if(!perm_service.check_user_permission(req.session)){
+    if(!(perm_service.check_user_permission(req.session) && perm_service.check_resource_permission(req.session))){
         res.status(403).json(perm_service.denied_error)
         return;
     }
@@ -213,7 +213,7 @@ router.post('/removeUsers', function(req,res,next){
 
     var deleteReservationsCallback = function(result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             res.status(200).json(result);
         }
