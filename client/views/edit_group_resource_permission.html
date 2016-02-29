@@ -13,7 +13,7 @@
 			ng-options="opt for opt in permissionOptions" ng-show="showPermission">
 			</select>
 			<br/><br/>
-			                <button type="button"
+			                <button type="button" ng-show="showPermission && (tempGroupPermission != resourceGroup.resource_permission)"
                         class="btn btn-primary btn-md"
                         ng-click="confirmation()" >Update Permissions!</button>
 			

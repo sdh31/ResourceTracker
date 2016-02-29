@@ -36,6 +36,7 @@ angular.module('resourceTracker')
                     $scope.resourceGroup = res_group;
                     $scope.tempGroupPermission = res_group.resource_permission;
                 } else {
+                    $scope.resourceGroup = {resource_permission: 'none'};
                     $scope.tempGroupPermission = 'none';
                 }
     		}, function(error){
@@ -55,11 +56,8 @@ angular.module('resourceTracker')
         };
 
         $scope.confirmation = function() {
-            if(confirm($scope.selectedGroup.group_name + " may be reservations on " + $scope.selectedResource.name + ", are you sure?")){
+            if($scope.tempGroupPermission == 'reserve' || $scope.resourceGroup.resource_permission != 'reserve' || ($scope.resourceGroup.resource_permission == 'reserve' && confirm('users in ' + $scope.selectedGroup.group_name + " may have reservations on " + $scope.selectedResource.name + ", are you sure you want to take away reserve permission?"))){
                 updatePermission();
-                console.log('confirmed');
-            } else {
-                console.log('not about it');
             }
         };
 
@@ -68,7 +66,6 @@ angular.module('resourceTracker')
             var groupID = [$scope.selectedGroup.group_id];
             var permissionReq = {resource_id: resourceID, group_ids: groupID};
             var promise = $http.post('/resource/removePermission', permissionReq).then(function(response) {
-                console.log('removed permission');
                 if($scope.tempGroupPermission != 'none'){
                     addPermission().then(function(){
                         openEditGroupSuccess();
@@ -86,9 +83,8 @@ angular.module('resourceTracker')
             var permissionReq = {resource_id: resourceID, 
                                 group_ids: groupID, 
                                 resource_permissions: [$scope.tempGroupPermission]};
-            console.log($scope.tempGroupPermission);
             var promise = $http.post('/resource/addPermission', permissionReq).then(function(response) {
-                console.log('added permission');
+
             }, function(error){
                 console.log(error);
             });
@@ -97,9 +93,14 @@ angular.module('resourceTracker')
 
         var openEditGroupSuccess = function() {
             $scope.showEditGroupSuccess = true;
+            initEditResourceGroupController();
             $timeout(function(){
                 $scope.showEditGroupSuccess = false;
             }, 1500);
+        };
+
+        $scope.hasChanged = function() {
+            return $scope.tempGroupPermission != $scope.resourceGroup.resource_permission;
         };
 
 
