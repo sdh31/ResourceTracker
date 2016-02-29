@@ -75,13 +75,9 @@ test_print(desc, r.json.loads(res.content)['results'][1]['username'] == 'rahul')
 
 desc =  '#### create a group ####'
 res = r.create_group("fungroup", "nope", True, True, True, False)
-<<<<<<< HEAD
 test_print(desc, res.status_code < 300)
 test_print(desc, res.content)
-=======
-print res.status_code < 300
-print res.content
->>>>>>> 865845ba6febb56e60ed2d9fe2adc0d161f1770c
+
 group_id = r.json.loads(res.content)['results']['insertId']
 
 desc =  '#### get groups and check if there are 3 ####'
@@ -217,10 +213,8 @@ desc =  '#### delete user rahul from DB and check if only 1 user now exists ####
 res = r.delete_user('rahul')
 test_print(desc, res.status_code < 300)
 res = r.get_all_users()
-<<<<<<< HEAD
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 
 print str(counter) + " tests failed"
-=======
 print len(r.json.loads(res.content)['results']) == 1
->>>>>>> 865845ba6febb56e60ed2d9fe2adc0d161f1770c
+
