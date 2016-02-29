@@ -100,7 +100,7 @@ describe('Login Test -- ', function() {
         expect($scope.user.username).toEqual('stevehughes');
         expect($scope.user.first_name).toEqual('Steph');
         expect($scope.user.loggedIn).toEqual(true);
-        expect($location.url).toHaveBeenCalledWith('/contact');
+        expect($location.url).toHaveBeenCalledWith('/user_reservation');
 
     });
 
