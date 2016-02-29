@@ -42,32 +42,6 @@ function verify_api_auth_token(token, callback){
 
 }
 
-/*function check_user_management_permission(min_permission_level, user, callback){
-	var getUserPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
-	console.log(getUserPermissionQuery);
-	var max_user_permission = 0;
-	var results = {};
-
-	db_sql.connection.query(getUserPermissionQuery)
-	    .on('result', function (row) {
-	       	if (row.user_management_permission > max_user_permission){
-	       		max_user_permission = row.user_management_permission;
-	       	}
-	     })
-	    .on('error', function (err) {
-	        results = {error: true, err: err};
-	     })
-	    .on('end', function (err){
-	        if (max_user_permission >= min_permission_level){
-	        	results = {error:false, auth: true}
-	        }
-	        else if(!('error' in results)){
-	        	results = {error:false, auth: false};
-	        }
-	        callback(results)
-	    });
-}
-*/
 function check_user_permission(session){
     if(session.auth && session.user.user_management_permission > 0){
         return true;
@@ -88,81 +62,6 @@ function check_reservation_permission(session){
     }
     return false;
 }
-
-
-function check_user_permission(session){
-    if(session.auth && session.user.user_management_permission > 0){
-        return true;
-    }
-    return false;
-}
-
-function check_resource_permission(session){
-    if(session.auth && session.user.resource_management_permission > 0){
-        return true;
-    }
-    return false;
-}
-
-function check_reservation_permission(session){
-    if(session.auth && session.user.reservation_management_permission > 0){
-        return true;
-    }
-    return false;
-}
-
-
-function check_reservation_management_permission(min_permission_level, user, callback){
-	var getReservationPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
-	console.log(getReservationPermissionQuery);
-	var max_reservation_permission = 0;
-    var results = {};
-
-	db_sql.connection.query(getReservationPermissionQuery)
-	    .on('result', function (row) {
-	       	if (row.reservation_management_permission > max_reservation_permission){
-	       		max_reservation_permission = row.reservation_management_permission;
-	       	}
-	     })
-	    .on('error', function (err) {
-	        results = {error: true, err: err};
-	     })
-	    .on('end', function (err){
-	        if (max_reservation_permission >= min_permission_level){
-	        	results = {error:false, auth: true}
-	        }
-	        else if(!('error' in results)){
-	        	results = {error:false, auth: false};
-	        }
-	        callback(results)
-	    });
-}
-
-function check_resource_management_permission(min_permission_level, user, callback){
-	var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user);
-	console.log(getResourcePermissionQuery);
-	var max_resource_permission = 0;
-    var results = {};
-
-	db_sql.connection.query(getResourcePermissionQuery)
-	    .on('result', function (row) {
-	       	if (row.resource_management_permission > max_resource_permission){
-	       		max_resource_permission = row.resource_management_permission;
-	       	}
-	     })
-	.on('error', function (err) {
-        results = {error: true, err: err};
-     })
-    .on('end', function (err){
-        if (max_resource_permission >= min_permission_level){
-        	results = {error:false, auth: true}
-        }
-        else if(!('error' in results)){
-        	results = {error:false, auth: false};
-        }
-        callback(results)
-    });
-};
 
 function get_all_system_permissions(user, callback){
     var getResourcePermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user);
@@ -206,8 +105,6 @@ function check_permission_for_resources(resources, group_ids, callback) {
 };
 
 module.exports = {
-//	check_resource_management_permission: check_resource_management_permission,
-//	check_reservation_management_permission: check_reservation_management_permission,
     check_permission_for_resource: check_permission_for_resource,
     check_permission_for_resources: check_permission_for_resources,
     generate_api_auth_token: generate_api_auth_token,

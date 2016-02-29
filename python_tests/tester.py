@@ -2,13 +2,17 @@ import requester as r
 
 r.verify = False
 
-counter = 0
+failed = 0
+passed = 0
 
 def test_print(desc, expression):
+	global failed, passed
 	if not expression:
 		print desc
 		print expression
-		counter +=1
+		failed += 1
+	else:
+		passed+=1
 
 desc = '#### initialize session ####'
 session_response = r.login_to_session('admin', 'Treeadmin')
@@ -215,6 +219,7 @@ test_print(desc, res.status_code < 300)
 res = r.get_all_users()
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 
-print str(counter) + " tests failed"
-print len(r.json.loads(res.content)['results']) == 1
+print str(failed) + " tests failed"
+print str(passed) + " tests passed"
+
 

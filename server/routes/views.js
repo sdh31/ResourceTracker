@@ -3,6 +3,7 @@ var router = express.Router();
 var app = express();
 
 var auth = require('../services/authorization');
+var perm_service = require('../services/permissions');
 
 var basePath =  '/home/bitnami/ResourceTracker/client';
 
@@ -11,27 +12,89 @@ router.get('/', function(req, res, next){
 });
 
 
-// ADMIN PERMISSION LEVEL
-var adminViews = ['resource.html', 'register.html'];
+// PERMISSIONLESS
+var anyViews = [
+    'contact.html',
+    'index.html',
+    'login.html'
+];
 
-adminViews.forEach(function(adminView) {
-    router.get('/views/' + adminView, auth.is('admin'), function (req, res) {
-        res.render(basePath + '/views/' + adminView);
-    });
-});
-
-// NO PERMISSION REQUIRED
-var permissionlessViews = ['index.html', 'login.html', 'contact.html', 'user_management.html', 'resource_permission.html'];
-
-permissionlessViews.forEach(function(view) {
+anyViews.forEach(function(view) {
     router.get('/views/' + view, function (req, res) {
         res.render(basePath + '/views/' + view);
     });
 });
 
-// DEFAULT TO USER PERMISSION LEVEL
-router.get('/views/*.html', auth.is('user'), function(req, res, next){
-	res.render(basePath + req.path);
+//LOGGED IN
+var loginViews = [
+    'token_modal.html',
+    'filter_reservation.html',
+    'user_reservation.html'
+];
+
+loginViews.forEach(function(view) {
+     router.get('/views/' + view, function (req, res) {
+        if(req.session.auth){
+            res.render(basePath + '/views/' + view);
+        }
+        else{
+            res.status(302).redirect('/views/login.html')
+        }
+    });
+        
+});
+
+
+
+//USER MANAGEMENT PERMISSION REQUIRED
+var userManagementViews = [
+    'system_permission.html',
+    'edit_group.html',
+    'edit_user.html',
+    'register.html'
+];
+
+userManagementViews.forEach(function(view) {
+    router.get('/views/' + view, function (req, res) {
+        if(perm_service.check_user_permission(req.session)){
+            res.render(basePath + '/views/' + view);
+        }
+        else{
+            res.status(302).redirect('/views/login.html')
+        }
+    }); 
+});
+
+//RESOURCE MANAGEMENT PERMISSION REQUIRED
+var resourceManagementViews = [
+    'resource.html',
+    'resource_permission.html',
+    'edit_group_resource_permission.html',
+    'edit_user_resource_permission.html'
+];
+resourceManagementViews.forEach(function(view) {
+   router.get('/views/' + view, function (req, res) {
+        if(perm_service.check_resource_permission(req.session)){
+            res.render(basePath + '/views/' + view);
+        }
+        else{
+            res.status(302).redirect('/views/login.html')
+        }
+    }); 
+});
+//RESERVATION MANAGEMENT PERMISSION REQUIRED
+var reservationManagementViews = [
+    'manage_reservation.html'
+];
+reservationManagementViews.forEach(function(view) {
+    router.get('/views/' + view, function (req, res) {
+        if(perm_service.check_reservation_permission(req.session)){
+            res.render(basePath + '/views/' + view);
+        }
+        else{
+            res.status(302).redirect('/views/login.html')
+        }
+    }); 
 });
 
 module.exports = router;
