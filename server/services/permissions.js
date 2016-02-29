@@ -42,7 +42,7 @@ function verify_api_auth_token(token, callback){
 
 }
 
-function check_user_management_permission(min_permission_level, user, callback){
+/*function check_user_management_permission(min_permission_level, user, callback){
 	var getUserPermissionQuery = permission_queries.buildQueryForSystemPermissionChecks(user)
 	console.log(getUserPermissionQuery);
 	var max_user_permission = 0;
@@ -67,7 +67,7 @@ function check_user_management_permission(min_permission_level, user, callback){
 	        callback(results)
 	    });
 }
-
+*/
 function check_user_permission(session){
     if(session.auth && session.user.user_management_permission > 0){
         return true;
@@ -184,9 +184,8 @@ function check_permission_for_resources(resources, group_ids, callback) {
 };
 
 module.exports = {
-	check_user_management_permission: check_user_management_permission,
-	check_resource_management_permission: check_resource_management_permission,
-	check_reservation_management_permission: check_reservation_management_permission,
+//	check_resource_management_permission: check_resource_management_permission,
+//	check_reservation_management_permission: check_reservation_management_permission,
     check_permission_for_resource: check_permission_for_resource,
     check_permission_for_resources: check_permission_for_resources,
     generate_api_auth_token: generate_api_auth_token,

@@ -101,19 +101,12 @@ router.put('/', function(req, res, next){
         }
     }
 
-    var resource_permission_callback = function(results){
-        if(results.error){
-            res.status(400).json(result.err)
-        }
-        else if(!results.auth){
-            res.sendStatus(403);
-        }
-        else{
-             res_service.create_resource(req.body, create_resource_callback);
-        }
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
 
-    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
+    res_service.create_resource(req.body, create_resource_callback);
 });
 
 router.post('/', function(req, res, next){
@@ -125,20 +118,12 @@ router.post('/', function(req, res, next){
             res.status(200).json(result);
         }
     }
-
-    var resource_permission_callback = function(results){
-        if(results.error){
-            res.status(400).json(result.err)
-        }
-        else if(!results.auth){
-            res.sendStatus(403);
-        }
-        else{
-             res_service.update_resource_by_id(req.body, update_resource_callback);
-        }
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
 
-    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
+    res_service.update_resource_by_id(req.body, update_resource_callback);
 
 });
 
@@ -151,18 +136,11 @@ router.delete('/', auth.is('user'), function(req, res, next){
             res.status(200).json(result);
         }
     }
-
-    var resource_permission_callback = function(results){
-        if (results.error){
-            res.status(400).json(result.err);
-        } else if (!results.auth){
-            res.sendStatus(403);
-        } else {
-             res_service.delete_resource_by_id(req.query, delete_resource_callback);
-        }
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
-
-    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
+    res_service.delete_resource_by_id(req.query, delete_resource_callback);
 });
 
 router.get('/all', auth.is('user'), function(req, res, next) {
@@ -205,18 +183,12 @@ router.post('/addPermission', function(req, res, next) {
         }
     };
 
-    var resource_permission_callback = function(results){
-        if (results.error){
-            res.status(400).json(result.err)
-        }
-        else if (!results.auth){
-            res.sendStatus(403);
-        } else{
-             res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);
-        }
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
 
-    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
+    res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);
 });
 
 // req.body should have resource_id, group_ids
@@ -312,18 +284,12 @@ router.post('/removePermission', function(req, res, next) {
         }
     };
 
-    var resource_permission_callback = function(results){
-        if (results.error){
-            res.status(400).json(result.err)
-        }
-        else if (!results.auth){
-            res.sendStatus(403);
-        } else{
-             res_service.removeGroupPermissionToResource(req.body, removeGroupPermissionCallback);
-        }
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
+    res_service.removeGroupPermissionToResource(req.body, removeGroupPermissionCallback);
 
-    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
 });
 
 // req.query should have resource_id
@@ -336,18 +302,12 @@ router.get('/getPermission', function(req, res, next) {
             res.status(200).json(result);
         }
     };
-
-    var resource_permission_callback = function(results){
-        if (results.error){
-            res.status(400).json(result.err)
-        }
-        else if (!results.auth){
-            res.sendStatus(403);
-        } else{
-             res_service.getGroupPermissionToResource(req.query, getGroupPermissionCallback);
-        }
+    
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
 
-    perm_service.check_resource_management_permission(1, req.session.user, resource_permission_callback);
+    res_service.getGroupPermissionToResource(req.query, getGroupPermissionCallback);
 });
 module.exports = router;

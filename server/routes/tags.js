@@ -19,6 +19,10 @@ router.get('/', auth.is('user'), function(req, res, next){
 
 // this takes includedTags and excludedTags in req.body and returns all resources that have any one of the included tags and none of the excluded tags
 router.post('/filter', auth.is('user'), function(req, res, next){
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
     var filter_callback = function(result){
 		if (result.error == true){
 		  res.sendStatus(400);
@@ -48,6 +52,11 @@ router.post('/filter', auth.is('user'), function(req, res, next){
 });
 
 router.put('/', auth.is('user'), function(req, res, next){
+
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
 
     var createResourceTagLinkCallback = function(result){
         if (result.error){
@@ -82,6 +91,10 @@ router.put('/', auth.is('user'), function(req, res, next){
 });
 
 router.post('/', auth.is('user'), function(req, res, next){
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
     var delete_callback = function(result){
         if (result.error == true){
 			res.sendStatus(400);

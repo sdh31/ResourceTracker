@@ -32,6 +32,11 @@ router.get('/', auth.is('user'), function(req, res, next){
 
 router.put('/', auth.is('admin'), function(req, res, next){
     //create user
+    if(!perm_service.check_user_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
+
     var createUserCallback = function(result){
         if (result.error) {
             res.sendStatus(401);
@@ -40,26 +45,19 @@ router.put('/', auth.is('admin'), function(req, res, next){
         }
     }
 
-    var checkUserManagementPermissionCallback = function(results){
-        if (results.error){
-            res.status(400).json(result.err)
-        } else if (!results.auth){
-            res.sendStatus(403);
-        } else {
-            if(!('username' in req.body) || !('password' in req.body)){
-                res.sendStatus(401);
-            } else {
-                user_service.create_user(req.body, createUserCallback);
-            }
-        }
+    if(!('username' in req.body) || !('password' in req.body)){
+        res.status(401).json({err: "no username or password provided"});
+    } 
+    else {
+        user_service.create_user(req.body, createUserCallback);
     }
+}
 
-    perm_service.check_user_management_permission(1, req.session.user, checkUserManagementPermissionCallback);
-});
+);
 
 router.post('/', auth.is('user'), function(req, res, next){
     //update user
-
+    
     var updateUserCallback = function(result) {
         if (result.error) {
             res.sendStatus(401);
@@ -68,27 +66,28 @@ router.post('/', auth.is('user'), function(req, res, next){
         }
     }
 
-    var checkUserManagementPermissionCallback = function(results){
-        if (results.error){
-            res.status(400).json(result.err)
-        } else if (!results.auth){
-            // if user does not have user management permission, check if they are trying to update themselves
-            if (req.body.username == req.session.user.username) {
-                user_service.update_user(req.body, updateUserCallback);
-            } else {
-                res.sendStatus(403);
-            }
-        } else {
+    if (!perm_service.check_user_permission(req.session)){
+        // if user does not have user management permission, check if they are trying to update themselves
+        if (req.body.username == req.session.user.username) {
+            user_service.update_user(req.body, updateUserCallback);
+        }
+        else {
+            res.status(403).json(perm_service.denied_error)
+        }
+    } else {
             // if they do have user management permission, just let them do what they gotta do
             user_service.update_user(req.body, updateUserCallback);
         }
     }
-
-    /// first check if user has user management permission
-    perm_service.check_user_management_permission(1, req.session.user, checkUserManagementPermissionCallback);
-});
+);
 
 router.delete('/', auth.is('user'), function(req, res, next){
+    
+    if(!perm_service.check_user_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
+
     var username = req.query["username"];
 
     var deletePrivateGroupCallback = function(result) {
@@ -106,21 +105,15 @@ router.delete('/', auth.is('user'), function(req, res, next){
             user_service.delete_private_group(username, deletePrivateGroupCallback);
         }
     };
-
-    var checkUserManagementPermissionCallback = function(results){
-        if (results.error){
-            res.status(400).json(result.err)
-        } else if (!results.auth){
-            res.sendStatus(403);
-        } else {
-            user_service.delete_user(username, deleteUserCallback);
-        }
-    }
-
-    perm_service.check_user_management_permission(1, req.session.user, checkUserManagementPermissionCallback);
+    
+    user_service.delete_user(username, deleteUserCallback)
 });
 
 router.get('/all', function(req,res,next){
+    if(!perm_service.check_user_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
     var getAllUsersCallback = function(result){
         if(result.error){
             res.status(400).json(result);
@@ -128,19 +121,7 @@ router.get('/all', function(req,res,next){
             res.status(200).json(result);
         }
     }
-
-    var user_permission_callback = function(results){
-        if(results.error){
-            res.status(400).json(result);
-        } else if(!results.auth){
-            res.sendStatus(403);
-        } else {
-            user_service.get_all_users(getAllUsersCallback);
-        }
-    }
-    
-    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
-
+    user_service.get_all_users(getAllUsersCallback);
 });
 
 router.post('/signin', function(req, res, next){
@@ -174,6 +155,10 @@ router.post('/signin', function(req, res, next){
 });
 
 router.post('/signout', auth.is('user'), function(req, res, next){
+    if(!perm_service.check_user_permission(req.session)){
+        res.status(403).json({err: "You are not signed in!"})
+        return;
+    }
 
     req.session.destroy(function() {
         res.type('text/plain');
@@ -182,6 +167,10 @@ router.post('/signout', auth.is('user'), function(req, res, next){
 });
 
 router.post('/token', function(req, res, next){
+    if(!req.session.auth){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
     var get_token_callback = function(result){
         res.status(200).json(result)
     }
