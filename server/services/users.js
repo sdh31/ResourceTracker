@@ -19,7 +19,7 @@ function create_user(user, callback){
         user_id = result.results.insertId;
         user.is_private = 1;
         user.name = user.username + "_group_" + random_string;
-        user.description = user.username + "_group_" + random_string;
+        user.description = "";
         group_service.create_group(user, createGroupCallback);
     };
 
