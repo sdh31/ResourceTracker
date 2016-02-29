@@ -215,6 +215,7 @@ function update_user(body, callback) {
         });
     } else {
         query = query.toString();
+        console.log(query)
         basic_db_utility.performSingleRowDBOperation(query, callback);
     }
 };
