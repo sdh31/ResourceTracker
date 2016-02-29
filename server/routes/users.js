@@ -110,7 +110,7 @@ router.delete('/', auth.is('user'), function(req, res, next){
 });
 
 router.get('/all', function(req,res,next){
-    if(!perm_service.check_user_permission(req.session)){
+    if(!(perm_service.check_user_permission(req.session) || perm_service.check_resource_permission(req.session))){
         res.status(403).json(perm_service.denied_error)
         return;
     }
