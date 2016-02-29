@@ -114,9 +114,9 @@ angular.module('resourceTracker')
                     deferred.reject();
                 } else {
                     var permissions = {
-                        reservation_management_permission: response.data.reservation_management_permission & 1,
-                        resource_management_permission: response.data.resource_management_permission & 1,
-                        user_management_permission: response.data.user_management_permission & 1
+                        reservation_management_permission: response.data.results.reservation_management_permission & 1,
+                        resource_management_permission: response.data.results.resource_management_permission & 1,
+                        user_management_permission: response.data.results.user_management_permission & 1
                     };
                     deferred.resolve(permissions);
                 }

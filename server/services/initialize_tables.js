@@ -11,7 +11,7 @@ exports.initializeDB = function(callback) {
     }
 
 	var rl = readline.createInterface({
-		input: fs.createReadStream('./create_tables.sql'),
+		input: fs.createReadStream('/home/bitnami/ResourceTracker/server/create_tables.sql'),
 		terminal: false
 	});
 

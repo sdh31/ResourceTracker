@@ -9,6 +9,9 @@ module.exports.api_auth = function(req, res, next){
             req.session.isValid = true
             req['session']['user'] = results.user
         }
+        else{
+            console.log(results)
+        }
         return next();
     }
 

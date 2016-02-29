@@ -111,7 +111,7 @@ function get_user_permissions(user, callback) {
             if (rowCount == 0) {
                 callback({error: error, empty: true});
             } else {
-                callback({error: error, user: userInfo});
+                callback({error: error, results: userInfo});
             }
          }
     );

@@ -38,7 +38,7 @@ module.exports.buildQueryForGetUser = function(username) {
                 .toString();
 };
 
-module.exports.buildQueryForGetUserPermissions = function(user) {
+module.exports.buildQueryForGetUserPermissions = function(user){
      return squel.select()
                 .field("user.username")
                 .field("user.first_name")
@@ -56,7 +56,7 @@ module.exports.buildQueryForGetUserPermissions = function(user) {
                 .from("user")
                 .left_join("user_group", null, "user_group.user_id = user.user_id")
                 .left_join("permission_group", null, "permission_group.group_id = user_group.group_id")
-                .where("username = '" + user.username + "'" + " AND is_shibboleth = " + user.is_shibboleth)
+                .where("username = ?", user.username)
                 .toString();
 };
 

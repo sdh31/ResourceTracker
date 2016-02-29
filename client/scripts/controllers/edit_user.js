@@ -3,7 +3,7 @@
 
 // at this point, there is a $scope.selectedGroup set through user_management.js
 angular.module('resourceTracker')
-    .controller('EditUserCtrl', function ($scope, $http, $timeout, $location) {
+    .controller('EditUserCtrl', function ($scope, $http, $timeout, $location, $q) {
 
     	var initEditUserController = function() {
             $scope.user_ReservationPerm = getPermissionForUser($scope.selectedUser, 'reservation_management_permission');
@@ -27,18 +27,25 @@ angular.module('resourceTracker')
                 $scope.getAllGroups().then(function() {
                     $scope.openEditUserSuccess();
                     $scope.selectUserByUserId($scope.selectedUser.user_id);
-                    initEditUserController();
+
+                    // could have updated reserve/resource system permission, meaning
+                    // we can call this function and it will update their access control 
+                    // on the scope
+                    updateUserPermissionsFromEditUserPage().then(function() {
+                        initEditUserController();
+                    });
                 }, function(error) {
                     // an error can occur when if user removed their own user_management_permission
-                    redirectUserIfPermissionChangedFromEditUserPage();
+                    updateUserPermissionsFromEditUserPage();
                 });
             }, function(error) {
                 console.log('error');
             });
         };
 
-        var redirectUserIfPermissionChangedFromEditUserPage = function() {
-            $scope.getMaximumPermissionsForActiveUser().then(function(permissions) {
+        var updateUserPermissionsFromEditUserPage = function() {
+            var deferred = $q.defer();
+            return $scope.getMaximumPermissionsForActiveUser().then(function(permissions) {
                 $scope.user.resource_management_permission = permissions.resource_management_permission;
                 $scope.user.reservation_management_permission = permissions.reservation_management_permission;
                 $scope.user.user_management_permission = permissions.user_management_permission;
@@ -48,7 +55,9 @@ angular.module('resourceTracker')
                     $scope.goToContactPage();
                     return;
                 }
+                deferred.resolve();
             });
+            return deferred.promise;
         };
 
         // given a user object... get the system properties from its private user group
