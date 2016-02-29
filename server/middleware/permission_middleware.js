@@ -35,8 +35,6 @@ module.exports.populate_permissions = function(req, res, next){
             next();
         }
         else{
-            console.log(result)
-            console.log("here")
             req.session.user.user_management_permission = result.results.user_management_permission;
             req.session.user.resource_management_permission = result.results.resource_management_permission;
             req.session.user.reservation_management_permission = result.results.reservation_management_permission;
@@ -44,7 +42,6 @@ module.exports.populate_permissions = function(req, res, next){
             console.log(req.session.user)
         }
     }
-    req.session.auth = true
     if(!req.session.isValid){
             req.session.auth = false
             next();

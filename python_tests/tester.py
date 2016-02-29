@@ -6,7 +6,6 @@ print '#### initialize session ####'
 session_response = r.login_to_session('admin', 'Treeadmin')
 print session_response.status_code < 300
 r.session = session_response.cookies
-print session_response.content
 
 print '#### update admin user to have new email ####'
 res = r.update_user(username="admin",email_address="jag.buddhavarapu@gmail.com")
@@ -69,6 +68,7 @@ print r.json.loads(res.content)['results'][1]['username'] == 'rahul'
 print '#### create a group ####'
 res = r.create_group("fungroup", "nope", True, True, True, False)
 print res.status_code < 300
+print res.content
 group_id = r.json.loads(res.content)['results']['insertId']
 
 print '#### get groups and check if there are 3 ####'
