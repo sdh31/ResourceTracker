@@ -184,6 +184,19 @@ def remove_group_permission_to_resource(resource_id, group_ids):
 
 	return send_request(method, params, url)
 
+def filter_tags(included_tags, excluded_tags, start_time, end_time):
+	url = baseUrl + '/resource/filter'
+	method = "POST"
+
+	params = {
+        'includedTags': included_tags,
+		'excludedTags': excluded_tags,
+		'start_time': start_time,
+		'end_time': end_time
+    }
+
+	return send_request(method, params, url)
+
 def get_group_permission_to_resource(resource_id):
 	url = baseUrl + '/resource/getPermission'
 	method = "GET"
@@ -212,6 +225,13 @@ def remove_tags(resource_id, tags):
 		'resource_id': resource_id,
 		'deletedTags': tags
 	}
+
+	return send_request(method, params, url)
+
+def get_all_tags():
+	url = baseUrl + '/tag'
+	method = "GET"
+	params = {}
 
 	return send_request(method, params, url)
 

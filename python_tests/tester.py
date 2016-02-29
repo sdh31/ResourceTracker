@@ -47,6 +47,10 @@ resource_id = r.json.loads(res.content)['insertId']
 res = r.add_tag(resource_id, ['ant', 'eater', 'shit'])
 test_print(desc, res.status_code < 300)
 
+desc = '#### Check all tags created ####'
+res = r.get_all_tags()
+test_print(desc, len(r.json.loads(res.content)["tags"]) == 3)
+
 desc =  '#### get permissions for resource with tags and make that the admin user has permission ####'
 res = r.get_group_permission_to_resource(resource_id)
 test_print(desc, res.status_code < 300)
@@ -81,6 +85,7 @@ desc =  '#### create a group ####'
 res = r.create_group("fungroup", "nope", True, True, True, False)
 test_print(desc, res.status_code < 300)
 test_print(desc, res.content)
+
 
 group_id = r.json.loads(res.content)['results']['insertId']
 
@@ -166,6 +171,9 @@ test_print(desc, len(r.json.loads(res.content)['results']) == 2)
 test_print(desc, r.json.loads(res.content)['results'][0]['start_time'] == 5)
 test_print(desc, r.json.loads(res.content)['results'][0]['end_time'] == 10)
 
+r.filter_tags([],[],0, 99999)
+print res.content
+
 desc =  '#### delete reservation ####'
 res = r.delete_reservation(reservation_id)
 test_print(desc, res.status_code < 300)
@@ -173,10 +181,12 @@ test_print(desc, res.status_code < 300)
 desc =  '#### get reservations and check reservation has been deleted successfully ####'
 res = r.get_reservations(resource_id, 0, 99999)
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
+print res.content
 
 desc =  '#### remove view permission to the group for the resource with tags ####'
 res = r.remove_group_permission_to_resource(resource_id, [group_id])
 test_print(desc, res.status_code < 300)
+print res.content
 
 desc =  '#### get permissions for resource with tags and make sure theres nothing ####'
 res = r.get_group_permission_to_resource(resource_id)
@@ -216,6 +226,7 @@ test_print(desc, res.status_code < 300)
 desc =  '#### delete user rahul from DB and check if only 1 user now exists ####'
 res = r.delete_user('rahul')
 test_print(desc, res.status_code < 300)
+
 res = r.get_all_users()
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 
