@@ -130,7 +130,7 @@ router.post('/Shibboleth.sso/SAML2/POST', function(req, res, next) {
             user_service.create_user(thisUser, createUserCallback);
         } else {
             req.session.isValid = true;
-            req.session.user = result.user;
+            req.session.user = result.results;
             res.redirect('/#/');
         }
     };
