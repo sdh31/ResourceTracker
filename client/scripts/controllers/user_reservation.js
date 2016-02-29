@@ -40,7 +40,6 @@ angular.module('resourceTracker')
 
         var getAllResources = function() {
             return $http.get('/reservation').then(function(response) {   
-                console.log(response.data);
                 populateResourceArray(response.data.results, $scope.allResources);
             }, function(error) {
                 console.log(error);
@@ -48,16 +47,21 @@ angular.module('resourceTracker')
         };
 
         var populateResourceArray = function(resourceData, resourceArray) {
-            resourceData.forEach(function(resource) {
-                var resourceData = {id: resource.resource_id, label: resource.name};
-                resourceArray.push(resourceData);
-                var thisReservation = {reservation_id: resource.reservation_id, start_time: resource.start_time, end_time: resource.end_time};
-                if ($scope.resourceReservationMap[resourceData.id]) {
-                    $scope.resourceReservationMap[resourceData.id].push(thisReservation);
-                } else {
-                    $scope.resourceReservationMap[resourceData.id] = [thisReservation];                
+            var seenResources = [];
+            for (var i = 0; i < resourceData.length; i++) {
+                var resource = resourceData[i];
+                var thisResource = {id: resource.resource_id, label: resource.name};
+                if (seenResources.indexOf(thisResource.id) == -1) {
+                    resourceArray.push(thisResource);
+                    seenResources.push(thisResource.id);
                 }
-            });
+                var thisReservation = {reservation_id: resource.reservation_id, start_time: resource.start_time, end_time: resource.end_time};
+                if ($scope.resourceReservationMap[thisResource.id]) {
+                    $scope.resourceReservationMap[thisResource.id].push(thisReservation);
+                } else {
+                    $scope.resourceReservationMap[thisResource.id] = [thisReservation];                
+                }
+            }
         };
 
         $scope.onResourceReservationToggle = function() {
