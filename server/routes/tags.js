@@ -7,6 +7,10 @@ var perm_service = require('../services/permissions')
 
 // this gets all tags
 router.get('/', auth.is('user'), function(req, res, next){
+    if(!req.session.auth){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
 	var tags_callback = function(result){
 		if (result.error == true){
 			res.sendStatus(400);
@@ -20,7 +24,7 @@ router.get('/', auth.is('user'), function(req, res, next){
 
 // this takes includedTags and excludedTags in req.body and returns all resources that have any one of the included tags and none of the excluded tags
 router.post('/filter', auth.is('user'), function(req, res, next){
-    if(!perm_service.check_resource_permission(req.session)){
+    if(!req.session.auth){
         res.status(403).json(perm_service.denied_error)
         return;
     }
