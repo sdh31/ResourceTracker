@@ -60,7 +60,7 @@ router.post('/', auth.is('user'), function(req, res, next){
     
     var updateUserCallback = function(result) {
         if (result.error) {
-            res.sendStatus(401);
+            res.sendStatus(401).json(result);
         } else {
             res.sendStatus(200);
         }
@@ -68,8 +68,10 @@ router.post('/', auth.is('user'), function(req, res, next){
 
     if (!perm_service.check_user_permission(req.session)){
         // if user does not have user management permission, check if they are trying to update themselves
-        if (req.body.username == req.session.user.username) {
-            user_service.update_user(req.body, updateUserCallback);
+        if(req.session.auth){
+            if (req.body.username == req.session.user.username) {
+                user_service.update_user(req.body, updateUserCallback);
+            }
         }
         else {
             res.status(403).json(perm_service.denied_error)

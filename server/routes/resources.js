@@ -113,9 +113,9 @@ router.post('/', function(req, res, next){
   
     var update_resource_callback = function(result){
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
-            res.status(200).json(result);
+            res.sendStatus(200);
         }
     }
     if(!perm_service.check_resource_permission(req.session)){
@@ -131,9 +131,9 @@ router.delete('/', auth.is('user'), function(req, res, next){
   
     var delete_resource_callback = function(result){
        if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
-            res.status(200).json(result);
+            res.sendStatus(200);
         }
     }
     if(!perm_service.check_resource_permission(req.session)){

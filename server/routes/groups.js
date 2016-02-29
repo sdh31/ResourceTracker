@@ -72,7 +72,7 @@ router.delete('/', function(req,res,next){
         if(result.error){
             res.status(400).json(result);
         } else {
-             res.status(200).json(result);
+             res.sendStatus(200);
         }
     };
 
@@ -186,7 +186,7 @@ router.post('/addUsers', function(req,res,next){
         if (result.error){
             res.status(400).json(result);
         } else {
-            res.status(200).json(result);
+            res.sendStatus(200);
         }
 
     }
@@ -213,9 +213,9 @@ router.post('/removeUsers', function(req,res,next){
 
     var deleteReservationsCallback = function(result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
-            res.status(200).json(result);
+            res.sendStatus(200);
         }
     };
 

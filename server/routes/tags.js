@@ -32,7 +32,7 @@ router.post('/filter', auth.is('user'), function(req, res, next){
 		if (result.error == true){
 		  res.sendStatus(400);
 		} else {
-			res.send(JSON.stringify(result));
+			res.json(result);
 		}
 	}
 
