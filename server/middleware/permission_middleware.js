@@ -1,7 +1,6 @@
 var express = require('express');
 var app = express();
 var perm_service = require('../services/permissions');
-var route_whitelists = require('../constants/route_whitelists/route_permissions')
 
 module.exports.api_auth = function(req, res, next){
 
