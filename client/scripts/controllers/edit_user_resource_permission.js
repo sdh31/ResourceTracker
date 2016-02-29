@@ -27,11 +27,8 @@ angular.module('resourceTracker')
 	   	};
 
         $scope.confirmation = function() {
-            if(confirm($scope.selectedUser.first_name + " " + $scope.selectedUser.last_name + " may be reservations on " + $scope.selectedResource.name + ", are you sure?")){
+            if($scope.tempGroupPermission == 'reserve' || $scope.resourceGroup.resource_permission != 'reserve' || ($scope.resourceGroup.resource_permission == 'reserve' && confirm($scope.selectedUser.username + " may have reservations on " + $scope.selectedResource.name + ", are you sure you want to take away reserve permission?"))){
                 updatePermission();
-                console.log('yah');
-            } else {
-                console.log('nah');
             }
         };
 
@@ -47,6 +44,7 @@ angular.module('resourceTracker')
                     $scope.resourceGroup = res_group;
                     $scope.tempGroupPermission = res_group.resource_permission;
                 } else {
+                    $scope.resourceGroup = {resource_permission: 'none'};
                     $scope.tempGroupPermission = 'none';
                 }
     		}, function(error){
@@ -70,7 +68,6 @@ angular.module('resourceTracker')
             var groupID = [$scope.userPrivateGroup.group_id];
             var permissionReq = {resource_id: resourceID, group_ids: groupID};
             var promise = $http.post('/resource/removePermission', permissionReq).then(function(response) {
-                console.log('removed permission');
                 if($scope.tempGroupPermission != 'none'){
                     addPermission().then(function() {
                         openEditUserSuccess();
@@ -89,7 +86,7 @@ angular.module('resourceTracker')
                                 group_ids: groupID, 
                                 resource_permissions: [$scope.tempGroupPermission]};
             var promise = $http.post('/resource/addPermission', permissionReq).then(function(response) {
-                console.log('added permission');
+
             }, function(error){
                 console.log(error);
             });
@@ -98,6 +95,7 @@ angular.module('resourceTracker')
 
         var openEditUserSuccess = function() {
             $scope.showEditUserSuccess = true;
+            initEditUserController();
             $timeout(function(){
                 $scope.showEditUserSuccess = false;
             }, 1500);

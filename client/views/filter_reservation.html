@@ -1,5 +1,6 @@
 <div class="container">
 <div class="row vertical-align">
+<div class="col-md-1"></div>
 <div class="input-group panel panel-default col-md-5" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
 	<div class="panel-body">
         <h4 style="text-align: center;">Filter Reservations</h4>
@@ -18,7 +19,7 @@
 		 	 translation-texts="tagExcludeTranslationText"
 		 	 style="vertical-align:top;"></span><br>
 		<br>
-		<button type="button" class="btn btn-default btn-md" ng-click="filterReservations()">Filter Reservations</button>
+		<button type="button" class="btn btn-primary btn-md" ng-click="filterReservations()">Filter Reservations</button>
 		<br><br>
 	</div>
 </div>
@@ -33,7 +34,8 @@
 			<span ng-dropdown-multiselect="" options="allResources" selected-model="resourceToCreate"
 		 	 extra-settings="{enableSearch: true, selectionLimit: 1, smartButtonMaxItems:1}"
 		 	 translation-texts="{buttonDefaultText: 'Select a Resource'}"></span>
-			<button type="button" class="btn btn-default btn-md" ng-click="createReservation()">Create Reservation</button>
+		 	 <br/><br/>
+			<button type="button" class="btn btn-primary btn-md" ng-click="createReservation()">Create Reservation</button>
 		</div>
 	</div>
 </div>
