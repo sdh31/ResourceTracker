@@ -109,7 +109,7 @@ router.post('/', auth.is('user'), function(req, res, next){
         if(result.error){
             res.status(403).json(result);
         } else if (result.results.length > 0) {
-            res.status(403).json(result);
+            res.status(403).json({results:{err: "conflicting reservations"}});
         } else {
             // this means that we can make the reservation
             reservation_service.update_reservation_by_id(req.body, updateReservationCallback)
@@ -118,32 +118,24 @@ router.post('/', auth.is('user'), function(req, res, next){
 
     var getReservationByIdCallback = function(result) {
         if (result.error) {
-            res.sendStatus(403);
+            res.sendStatus(403).json(result);
         } else {
             if (req.session.user.user_id == result.results.user_id) {
                 reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
             } else {
                 // this means that the user doesn't have reservation management AND the reservation isn't theirs
-                res.sendStatus(403);
+                res.sendStatus(403).json(perm_service.denied_error);
             }
         }
     };
 
-    var checkReservationManagementPermissionCallback = function(results){
-        if (results.error){
-            res.status(400).json(result.err)
-        } else if (!results.auth){
+    if(!perm_service.check_resource_permission(req.session)){
             // if user does not have reservation management permission, check if this is their own reservation
             reservation_service.get_reservation_by_id(req.body, getReservationByIdCallback);
         } else {
             // if they do have reservation management permission, just let them do what they gotta do
             reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
-        }
     }
-
-    /// first check if user has reservation management permission
-    perm_service.check_reservation_management_permission(1, req.session.user, checkReservationManagementPermissionCallback);
-
 });
 
 router.delete('/', auth.is('user'), function(req, res, next){
@@ -178,20 +170,11 @@ router.delete('/', auth.is('user'), function(req, res, next){
             }
         }
     };
-
-    var checkReservationManagementPermissionCallback = function(results){
-        if (results.error){
-            res.status(400);
-            return;
-        } else if (results.auth) {
+    
+    if (perm_service.check_resource_permission(req.session)) {
             hasAuth = true;
-        }
-
-        reservation_service.get_reservation_by_id(req.query, getReservationByIdCallback);
     }
-
-    /// first check if user has reservation management permission
-    perm_service.check_reservation_management_permission(1, req.session.user, checkReservationManagementPermissionCallback);
+        reservation_service.get_reservation_by_id(req.query, getReservationByIdCallback);
 });
 
 module.exports = router;

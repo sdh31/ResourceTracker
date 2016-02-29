@@ -15,25 +15,16 @@ router.get('/', function(req,res,next){
             res.status(200).json(result);
         }
     }
-
-    var user_permission_callback = function(results){
-        if(results.error){
-            res.status(400).json(result)
-        }
-        else if(!results.auth){
-            res.sendStatus(403);
-        }
-        else{
-            group_service.get_groups_by_id(req.query, get_group_callback);
-        }
+    if(!perm_service.check_user_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
-
-    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
+    group_service.get_groups_by_id(req.query, get_group_callback);
 
 });
 
 router.put('/', function(req,res,next){
-        if(!('name' in req.body) ){
+    if(!('name' in req.body) ){
         res.status(400).json({err: 'no group name specified'});
     }
     group_service.toggle_group_privacy(req.body, false);
@@ -46,21 +37,12 @@ router.put('/', function(req,res,next){
             res.status(200).json(result);
         }
     }
-
-    var user_permission_callback = function(results){
-        if(results.error){
-            res.status(400).json(result)
-        }
-        else if(!results.auth){
-            res.sendStatus(403);
-        }
-        else{
-            group_service.create_group(req.body, create_group_callback);
-        }
+    if(!perm_service.check_user_permission(req.session)){
+        console.log()
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
-
-    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
-
+    group_service.create_group(req.body, create_group_callback);
 });
 
 router.post('/', function(req,res,next){
@@ -73,19 +55,11 @@ router.post('/', function(req,res,next){
         }
     }
 
-    var user_permission_callback = function(results){
-        if(results.error){
-            res.status(400).json(result)
-        }
-        else if(!results.auth){
-            res.sendStatus(403);
-        }
-        else{
-            group_service.update_group_by_id(req.body, update_group_callback);
-        }
+    if(!perm_service.check_user_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
-    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
-    
+    group_service.update_group_by_id(req.body, update_group_callback);
 });
 
 router.delete('/', function(req,res,next){
@@ -195,17 +169,14 @@ router.delete('/', function(req,res,next){
             }
         }
     };
-
-    var user_permission_callback = function(results){
-        if (results.error){
-            res.status(400).json(result)
-        } else if (!results.auth) {
-            res.sendStatus(403);
-        } else {
-            tag_service.filter_by_tag([], [], 0, Number.MAX_VALUE, [req.query.group_id], getAllResourcesCallback);
-        }
+    
+    if(!perm_service.check_user_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
-    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
+
+    tag_service.filter_by_tag([], [], 0, Number.MAX_VALUE, [req.query.group_id], getAllResourcesCallback);
+
 });
 
 // req.body should have user_ids and group_id
@@ -220,18 +191,12 @@ router.post('/addUsers', function(req,res,next){
 
     }
 
-    var user_permission_callback = function(results){
-        if (results.error){
-            res.status(400).json(result)
-        } else if (!results.auth){
-            res.sendStatus(403);
-        } else{
-            group_service.add_users_to_group(req.body, add_user_callback)
-        }
+    if(!perm_service.check_user_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
-    
-    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
 
+    group_service.add_users_to_group(req.body, add_user_callback)
 });
 
 // req.body should have user_ids and group_id
@@ -341,19 +306,11 @@ router.post('/removeUsers', function(req,res,next){
         }
     };
 
-    var user_permission_callback = function(results){
-        if(results.error){
-            res.status(400).json(result)
-        }
-        else if(!results.auth){
-            res.sendStatus(403);
-        }
-        else{
-             group_service.remove_users_from_group(req.body, remove_user_callback);
-        }
+    if(!perm_service.check_user_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
     }
-
-    perm_service.check_user_management_permission(1, req.session.user, user_permission_callback);
+    group_service.remove_users_from_group(req.body, remove_user_callback);
 
 });
 
