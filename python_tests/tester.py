@@ -12,7 +12,7 @@ def test_print(desc, expression):
 		print expression
 		failed += 1
 	else:
-		passed+=1
+		passed += 1
 
 desc = '#### initialize session ####'
 session_response = r.login_to_session('admin', 'Treeadmin')
@@ -46,6 +46,10 @@ resource_id = r.json.loads(res.content)['insertId']
 
 res = r.add_tag(resource_id, ['tag1', 'tag2'])
 test_print(desc, res.status_code < 300)
+
+desc = '#### Check all tags created ####'
+res = r.get_all_tags()
+test_print(desc, len(r.json.loads(res.content)["tags"]) == 2)
 
 desc =  '#### get permissions for resource with tags and make that the admin user has permission ####'
 res = r.get_group_permission_to_resource(resource_id)
@@ -166,6 +170,10 @@ test_print(desc, len(r.json.loads(res.content)['results']) == 2)
 test_print(desc, r.json.loads(res.content)['results'][0]['start_time'] == 5)
 test_print(desc, r.json.loads(res.content)['results'][0]['end_time'] == 10)
 
+desc = '#### Filter based on tags'
+r.filter_tags([],[],0, 99999)
+test_print (desc, len((r.json.loads(res.content))['results']) == 2)
+
 desc =  '#### delete reservation ####'
 res = r.delete_reservation(reservation_id)
 test_print(desc, res.status_code < 300)
@@ -219,7 +227,7 @@ test_print(desc, res.status_code < 300)
 res = r.get_all_users()
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 
-print str(failed) + " tests failed"
-print str(passed) + " tests passed"
+print str(failed) + "tests failed"
+print str(passed) + "tests passed"
 
 
