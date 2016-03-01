@@ -44,8 +44,8 @@ router.put('/', function(req, res, next){
         if(result.error){
             res.status(403).json(result);
         } else if (result.results.length > 0) {
-            result.error = true;
-            result.err = "Conflicting Reservation(s)!"
+            result['error'] = true;
+            result['err'] = "Conflicting Reservation(s)!"
             res.status(403).json(result);
         } else {
             // this means that we can make the reservation
@@ -55,22 +55,24 @@ router.put('/', function(req, res, next){
 
     var checkPermissionForResourceCallback = function(result){
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else if (result.results == {}) {
-            res.sendStatus(403);
+            result['err'] = "The resource you specified doesn't exist"
+            res.status(400).json(result);
         } else {
             // now check if the user has reserve permission
             if (group_service.checkReservePermission(result.results)) {
                 reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
             } else {
-                res.sendStatus(403);
+                result = perm_service.denied_error
+                res.status(403).json(result);
             }
         }
     };
 
     var getAllGroupsForUserCallback = function(result){
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var group_ids = [];
             for (var i = 0; i<result.results.length; i++) {
@@ -82,9 +84,9 @@ router.put('/', function(req, res, next){
     };
 
     if(!("start_time" in req.body) || !("end_time" in req.body) || !("resource_id" in req.body)){
-        res.sendStatus(400);
+        res.status(400).json({err: "Missing fields"});
     } else if(req.body.start_time >= req.body.end_time){
-        res.sendStatus(400);
+        res.status(400).json({err: "start time must be less than end time"});
     } else {
         // we first get all of the groups that the user is a part of
         group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
