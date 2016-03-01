@@ -44,6 +44,8 @@ router.put('/', function(req, res, next){
         if(result.error){
             res.status(403).json(result);
         } else if (result.results.length > 0) {
+            result.error = true;
+            result.err = "Conflicting Reservation(s)!"
             res.status(403).json(result);
         } else {
             // this means that we can make the reservation
