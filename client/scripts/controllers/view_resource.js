@@ -48,6 +48,8 @@ angular.module('resourceTracker')
 			$scope.editingResource.name = oldName;
 			$scope.editingResource.description = oldDescription;
 			$scope.editingResource.tags = oldTags;
+            addedTags = [];
+            deletedTags = [];
 			$scope.saveOldResourceState();
 		};
 
