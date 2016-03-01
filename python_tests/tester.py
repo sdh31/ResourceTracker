@@ -40,11 +40,11 @@ test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 test_print(desc, r.json.loads(res.content)['results'][0]['email_address'] == 'jag.buddhavarapu@gmail.com')
 
 desc = '#### create resource with tags ####'
-res = r.create_resource("YAAAAAAAM", "huh")
+res = r.create_resource("server1", "this is a server")
 test_print(desc, res.status_code < 300)
 resource_id = r.json.loads(res.content)['insertId']
 
-res = r.add_tag(resource_id, ['ant', 'eater', 'shit'])
+res = r.add_tag(resource_id, ['tag1', 'tag2'])
 test_print(desc, res.status_code < 300)
 
 desc =  '#### get permissions for resource with tags and make that the admin user has permission ####'
@@ -53,7 +53,7 @@ test_print(desc, res.status_code < 300)
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 
 desc =  '#### create resource without tags ####'
-res = r.create_resource("YAAAAAMU", "notags", 1)
+res = r.create_resource("notags", "notags", 1)
 test_print(desc, res.status_code < 300)
 no_tags_id = r.json.loads(res.content)['insertId']
 
@@ -91,13 +91,13 @@ test_print(desc, len(r.json.loads(res.content)['results']) == 3)
 test_print(desc, r.json.loads(res.content)['results'][2]['group_name'] == "fungroup")
 
 desc =  '#### update group ####'
-res = r.update_group(group_id, "nopegroup", "fun", False, False, True)
+res = r.update_group(group_id, "editedGroup", "fun", False, False, True)
 test_print(desc, res.status_code < 300)
 
 desc =  '#### make sure update has persisted ####'
 res = r.get_groups()
 test_print(desc, len(r.json.loads(res.content)['results']) == 3)
-test_print(desc, r.json.loads(res.content)['results'][2]['group_name'] == 'nopegroup')
+test_print(desc, r.json.loads(res.content)['results'][2]['group_name'] == 'editedGroup')
 
 desc =  '#### add admin and rahul to the group ####'
 res = r.add_users_to_group([1, user_id], group_id)
@@ -127,13 +127,13 @@ res = r.delete_resource(no_tags_id)
 test_print(desc, res.status_code < 300)
 
 desc =  '#### update resource with tags ####'
-res = r.update_resource(resource_id, "YAAAAAAAAAAAAAAAAAAAAAM", "huh edited")
+res = r.update_resource(resource_id, "serverEdited", "huh edited")
 test_print(desc, res.status_code < 300)
 
 desc =  '#### get updated resource ####'
 res = r.get_resource_by_id(resource_id)
 test_print(desc, res.status_code < 300)
-test_print(desc, r.json.loads(res.content)['results']['name'] == "YAAAAAAAAAAAAAAAAAAAAAM")
+test_print(desc, r.json.loads(res.content)['results']['name'] == "serverEdited")
 
 desc =  '#### create reservation ####'
 res = r.create_reservation(resource_id, 1, 2)
