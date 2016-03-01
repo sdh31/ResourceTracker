@@ -2,7 +2,7 @@
     <div class="panel-body">
             <h5>Create a New Group</h5>
             <input type="text" class="form-control" placeholder="Name of Group" ng-model="groupNameToCreate"><br><br>
-            <button class="btn btn-primary" ng-click="createNewGroup()">Create</button>
+            <button class="btn btn-primary" ng-disabled="groupNameToCreate==''" ng-click="createNewGroup()">Create</button>
     </div>
 </div><br>
 
