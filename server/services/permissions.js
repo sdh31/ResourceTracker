@@ -23,7 +23,7 @@ function generate_api_auth_token(payload, callback){
         email_address: payload.email_address
     }
     var options = {
-        expiresIn: "10 minutes",
+        expiresIn: "1h",
     };
     jwt.sign(payload, secret_token,options,function(token){
         callback({results:{token: token}});
