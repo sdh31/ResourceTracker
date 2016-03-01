@@ -14,11 +14,19 @@ router.get('/', auth.is('user'), function(req, res, next){
             res.status(200).json(result);
         }
     };
-
+    if(!req.session.auth){
+        res.status(403).json(perm_service.denied_error);
+        return;
+    }
     reservation_service.getAllReservationsForUser(req.session.user, getAllReservationsForUserCallback);
 });
 
 router.put('/', function(req, res, next){
+
+    if(!req.session.auth){
+        res.status(403).json(perm_service.denied_error);
+        return;
+    }
 
     var addUserReservationLinkCallback = function(result) {
         if(result.error){
@@ -160,7 +168,7 @@ router.delete('/', auth.is('user'), function(req, res, next){
 
     var getReservationByIdCallback = function(result) {
         if (result.error) {
-            res.sendStatus(403);
+            res.sendStatus(400).json(result);
         } else {
             // if this is the user's reservation just delete it, if the user has requisite permission delete the reservation and send an email, else send a 403
             if (req.session.user.user_id == result.results.user_id) {
@@ -170,12 +178,12 @@ router.delete('/', auth.is('user'), function(req, res, next){
                 reservation_service.delete_reservation_by_id(req.query, request_callback);
             } else {
                 // this means that the user doesn't have reservation management AND the reservation isn't theirs
-                res.sendStatus(403);
+                res.status(403).json(perm_service.denied_error);
             }
         }
     };
     
-    if (perm_service.check_resource_permission(req.session)) {
+    if (perm_service.check_reservation_permission(req.session)) {
             hasAuth = true;
     }
         reservation_service.get_reservation_by_id(req.query, getReservationByIdCallback);

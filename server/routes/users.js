@@ -20,7 +20,11 @@ router.get('/', auth.is('user'), function(req, res, next){
 
     if (!req.session.user || !('username' in req.session.user)) {
         res.status(401).json({noSession: true});
-    } else {
+    }
+    else if(!req.session.auth){
+        res.status(403).json(perm_service.denied_error)
+    }
+    else {
         var username = req.session.user.username;
         //Allow this call to be made with arbitrary username as well
         if("username" in req.query){
@@ -68,7 +72,7 @@ router.post('/', auth.is('user'), function(req, res, next){
 
     if (!perm_service.check_user_permission(req.session)){
         // if user does not have user management permission, check if they are trying to update themselves
-        if (req.body.username == req.session.user.username) {
+        if ("username" in req.session && req.body.username == req.session.user.username) {
             user_service.update_user(req.body, updateUserCallback);
         }
         else {
@@ -147,7 +151,12 @@ router.post('/signin', function(req, res, next){
         if (result.error == true) {
             res.sendStatus(403);
         } else {
-            user_service.compare_passwords(password, result.results, comparePasswordsCallback);
+            if(result.empty){
+                res.sendStatus(403);
+            }
+            else{
+                user_service.compare_passwords(password, result.results, comparePasswordsCallback);
+            }
         }
     }
 

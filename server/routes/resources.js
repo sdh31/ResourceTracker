@@ -40,7 +40,10 @@ router.get('/', function(req, res, next){
             perm_service.check_permission_for_resource(req.query.resource_id, group_ids, checkPermissionForResourceCallback);
         }
     };
-
+    if(!req.session.auth){
+        res.status(403).json(perm_service.denied_error);
+        return;
+    }
     // we first get all of the groups that the user is a part of so that we only show resources that they have view/reserve access on
     group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
