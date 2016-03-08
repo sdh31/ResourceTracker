@@ -121,6 +121,15 @@ Run Node Server on Reboot
         
         You can now control the server with the command 'resource-tracker start' or 'resource-tracker stop'
 
+Redirect HTTP to HTTPS
+
+        On your server, enter the command 'sudo iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-ports 443'.
+        Then, open the file '/etc/network/interfaces' and type in the following:
+                pre-up iptables-restore < /etc/iptables.rules
+                post-down iptables-save > /etc/iptables.rules
+                
+        This will ensure that the redirect still works if the server reboots!
+
 
 Using Redis Store to store info for session handling
 
