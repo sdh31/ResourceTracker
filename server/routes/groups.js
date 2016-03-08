@@ -88,7 +88,7 @@ router.delete('/', function(req,res,next){
         if (result.error) {
             res.sendStatus(400);
         } else {
-            if (result.results == []) {
+            if (result.results.length == 0) {
                 res.status(200).json(result);
             } else {
                 for (var i = 0; i<result.results.length; i++) {
@@ -223,7 +223,7 @@ router.post('/removeUsers', function(req,res,next){
         if (result.error) {
             res.sendStatus(400);
         } else {
-            if (result.results == []) {
+            if (result.results.length == 0) {
                 res.status(200).json(result);
             } else {
                 for (var i = 0; i<result.results.length; i++) {
