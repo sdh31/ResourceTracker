@@ -22,7 +22,7 @@ router.get('/', function(req, res, next){
     var checkPermissionForResourceCallback = function (result) {
         if (result.error) {
             res.sendStatus(400);
-        } else if (result.results == []) {
+        } else if (result.results.length == 0) {
             res.sendStatus(403);
         } else {
             res_service.get_resource_by_id(req.query, getResourceCallback);

@@ -97,8 +97,7 @@ exports.buildQueryForSelectTagIds = function(tags) {
         select_expression.or("tag_name = '" + tags[i] + "'")
     }
     return squel.select()
-                .from('tag') 
-                .field("tag_id")
+                .from('tag')
                 .where(select_expression)
                 .toString();
 };

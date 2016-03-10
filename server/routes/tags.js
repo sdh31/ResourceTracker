@@ -81,7 +81,6 @@ router.put('/', auth.is('user'), function(req, res, next){
             }
             tag_service.create_resource_tag_link(req.body.resource_id, tag_ids, createResourceTagLinkCallback);
         }
-
     };
 
     var createTagCallback = function(result) {
@@ -92,7 +91,31 @@ router.put('/', auth.is('user'), function(req, res, next){
         }
     };
 
-    tag_service.create_tag(req.body.addedTags, createTagCallback);
+    var initialSelectTagsIdsCallback = function(result) {
+        if (result.error) {
+            res.sendStatus(400);
+        } else {
+            var addedTags = [];
+
+            for (var i = 0; i<req.body.addedTags.length; i++) {
+                addedTags.push(req.body.addedTags[i]);
+            }
+
+            var tag_names = [];
+            for (i = 0; i<result.results.length; i++) {
+                tag_names.push(result.results[i].tag_name);
+            }
+            
+            for (i = 0; i<tag_names.length; i++) {
+                if (addedTags.indexOf(tag_names[i]) != -1) {
+                    addedTags.splice(addedTags.indexOf(tag_names[i]), 1);
+                }
+            }
+            tag_service.create_tag(addedTags, createTagCallback);
+        }
+    }
+
+    tag_service.select_tag_ids(req.body.addedTags, initialSelectTagsIdsCallback);
 });
 
 router.post('/', auth.is('user'), function(req, res, next){
