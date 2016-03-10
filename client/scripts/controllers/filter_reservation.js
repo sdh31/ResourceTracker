@@ -11,7 +11,7 @@ angular.module('resourceTracker')
                                             "during this time.";
         $scope.onReservationCreateInPast = "Please select a time in the present or future.";
         $scope.onReservationStartAfterEnd = "Please select a start time before the end time.";
-        $scope.onReservationNoResource = "Please select a resource to reserve.";
+        $scope.onReservationNoResource = "Please select at least one resource to reserve.";
         $scope.onReservationInvalidStartDate = "Please select a valid start date.";
         $scope.onReservationInvalidEndDate = "Please select a valid end date.";
 
@@ -111,6 +111,11 @@ angular.module('resourceTracker')
             $scope.endReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
                                                     currentTime.getDate(), currentTime.getHours(), currentTime.getMinutes());
 
+            $scope.reservationName = '';
+            $scope.reservationDescription = '';
+
+
+
             $scope.newStartReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
                                                     currentTime.getDate(), currentTime.getHours(), currentTime.getMinutes());
             $scope.newEndReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
@@ -126,7 +131,7 @@ angular.module('resourceTracker')
             $scope.allResources = [];
 
             // create resource dropdown model
-            $scope.resourceToCreate = {}; 
+            $scope.resourcesToCreate = []; 
 
             // modify a reservation dropdown model for RESOURCE
             $scope.resourceReservationToModify = {};
@@ -159,8 +164,16 @@ angular.module('resourceTracker')
                 return;
             }
 
-            var reservationData = {start_time: $scope.startReservationTime.valueOf(),
-                end_time: $scope.endReservationTime.valueOf(), resource_id: $scope.resourceToCreate.id};
+            var reservationData = {
+                start_time: $scope.startReservationTime.valueOf(),
+                end_time: $scope.endReservationTime.valueOf(),
+                resource_ids: []
+            };
+
+            $scope.resourcesToCreate.forEach(function(resourceToCreate) {
+                reservationData.resource_ids.push(resourceToCreate.id);
+            });
+
             if(!validateCreateReservation(reservationData)){ 
                 return;
             }
@@ -183,7 +196,7 @@ angular.module('resourceTracker')
             } if(reservationData.start_time >= reservationData.end_time){
                 $scope.addError($scope.onReservationStartAfterEnd);
                 return false;
-            } if(!reservationData.resource_id){
+            } if(reservationData.resource_ids.length == 0){
                 $scope.addError($scope.onReservationNoResource);
                 return false;
             }
