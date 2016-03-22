@@ -4,15 +4,21 @@ module.exports.buildQueryForGetConflictingReservations = function(reservation) {
 
     var time_check = generate_conflict_expression(reservation);
 
+    var resource_filter = squel.expr();
+	for (var i = 0; i < reservation.resource_ids.length; i++){
+        resource_filter.or("reservation_resource.resource_id = " + reservation.resource_ids[i]);
+    }
+
     var query = squel.select()
         .from("reservation")
+        .join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
         .where(time_check)
-        .where("reservation.resource_id = " + reservation.resource_id)
+        .where(resource_filter)
         //NOTE: If the reservation_id is provided, don't include that reservation in conflicts
     if("reservation_id" in reservation){
         query = query.where("reservation_id !=" + reservation.reservation_id)
     }
-    return query.order("reservation.resource_id")
+    return query.order("reservation.reservation_id")
         .toString();
 };
 
@@ -21,7 +27,8 @@ module.exports.buildQueryForCreateReservation = function(reservation) {
         .into("reservation")
         .set("start_time", reservation.start_time)
         .set("end_time", reservation.end_time)
-        .set("resource_id", reservation.resource_id)
+        .set("reservation_title", reservation.reservation_title)
+        .set("reservation_description", reservation.reservation_description)
         .toString();
 };
 
@@ -30,6 +37,19 @@ module.exports.buildQueryForAddUserReservationLink = function(user, reservation)
         .into("user_reservation")
         .set("user_id", user.user_id)
         .set("reservation_id", reservation.reservation_id)
+        .toString();
+};
+
+module.exports.buildQueryForCreateReservationResourcesLinkQuery = function(reservation_id, resources) {
+    var rows_to_add = [];
+    for(var i = 0; i < resources.length; i++){
+        var row = {"reservation_id": reservation_id, "resource_id": resources[i].resource_id, "is_confirmed": resources[i].resource_state == "free"};
+        rows_to_add.push(row);
+    }
+
+    return squel.insert()
+        .into('reservation_resource')
+        .setFieldsRows(rows_to_add)
         .toString();
 };
 
@@ -115,7 +135,8 @@ module.exports.buildQueryForGetAllReservationsForUser = function(user) {
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "reservation.reservation_id = user_reservation.reservation_id")
-        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .left_join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
+        .left_join("resource", null, "reservation_resource.resource_id = resource.resource_id")
         .where("user_reservation.user_id = " + user.user_id)
         .toString();
 };

@@ -1,4 +1,5 @@
 import requester as r
+from time import sleep
 
 r.verify = False
 
@@ -57,7 +58,7 @@ test_print(desc, res.status_code < 300)
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 
 desc =  '#### create resource without tags ####'
-res = r.create_resource("notags", "notags", 1, 'free')
+res = r.create_resource("notags", "notags", 'free')
 test_print(desc, res.status_code < 300)
 no_tags_id = r.json.loads(res.content)['insertId']
 
@@ -126,10 +127,6 @@ desc =  '#### add view permission to the group for the resource without tags ###
 res = r.add_group_permission_to_resource(no_tags_id, [group_id], ['view'])
 test_print(desc, res.status_code < 300)
 
-desc =  '#### delete resource without tags ####'
-res = r.delete_resource(no_tags_id)
-test_print(desc, res.status_code < 300)
-
 desc =  '#### update resource with tags ####'
 res = r.update_resource(resource_id, "serverEdited", "huh edited")
 test_print(desc, res.status_code < 300)
@@ -140,8 +137,7 @@ test_print(desc, res.status_code < 300)
 test_print(desc, r.json.loads(res.content)['results']['name'] == "serverEdited")
 
 desc =  '#### create reservation ####'
-res = r.create_reservation([resource_id], 1, 2, 'title', 'description')
-print r.json.loads(res.content)
+res = r.create_reservation([no_tags_id, resource_id], 1, 2, 'title', 'description')
 test_print(desc, res.status_code < 300)
 reservation_id = r.json.loads(res.content)['results']['insertId']
 
@@ -161,73 +157,9 @@ desc =  '#### get all reservations ####'
 res = r.get_reservations(resource_id, 0, 99999)
 test_print(desc, len(r.json.loads(res.content)['results']) == 2)
 
-desc =  '#### update first reservation ####'
-res = r.update_reservations(resource_id, 5, 10, reservation_id)
+desc =  '#### delete resource without tags ####'
+res = r.delete_resource(no_tags_id)
 test_print(desc, res.status_code < 300)
-
-desc =  '#### get reservations and check if updated values have persisted ####'
-res = r.get_reservations(resource_id, 0, 99999)
-test_print(desc, len(r.json.loads(res.content)['results']) == 2)
-test_print(desc, r.json.loads(res.content)['results'][0]['start_time'] == 5)
-test_print(desc, r.json.loads(res.content)['results'][0]['end_time'] == 10)
-
-desc = '#### Filter based on tags'
-r.filter_tags([],[],0, 99999)
-test_print (desc, len((r.json.loads(res.content))['results']) == 2)
-
-desc =  '#### delete reservation ####'
-res = r.delete_reservation(reservation_id)
-test_print(desc, res.status_code < 300)
-
-desc =  '#### get reservations and check reservation has been deleted successfully ####'
-res = r.get_reservations(resource_id, 0, 99999)
-test_print(desc, len(r.json.loads(res.content)['results']) == 1)
-
-desc =  '#### remove view permission to the group for the resource with tags ####'
-res = r.remove_group_permission_to_resource(resource_id, [group_id])
-test_print(desc, res.status_code < 300)
-
-desc =  '#### get permissions for resource with tags and make sure theres nothing ####'
-res = r.get_group_permission_to_resource(resource_id)
-test_print(desc, res.status_code < 300)
-test_print(desc, len(r.json.loads(res.content)['results']) == 1)
-
-desc =  '#### remove the admin and rahul user from the group ####'
-res = r.remove_users_from_group([1, user_id], group_id)
-test_print(desc, res.status_code < 300)
-
-desc =  '#### make sure that the users have been successfully removed ####'
-res = r.get_users_in_group(group_id)
-test_print(desc, len(r.json.loads(res.content)['results']) == 0)
-
-desc =  '#### delete the group ####'
-res = r.delete_group(group_id)
-test_print(desc, res.status_code < 300)
-
-desc =  '#### get groups and make sure the group was deleted ####'
-res = r.get_groups()
-test_print(desc, len(r.json.loads(res.content)['results']) == 2)
-
-desc =  '#### update admin user to have new email ####'
-res = r.update_user(username="admin", email_address="admin@admin.com")
-test_print(desc, res.status_code < 300)
-
-desc =  '#### get all users in DB, make sure theres only 2 and that the username == admin ####'
-res = r.get_all_users()
-test_print(desc, len(r.json.loads(res.content)['results']) == 2)
-test_print(desc, r.json.loads(res.content)['results'][0]['username'] == 'admin')
-test_print(desc, r.json.loads(res.content)['results'][0]['email_address'] == 'admin@admin.com')
-
-desc =  '#### cleanup by deleting the resource that we created ####'
-res = r.delete_resource(resource_id)
-test_print(desc, res.status_code < 300)
-
-desc =  '#### delete user rahul from DB and check if only 1 user now exists ####'
-res = r.delete_user('rahul')
-test_print(desc, res.status_code < 300)
-res = r.get_all_users()
-test_print(desc, len(r.json.loads(res.content)['results']) == 1)
-
 
 print str(failed) + "tests failed"
 print str(passed) + "tests passed"

@@ -12,6 +12,11 @@ function get_resource_by_id(resource, callback){
     basic_db_utility.performSingleRowDBOperation(getResourceByIdQuery, callback);
 };
 
+function get_resources_by_ids(resource_ids, callback) {
+    var getResourceByIdsQuery = resource_query_builder.buildQueryForGetResourcesByIds(resource_ids);
+    basic_db_utility.performMultipleRowDBOperation(getResourceByIdsQuery, callback);
+};
+
 function create_resource(resource, callback){
     /*
     Create a resource, given all parameters 
@@ -105,6 +110,7 @@ var notifyUserOnReservationDelete = function(row) {
 
 module.exports = {
 	get_resource_by_id: get_resource_by_id,
+    get_resources_by_ids: get_resources_by_ids,
 	create_resource: create_resource,
     update_resource_by_id: update_resource_by_id,
     delete_resource_by_id:delete_resource_by_id,

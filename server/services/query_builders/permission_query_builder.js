@@ -36,13 +36,14 @@ module.exports.buildQueryForCheckPermissionForResource = function (resource_id, 
         group_filter.or("permission_group.group_id = '" + group_ids[i] + "'");
     }
 
-    group_filter.and("resource.resource_id = " + resource_id);
+    //group_filter.and("resource.resource_id = " + resource_id);
 
     return squel.select()
         .from("permission_group")
         .join("resource_group", null, "permission_group.group_id = resource_group.group_id")
         .join("resource", null, "resource_group.resource_id = resource.resource_id")
         .where(group_filter)
+        .where("resource.resource_id = " + resource_id)
         .toString();
 };
 
@@ -53,17 +54,18 @@ module.exports.buildQueryForCheckPermissionForResources = function (resources, g
         group_filter.or("permission_group.group_id = " + group_ids[i]);
     }
 
-    group_filter.and_begin();
+    var resource_filter = squel.expr();//group_filter.and_begin();
     for (i = 0; i < resources.length; i++){
-        group_filter.or("resource.resource_id = " + resources[i].resource_id);
+        resource_filter.or("resource.resource_id = " + resources[i].resource_id);
     }
 
-    group_filter.end();
+    //group_filter.end();
 
     return squel.select()
         .from("permission_group")
         .join("resource_group", null, "permission_group.group_id = resource_group.group_id")
         .join("resource", null, "resource_group.resource_id = resource.resource_id")
         .where(group_filter)
+        .where(resource_filter)
         .toString();
 };

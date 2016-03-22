@@ -11,6 +11,7 @@ router.get('/', auth.is('user'), function(req, res, next){
         if(result.error){
             res.status(400).json(result);
         } else {
+            result.results = reservation_service.organizeReservations(result.results);
             res.status(200).json(result);
         }
     };
@@ -28,12 +29,28 @@ router.put('/', function(req, res, next){
         return;
     }
 
-    var addUserReservationLinkCallback = function(result) {
+    var createReservationResourcesLinkCallback = function(result) {
         if(result.error){
             res.status(403).json(result);
         } else {
             result.results.insertId = req.body.reservation_id;
             res.status(200).json(result);
+        }
+    };
+
+    var getResourcesByIdsCallback = function(result) {
+        if(result.error){
+            res.status(403).json(result);
+        } else {
+            reservation_service.create_reservation_resources_link(req.body.reservation_id, result.results, createReservationResourcesLinkCallback);
+        }
+    };
+    
+    var addUserReservationLinkCallback = function(result) {
+        if(result.error){
+            res.status(403).json(result);
+        } else {
+            resource_service.get_resources_by_ids(req.body.resource_ids, getResourcesByIdsCallback);
         }
     };
 
@@ -43,7 +60,7 @@ router.put('/', function(req, res, next){
         } else {
             // this means that we can add the link to user
             req.body.reservation_id = result.results.insertId;
-            reservation_service.scheduleEmailForReservation(req.session.user, req.body);
+            //TODO: reservation_service.scheduleEmailForReservation(req.session.user, req.body);
             reservation_service.add_user_reservation_link(req.session.user, req.body, addUserReservationLinkCallback);
         }
     };
@@ -53,11 +70,11 @@ router.put('/', function(req, res, next){
             res.status(403).json(result);
         } else if (result.results.length > 0) {
             result['error'] = true;
-            result['err'] = "Conflicting Reservation(s)!"
+            result['err'] = "Conflicting Reservation(s)!";
             res.status(403).json(result);
         } else {
             // this means that we can make the reservation
-            reservation_service.create_reservation(req.session.user, req.body, createReservationCallback)
+            reservation_service.create_reservation(req.session.user, req.body, createReservationCallback);
         }
     };
 
@@ -65,14 +82,21 @@ router.put('/', function(req, res, next){
         if (result.error) {
             res.status(400).json(result);
         } else if (result.results == {}) {
-            result['err'] = "The resource you specified doesn't exist"
+            result['err'] = "The resources you specified don't exist";
             res.status(400).json(result);
         } else {
-            // now check if the user has reserve permission
-            if (group_service.checkReservePermission(result.results)) {
+            // now check if the user has reserve permission on all of the resources
+
+            var resourcesWithPermission = [];
+            for (var i = 0; i<result.results.length; i++) {
+                if ((result.results[i].resource_permission == 'reserve' || result.results[i].resource_permission == 'manage') && resourcesWithPermission.indexOf(result.results[i].resource_id) == -1) {
+                    resourcesWithPermission.push(result.results[i].resource_id);
+                }
+            }
+            if (resourcesWithPermission.length == req.body.resource_ids.length) {
                 reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
             } else {
-                result = perm_service.denied_error
+                result = perm_service.denied_error;
                 res.status(403).json(result);
             }
         }
@@ -87,11 +111,16 @@ router.put('/', function(req, res, next){
                 group_ids.push(result.results[i].group_id);
             }
             // this gets all permissions for the resource
-            perm_service.check_permission_for_resource(req.body.resource_id, group_ids, checkPermissionForResourceCallback);
+            // TODO: NEEED TO CHANGE THIS PERMISSION CHECK TO TAKE RESOURCE_IDS
+            var resources = [];
+            for (i = 0; i<req.body.resource_ids.length; i++) {
+                resources.push({resource_id: req.body.resource_ids[i]});
+            }
+            perm_service.check_permission_for_resources(resources, group_ids, checkPermissionForResourceCallback);
         }
     };
 
-    if(!("start_time" in req.body) || !("end_time" in req.body) || !("resource_id" in req.body)){
+    if(!("start_time" in req.body) || !("end_time" in req.body) || !("resource_ids" in req.body)){
         res.status(400).json({err: "Missing fields"});
     } else if(req.body.start_time >= req.body.end_time){
         res.status(400).json({err: "start time must be less than end time"});
