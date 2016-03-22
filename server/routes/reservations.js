@@ -66,15 +66,21 @@ router.put('/', function(req, res, next){
     };
 
     var getConflictingReservationsCallback = function(result){
+
         if(result.error){
             res.status(403).json(result);
-        } else if (result.results.length > 0) {
-            result['error'] = true;
-            result['err'] = "Conflicting Reservation(s)!";
-            res.status(403).json(result);
-        } else {
-            // this means that we can make the reservation
+        } else if (result.results.length == 0) {
+            // we can create the reservation
             reservation_service.create_reservation(req.session.user, req.body, createReservationCallback);
+        } else {
+            if (reservation_service.filterAllowedOverlappingReservations(reservation_service.organizeReservations(result.results)).length == 0) {
+                // this means that we can make the reservation
+                reservation_service.create_reservation(req.session.user, req.body, createReservationCallback);
+            } else {
+                result['error'] = true;
+                result['err'] = "Conflicting Reservation(s)!";
+                res.status(403).json(result);
+            }
         }
     };
 
@@ -111,7 +117,6 @@ router.put('/', function(req, res, next){
                 group_ids.push(result.results[i].group_id);
             }
             // this gets all permissions for the resource
-            // TODO: NEEED TO CHANGE THIS PERMISSION CHECK TO TAKE RESOURCE_IDS
             var resources = [];
             for (i = 0; i<req.body.resource_ids.length; i++) {
                 resources.push({resource_id: req.body.resource_ids[i]});

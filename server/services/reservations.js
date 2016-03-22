@@ -38,6 +38,28 @@ function update_reservation_by_id(reservation, callback){
     basic_db_utility.performSingleRowDBOperation(updateReservationByIdQuery, callback);
 }
 
+function filterAllowedOverlappingReservations(reservations) {
+
+    var confirmedReservations = [];
+
+    for (var i = 0; i<reservations.length; i++) {
+        var thisReservation = reservations[i];
+        var allConfirmed = true;
+        for (var j = 0; j<thisReservation.resources.length; j++) {
+            if (!thisReservation.resources[j].is_confirmed) {
+                allConfirmed = false;
+                break;
+            }
+        }
+
+        if (allConfirmed) {
+            confirmedReservations.push(thisReservation);
+        }
+    }
+
+    return confirmedReservations;
+}
+
 function scheduleEmailForReservation(user, reservation) {
     //Doesn't have a callback so that the other data functions can run first.
     //Also don't really want to throw an error if all of the INSERTS worked correctly
@@ -81,7 +103,8 @@ function organizeReservations(reservations) {
             resource_id: thisRow.resource_id,
             name: thisRow.name,
             description: thisRow.description,
-            resource_state: thisRow.resource_state
+            resource_state: thisRow.resource_state,
+            is_confirmed: thisRow.is_confirmed
         };
         if (seenReservationIds.indexOf(thisRow.reservation_id) == -1) {
             var reservationToAdd = {
@@ -117,5 +140,6 @@ module.exports = {
     getAllReservationsOnResourceByUsers: getAllReservationsOnResourceByUsers,
     deleteReservationsById: deleteReservationsById,
     getAllReservationsForUser: getAllReservationsForUser,
-    organizeReservations: organizeReservations
+    organizeReservations: organizeReservations,
+    filterAllowedOverlappingReservations: filterAllowedOverlappingReservations
 }
