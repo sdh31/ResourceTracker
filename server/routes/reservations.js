@@ -104,7 +104,7 @@ router.put('/', function(req, res, next){
 router.post('/', auth.is('user'), function(req, res, next){
 
     if(!("start_time" in req.body) || !("end_time" in req.body) || !("reservation_id" in req.body)){
-        res.sendStatus(400);
+        res.status(400).json({result:{err:"missing field"});
         return;
     }
 
@@ -130,13 +130,13 @@ router.post('/', auth.is('user'), function(req, res, next){
 
     var getReservationByIdCallback = function(result) {
         if (result.error) {
-            res.sendStatus(403).json(result);
+            res.status(403).json(result);
         } else {
             if (req.session.user.user_id == result.results.user_id) {
                 reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
             } else {
                 // this means that the user doesn't have reservation management AND the reservation isn't theirs
-                res.sendStatus(403).json(perm_service.denied_error);
+                res.status(403).json(perm_service.denied_error);
             }
         }
     };
@@ -154,13 +154,13 @@ router.delete('/', auth.is('user'), function(req, res, next){
 
     var hasAuth = false;
     if(!("reservation_id" in req.query)){
-        res.sendStatus(400);
+        res.status(400).json({results: {err: "no id provided"}});
         return;
     }
 
     var request_callback = function(result){
         if(result.error){
-            res.sendStatus(403);
+            res.status(403).json(result);
         } else {
             res.sendStatus(200);
         }
@@ -168,7 +168,7 @@ router.delete('/', auth.is('user'), function(req, res, next){
 
     var getReservationByIdCallback = function(result) {
         if (result.error) {
-            res.sendStatus(400).json(result);
+            res.status(400).json(result);
         } else {
             // if this is the user's reservation just delete it, if the user has requisite permission delete the reservation and send an email, else send a 403
             if (req.session.user.user_id == result.results.user_id) {
