@@ -15,6 +15,15 @@
 			<div ng-show="isResourceSelected()">
 				<input type="text" class="form-control" placeholder="name" ng-model="editingResource.name"><br>
 				<textarea class="form-control" placeholder="description of resource" ng-model="editingResource.description"></textarea><br>
+                Resource State:                
+                <label>
+                    <input type="radio" ng-model="editingResource.resource_state" value="free">
+                    Free
+                </label>
+                <label>
+                    <input type="radio" ng-model="editingResource.resource_state" value="restricted">
+                    Restricted
+                </label><br/>
 				<input type="text" class="form-control" placeholder="tag" ng-model="currentTag">
 				<div class="tags">
 					<span ng-repeat="(index, tag) in editingResource.tags" class="tag">{{tag}}
@@ -32,6 +41,15 @@
 	 			<h5>Create a Resource</h5>
 			 	<input type="text" class="form-control" placeholder="name" ng-model="newResource.name"><br>
 				<textarea class="form-control" placeholder="description of resource" ng-model="newResource.description"></textarea><br>
+                Resource State:
+                <label>
+                    <input type="radio" ng-model="newResource.resource_state" value="free">
+                    Free
+                </label>
+                <label>
+                    <input type="radio" ng-model="newResource.resource_state" value="restricted">
+                    Restricted
+                </label><br/>
 				<input type="text" class="form-control" placeholder="tag" ng-model="activeTag">
 				<div class="tags">
 					<span ng-repeat="(index, tag) in newResource.tags" class="tag">{{tag}}

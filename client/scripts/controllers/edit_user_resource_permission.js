@@ -11,7 +11,7 @@ angular.module('resourceTracker')
             $scope.openEditUserSuccess = false;
     		$scope.showPermission = false;
     		$scope.tempGroupPermission = {};
-            $scope.permissionOptions = ['none', 'view', 'reserve'];
+            $scope.permissionOptions = ['none', 'view', 'reserve', 'manage'];
 
     		$scope.userPrivateGroup = $scope.usernameToPrivateGroupMap[$scope.selectedUser.username];
             getAllResources();

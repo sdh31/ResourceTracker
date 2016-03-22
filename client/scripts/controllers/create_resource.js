@@ -10,6 +10,7 @@ angular.module('resourceTracker')
 			$scope.newResource = {
 				name: '',
 				description: '',
+                resource_state: '',
 				tags: []
 			};
 		};

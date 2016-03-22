@@ -153,7 +153,8 @@ function organizeResources(resources) {
 			var resource = {
 				name: thisResource.name,
 				description: thisResource.description,
-				max_users: thisResource.max_users,
+				//max_users: thisResource.max_users,
+                resource_state: thisResource.resource_state,
 				tags: tag,
 				resource_id: thisResource.resource_id,
                 reservations: reservation,

@@ -15,7 +15,7 @@ module.exports.buildQueryForCreateResource = function(resource) {
 		.into('resource')
 		.set("name", resource.name)
 		.set("description", resource.description)
-		.set("max_users", resource.max_users)
+		.set("resource_state", resource.resource_state)
 		.toString();
 };
 
@@ -33,8 +33,8 @@ module.exports.buildQueryForUpdateResource = function(resource) {
         query.set("description", resource.description);
     }
 
-    if (("max_users" in resource)){
-        query.set("max_users", resource.max_users);
+    if (("resource_state" in resource)){
+        query.set("resource_state", resource.resource_state);
     }
 
     return query.toString();

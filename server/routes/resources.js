@@ -48,6 +48,7 @@ router.get('/', function(req, res, next){
     group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
 
+// create resource - req.body should have name, description, and resource_state (either 'free' or 'restricted')
 router.put('/', function(req, res, next){
 
     var resource_id = -1;
