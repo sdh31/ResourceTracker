@@ -133,7 +133,7 @@ router.put('/', function(req, res, next){
 router.post('/', auth.is('user'), function(req, res, next){
 
     if(!("start_time" in req.body) || !("end_time" in req.body) || !("reservation_id" in req.body)){
-        res.status(400).json({result:{err:"missing field"});
+        res.status(400).json({result:{err:"missing field"}});
         return;
     }
 
