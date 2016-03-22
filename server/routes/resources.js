@@ -13,7 +13,7 @@ router.get('/', function(req, res, next){
   
     var getResourceCallback = function (result) {
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             res.status(200).json(result);
         }
@@ -21,9 +21,9 @@ router.get('/', function(req, res, next){
 
     var checkPermissionForResourceCallback = function (result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else if (result.results.length == 0) {
-            res.sendStatus(403);
+            res.status(403).json(result);
         } else {
             res_service.get_resource_by_id(req.query, getResourceCallback);
         }
@@ -31,7 +31,7 @@ router.get('/', function(req, res, next){
 
     var getAllGroupsForUserCallback = function(result){
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var group_ids = [];
             for (var i = 0; i<result.results.length; i++) {
@@ -55,7 +55,7 @@ router.put('/', function(req, res, next){
 
     var addAdminGroupPermissionCallback = function(result) {
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             result.results.insertId = resource_id;
             res.status(200).json(result.results);
@@ -64,7 +64,7 @@ router.put('/', function(req, res, next){
 
     var getAdminGroupCallback = function(result) {
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var group_ids = [result.results.group_id];
             var resource_permissions = ['reserve'];
@@ -74,7 +74,7 @@ router.put('/', function(req, res, next){
 
     var addGroupPermissionCallback = function(result) {
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             if (req.session.user.username == 'admin') {
                 result.results.insertId = resource_id;
@@ -87,7 +87,7 @@ router.put('/', function(req, res, next){
 
     var getPrivateGroupCallback = function (result) {
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var group_ids = [result.results.group_id];
             // TODO: not sure if this should be 'view' or 'reserve'; helps with testing for it to be 'reserve' for now
@@ -98,7 +98,7 @@ router.put('/', function(req, res, next){
 
     var create_resource_callback = function(result) {
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             resource_id = result.results.insertId;
             user_service.get_private_group(req.session.user.user_id, getPrivateGroupCallback);
@@ -117,7 +117,7 @@ router.post('/', function(req, res, next){
   
     var update_resource_callback = function(result){
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             res.status(200).json(result);
         }
@@ -135,7 +135,7 @@ router.delete('/', auth.is('user'), function(req, res, next){
   
     var delete_resource_callback = function(result){
        if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             res.status(200).json(result);
         }
@@ -150,7 +150,7 @@ router.delete('/', auth.is('user'), function(req, res, next){
 router.get('/all', auth.is('user'), function(req, res, next) {
 	var getAllResourcesCallback = function(result){
 		if (result.error) {
-		  res.sendStatus(400);
+		  res.status(400).json(result);
 		} else if (result.empty) {
 			console.log("no resources!");
 			res.send(JSON.stringify(result.resources));
@@ -162,7 +162,7 @@ router.get('/all', auth.is('user'), function(req, res, next) {
 
     var getAllGroupsForUserCallback = function(result){
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var group_ids = [];
             for (var i = 0; i<result.results.length; i++) {
@@ -181,7 +181,7 @@ router.post('/addPermission', function(req, res, next) {
     
     var addGroupPermissionCallback = function(result){
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             res.status(200).json(result);
         }
@@ -203,7 +203,7 @@ router.post('/removePermission', function(req, res, next) {
 
     var deleteReservationsCallback = function(result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             res.status(200).json(result);
         }
@@ -212,7 +212,7 @@ router.post('/removePermission', function(req, res, next) {
     var getReservationsCallback = function(result) {
 
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             if (result.results.length == 0) {
                 res.status(200).json(result);
@@ -227,7 +227,7 @@ router.post('/removePermission', function(req, res, next) {
 
     var checkPermissionForResourceCallback = function (result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var groupsThatHaveReservePermission = [];
 
@@ -258,7 +258,7 @@ router.post('/removePermission', function(req, res, next) {
 
     var getAllGroupsForUsersCallback = function(result) {
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             allGroupsForUsers = result.results;
 
@@ -273,7 +273,7 @@ router.post('/removePermission', function(req, res, next) {
 
     var getUsersInGroupsCallback = function(result){
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             allUsers = result.results;
             group_service.get_all_groups_for_users(result.results, getAllGroupsForUsersCallback);
@@ -282,7 +282,7 @@ router.post('/removePermission', function(req, res, next) {
 
     var removeGroupPermissionCallback = function(result){
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             group_service.get_users_in_groups(req.body.group_ids, getUsersInGroupsCallback);
         }
@@ -301,7 +301,7 @@ router.get('/getPermission', function(req, res, next) {
     
     var getGroupPermissionCallback = function(result){
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             res.status(200).json(result);
         }
