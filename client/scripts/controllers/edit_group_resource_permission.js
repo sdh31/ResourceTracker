@@ -11,7 +11,7 @@ angular.module('resourceTracker')
             $scope.showEditGroupSuccess = false;
             $scope.tempGroupPermission = {};
             $scope.resourceGroup = {};
-            $scope.permissionOptions = ['none', 'view', 'reserve'];
+            $scope.permissionOptions = ['none', 'view', 'reserve', 'manage'];
 			getAllResources();
 	   	};
 

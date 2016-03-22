@@ -17,7 +17,7 @@ exports.buildQueryForIncludedTags = function(includedTags, start_time, end_time,
         .field("resource.name")
         .field("resource.resource_id")
         .field("resource.description")
-        .field("resource.max_users")
+        .field("resource.resource_state")
         .field("resource.created_by")
         .field("tag.tag_name")
         .field("reservation.reservation_id")

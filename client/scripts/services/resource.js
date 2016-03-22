@@ -8,7 +8,8 @@ angular.module('resourceTracker')
 			duplicateTag: "Cannot have duplicate tags!",
 			emptyResourceName: "You must give the resource a name!",
 			resourceCreationFailed: "Resource could not be created at this time, try again!",
-			resourceUpdatingFailed: "Resource could not be updated at this time, try again!"
+			resourceUpdatingFailed: "Resource could not be updated at this time, try again!",
+            noResourceState: "You must provide a resource state when creating a resource!"
 		};
 
 		this.addTagToResource = function(resource, tag, onError) {
@@ -30,6 +31,11 @@ angular.module('resourceTracker')
 				deferred.reject(this.alertMessages.emptyResourceName);
 				return deferred.promise;
 			}
+
+            if (resource.resource_state == '') {
+                deferred.reject(this.alertMessages.noResourceState);
+                return deferred.promise;
+            }
 
 			var resourceCreationFailedMessage = this.alertMessages.resourceCreationFailed;
 			$http.put('/resource', resource).then(function(response) {
