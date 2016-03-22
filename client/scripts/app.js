@@ -39,6 +39,10 @@ angular
                 templateUrl: '/views/resource_permission.html',
                 controller: 'ResourcePermissionCtrl'
             })
+            .when('pending_reservations', {
+                templateUrl: '/views/pending_reservations.html',
+                controller: 'PendingReservationCtrl'
+            })
             .otherwise({
       		    redirectTo: '/login'
       	   });

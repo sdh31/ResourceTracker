@@ -151,6 +151,10 @@ angular.module('resourceTracker')
             $location.url('/resource_permission');
         };
 
+        $scope.goToPendingReservationsPage = function() {
+            $location.url('/pending_reservations')
+        }
+
         $scope.isTabSelected = function(loadedPage) {
             if ($location.path() == loadedPage) {
                 return 'active';
