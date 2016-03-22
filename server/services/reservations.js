@@ -13,6 +13,11 @@ function get_reservation_by_id(reservation, callback){
     basic_db_utility.performSingleRowDBOperation(getReservationByIdQuery, callback);
 }
 
+function create_reservation_resources_link(reservation_id, resources, callback) {
+    var createReservationResourcesLinkQuery = reservation_query_builder.buildQueryForCreateReservationResourcesLinkQuery(reservation_id, resources);
+    basic_db_utility.performSingleRowDBOperation(createReservationResourcesLinkQuery, callback);
+}
+
 function create_reservation(user, reservation, callback){
     var createReservationQuery = reservation_query_builder.buildQueryForCreateReservation(reservation);
     basic_db_utility.performSingleRowDBOperation(createReservationQuery, callback);
@@ -65,11 +70,44 @@ function deleteReservationsById(reservations, callback) {
 function getAllReservationsForUser(user, callback) {
     var getAllReservationsForUserQuery = reservation_query_builder.buildQueryForGetAllReservationsForUser(user);
     basic_db_utility.performMultipleRowDBOperation(getAllReservationsForUserQuery, callback);
-}
+};
+
+function organizeReservations(reservations) {
+    var finalReservations = [];
+    var seenReservationIds = [];
+    for (var i = 0; i<reservations.length; i++) {
+        var thisRow = reservations[i];
+        var thisResource = {
+            resource_id: thisRow.resource_id,
+            name: thisRow.name,
+            description: thisRow.description,
+            resource_state: thisRow.resource_state
+        };
+        if (seenReservationIds.indexOf(thisRow.reservation_id) == -1) {
+            var reservationToAdd = {
+                reservation_id: thisRow.reservation_id,
+                start_time: thisRow.start_time,
+                end_time: thisRow.end_time,
+                resources: [thisResource]
+            };
+            seenReservationIds.push(thisRow.reservation_id);
+            finalReservations.push(reservationToAdd);
+        } else {
+            for (var j = 0; j<finalReservations.length; j++) {
+                if (finalReservations[j].reservation_id == thisRow.reservation_id) {
+                    finalReservations[j].resources.push(thisResource);
+                }
+            }
+        }
+    }
+    
+    return finalReservations;
+};
 
 module.exports = {
     get_conflicting_reservations:get_conflicting_reservations,
     create_reservation:create_reservation,
+    create_reservation_resources_link: create_reservation_resources_link,
     delete_reservation_by_id:delete_reservation_by_id,
     update_reservation_by_id:update_reservation_by_id,
     add_user_reservation_link:add_user_reservation_link,
@@ -78,5 +116,6 @@ module.exports = {
     scheduleEmailForReservation: scheduleEmailForReservation,
     getAllReservationsOnResourceByUsers: getAllReservationsOnResourceByUsers,
     deleteReservationsById: deleteReservationsById,
-    getAllReservationsForUser: getAllReservationsForUser
+    getAllReservationsForUser: getAllReservationsForUser,
+    organizeReservations: organizeReservations
 }

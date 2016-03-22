@@ -9,7 +9,7 @@ headers = {
 	}
 
 session = ''
-baseUrl = 'https://colab-sbx-202.oit.duke.edu'
+baseUrl = 'https://colab-sbx-212.oit.duke.edu'
 
 def send_request(method, params, url):
 	if method == 'GET' or method == 'DELETE':
@@ -123,19 +123,19 @@ def get_all_resources():
 
 	return send_request(method, params, url)
 
-def create_resource(name, description, max_users=None):
+def create_resource(name, description, resource_state):
 	url = baseUrl + '/resource'
 	method = "PUT"
 
 	params = {
 	'name': name,
 	'description':description,
-	'max_users': max_users
+	'resource_state': resource_state
 	}
 
 	return send_request(method, params, url)
 
-def update_resource(id, name = None, description = None, max_users = None):
+def update_resource(id, name = None, description = None, resource_state = None):
 	url = baseUrl + '/resource'
 	method = "POST"
     
@@ -146,8 +146,8 @@ def update_resource(id, name = None, description = None, max_users = None):
 		params['name'] = name
 	if description:
 		params['description'] = description
-	if max_users:
-		params['max_users'] = max_users
+	if resource_state:
+		params['resource_state'] = resource_state
 
 	return send_request(method, params, url)
 
@@ -236,14 +236,16 @@ def get_all_tags():
  	return send_request(method, params, url)
  
 
-def create_reservation(resource_id, start, end):
+def create_reservation(resource_ids, start, end, title, description):
 	url = baseUrl + '/reservation'
 	method = "PUT"
 
 	params = {
-		'resource_id':resource_id,
+		'resource_ids':resource_ids,
 		'start_time':start,
-		'end_time':end
+		'end_time':end,
+		'reservation_title':title,
+		'reservation_description':description
 	}
 
 	return send_request(method, params, url)
