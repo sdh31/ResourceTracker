@@ -30,6 +30,7 @@
     <script src="scripts/controllers/resource_permission.js"></script>
     <script src="scripts/controllers/edit_group_resource_permission.js"></script>
     <script src="scripts/controllers/edit_user_resource_permission.js"></script>
+    <script src="scripts/controllers/pending_reservations.js"></script>
 
     <link rel="stylesheet" href="styles/main.css"/>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css"/>
@@ -106,10 +107,16 @@
                             ng-show="user.reservation_management_permission"
                             ng-click="goToManageReservationPage()">
                             <a href="" data-toggle="tab">Manage Reservations</a></li>
+
                         <li ng-class="isTabSelected('/user_reservation')"
                             ng-show="user.loggedIn"
                             ng-click="goToUserReservationPage()">
                             <a href="" data-toggle="tab">My Reservations</a></li>
+
+                        <li ng-class="isTabSelected('pending_reservations')"
+                            ng-show="user.reservation_management_permission"
+                            ng-click="goToPendingReservationsPage()">
+                            <a href="" data-toggle="tab">Pending Reservations</a></li>
                     </ul>
                 </div>
 
