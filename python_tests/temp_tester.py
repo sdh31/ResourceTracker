@@ -160,16 +160,21 @@ desc =  '#### get all reservations ####'
 res = r.get_reservations(resource_id, 0, 99999)
 test_print(desc, len(r.json.loads(res.content)['results']) == 2)
 
-desc =  '#### delete resource without tags ####'
-res = r.delete_resource(no_tags_id)
-test_print(desc, res.status_code < 300)
-
 desc = '### fail to extend reservation ###'
 res = r.update_reservations(resource_id, 200, 201, reservation_id, 'updated_reserv', 'u_desc')
 test_print(desc, res.status_code > 300)
 
 desc = "### successfully update reservation ###"
 res = r.update_reservations(resource_id, 1, 2, reservation_id, 'updated_reserv', 'u_desc')
+test_print(desc, res.status_code < 300)
+
+desc = "### get all reservations for resource_id and no_tags_id"
+res = r.get_reservations_by_resources([resource_id, no_tags_id])
+test_print (desc, len(r.json.loads(res.content)['results']) == 3)
+test_print(desc, res.status_code < 300)
+
+desc =  '#### delete resource without tags ####'
+res = r.delete_resource(no_tags_id)
 test_print(desc, res.status_code < 300)
 
 r.session = ''

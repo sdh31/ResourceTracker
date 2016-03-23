@@ -8,6 +8,15 @@ function get_conflicting_reservations(reservation, callback){
     basic_db_utility.performMultipleRowDBOperation(getConflictingReservationsQuery, callback);
 }
 
+function get_reservations_by_resources(body, callback) {
+    var reservation = {
+        start_time: 0,
+        end_time: Number.MAX_VALUE,
+        resource_ids: body.resource_ids
+    };
+    get_conflicting_reservations(reservation, callback);
+}
+
 function get_reservation_by_id(reservation, callback){
     var getReservationByIdQuery = reservation_query_builder.buildQueryForGetReservationById(reservation);
     basic_db_utility.performSingleRowDBOperation(getReservationByIdQuery, callback);
@@ -99,6 +108,19 @@ function getAllReservationsForUser(user, callback) {
     basic_db_utility.performMultipleRowDBOperation(getAllReservationsForUserQuery, callback);
 };
 
+function filterResourcesByPermission(resources, minPermission) {
+
+    var resourcesWithPermission = [];
+
+    for (var i = 0; i<resources.length; i++) {
+        if ((resources[i].resource_permission == minPermission || resources[i].resource_permission == 'manage') && resourcesWithPermission.indexOf(resources[i].resource_id) == -1) {
+            resourcesWithPermission.push(resources[i].resource_id);
+        }
+    }
+
+    return resourcesWithPermission;
+};
+
 function denyResourceReservation(reservation, user, callback){
     var denyreservationQuery = buildQueryForDenyResourceReservation(reservation, user)
     basic_db_utility.performSingleRowDBOperation(denyreservationQuery, callback);
@@ -139,6 +161,7 @@ function organizeReservations(reservations) {
 
 module.exports = {
     get_conflicting_reservations:get_conflicting_reservations,
+    get_reservations_by_resources: get_reservations_by_resources,
     create_reservation:create_reservation,
     create_reservation_resources_link: create_reservation_resources_link,
     delete_reservation_by_id:delete_reservation_by_id,
@@ -152,5 +175,6 @@ module.exports = {
     getAllReservationsForUser: getAllReservationsForUser,
     organizeReservations: organizeReservations,
     remove_resource_from_reservation:remove_resource_from_reservation,
-    filterAllowedOverlappingReservations: filterAllowedOverlappingReservations
+    filterAllowedOverlappingReservations: filterAllowedOverlappingReservations,
+    filterResourcesByPermission: filterResourcesByPermission
 }

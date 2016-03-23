@@ -9,7 +9,7 @@ headers = {
 	}
 
 session = ''
-baseUrl = 'https://colab-sbx-202.oit.duke.edu'
+baseUrl = 'https://colab-sbx-212.oit.duke.edu'
 
 def send_request(method, params, url):
 	if method == 'GET' or method == 'DELETE':
@@ -298,6 +298,15 @@ def update_reservations(resource_id, start, end, reservation_id, title, descript
 	if description:
 		params['reservation_description'] = description
 
+	return send_request(method, params, url)
+
+def get_reservations_by_resources(resource_ids):
+	url = baseUrl + '/reservation/getReservationsByResources';
+	method = "POST";
+
+	params = {
+		'resource_ids': resource_ids
+	}
 	return send_request(method, params, url)
 
 def create_group(name, description, user_permissions, resource_permissions, reservation_permissions, privacy):

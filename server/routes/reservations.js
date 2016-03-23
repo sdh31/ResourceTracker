@@ -110,12 +110,8 @@ router.put('/', function(req, res, next){
         } else {
             // now check if the user has reserve permission on all of the resources
 
-            var resourcesWithPermission = [];
-            for (var i = 0; i<result.results.length; i++) {
-                if ((result.results[i].resource_permission == 'reserve' || result.results[i].resource_permission == 'manage') && resourcesWithPermission.indexOf(result.results[i].resource_id) == -1) {
-                    resourcesWithPermission.push(result.results[i].resource_id);
-                }
-            }
+            var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, 'reserve');
+
             if (resourcesWithPermission.length == req.body.resource_ids.length) {
                 reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
             } else {
@@ -134,7 +130,6 @@ router.put('/', function(req, res, next){
                 group_ids.push(result.results[i].group_id);
             }
             // this gets all permissions for the resource
-            // TODO: NEEED TO CHANGE THIS PERMISSION CHECK TO TAKE RESOURCE_IDS
             var resources = [];
             for (i = 0; i<req.body.resource_ids.length; i++) {
                 resources.push({resource_id: req.body.resource_ids[i]});
@@ -236,6 +231,7 @@ router.post('/remove_resource', function(req, res, next){
 
 });
 
+
 router.post('/deny_request', function(req, res, next){
     var deny_resource_callback = function(result){
         if(result.error){
@@ -247,6 +243,56 @@ router.post('/deny_request', function(req, res, next){
         }
     }
     reservation_service.denyResourceReservation(req.body, req.session.user, deny_resource_callback);    
+});
+
+router.post('/getReservationsByResources', function(req, res, next){
+    var has_auth = false;
+    var getReservationsByResourcesCallback = function(result){
+        if(result.error){
+            res.status(400).json({results: {err: perm_service.denied_error}});
+        } else{
+            res.status(200).json(result);
+        }
+    }
+
+    var checkPermissionForResourceCallback = function(result){
+        if (result.error) {
+            res.status(400).json(result);
+        } else if (result.results == {}) {
+            result['err'] = "The resources you specified don't exist";
+            res.status(400).json(result);
+        } else {
+            // now check if the user has reserve permission on all of the resources
+
+            var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, 'reserve');
+
+            if (resourcesWithPermission.length == req.body.resource_ids.length) {
+                reservation_service.get_reservations_by_resources(req.body, getReservationsByResourcesCallback);
+            } else {
+                result = perm_service.denied_error;
+                res.status(403).json(result);
+            }
+        }
+    };
+
+    var getAllGroupsForUserCallback = function(result){
+        if (result.error) {
+            res.status(400).json(result);
+        } else {
+            var group_ids = [];
+            for (var i = 0; i<result.results.length; i++) {
+                group_ids.push(result.results[i].group_id);
+            }
+            // this gets all permissions for the resource
+            var resources = [];
+            for (i = 0; i<req.body.resource_ids.length; i++) {
+                resources.push({resource_id: req.body.resource_ids[i]});
+            }
+            perm_service.check_permission_for_resources(resources, group_ids, checkPermissionForResourceCallback);
+        }
+    };
+
+    group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
 
 router.post('/confirm_request', function(result){
