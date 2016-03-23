@@ -5,6 +5,7 @@ var auth = require('../services/authorization');
 var perm_service = require('../services/permissions');
 var group_service = require('../services/groups');
 var resource_service = require('../services/resources');
+var agenda = require('../services/agenda');
 
 router.get('/', auth.is('user'), function(req, res, next){
     var getAllReservationsForUserCallback = function(result){
@@ -29,10 +30,24 @@ router.put('/', function(req, res, next){
         return;
     }
 
+    var resourcesOnReservation = [];
+
     var createReservationResourcesLinkCallback = function(result) {
         if(result.error){
             res.status(403).json(result);
         } else {
+            // schedule the email reminder for this reservation!
+            var reservation = {
+                reservation_id: req.body.reservation_id,
+                resources: resourcesOnReservation,
+                start_time: req.body.start_time,
+                end_time: req.body.end_time,
+                reservation_title: req.body.reservation_title,
+                reservation_description: req.body.reservation_description
+            };
+            agenda.schedule(new Date(reservation.start_time), 'send email', {user: req.session.user, reservation: reservation});
+
+            // set the insertId properly and send back a 200
             result.results.insertId = req.body.reservation_id;
             res.status(200).json(result);
         }
@@ -42,6 +57,7 @@ router.put('/', function(req, res, next){
         if(result.error){
             res.status(403).json(result);
         } else {
+            resourcesOnReservation = result.results;
             reservation_service.create_reservation_resources_link(req.body.reservation_id, result.results, createReservationResourcesLinkCallback);
         }
     };
@@ -66,15 +82,22 @@ router.put('/', function(req, res, next){
     };
 
     var getConflictingReservationsCallback = function(result){
+
         if(result.error){
             res.status(403).json(result);
-        } else if (result.results.length > 0) {
-            result['error'] = true;
-            result['err'] = "Conflicting Reservation(s)!";
-            res.status(403).json(result);
-        } else {
-            // this means that we can make the reservation
+
+        } else if (result.results.length == 0) {
+            // we can create the reservation
             reservation_service.create_reservation(req.session.user, req.body, createReservationCallback);
+        } else {
+            if (reservation_service.filterAllowedOverlappingReservations(reservation_service.organizeReservations(result.results)).length == 0) {
+                // this means that we can make the reservation
+                reservation_service.create_reservation(req.session.user, req.body, createReservationCallback);
+            } else {
+                result['error'] = true;
+                result['err'] = "Conflicting Reservation(s)!";
+                res.status(403).json(result);
+            }
         }
     };
 
@@ -140,7 +163,8 @@ router.post('/', auth.is('user'), function(req, res, next){
         if(result.error){
             res.status(403).json(result);
         } else {
-            reservation_service.scheduleEmailForReservation(req.session.user, req.body);
+            //**Commented this out because the method was commented out in the service
+            //reservation_service.scheduleEmailForReservation(req.session.user, req.body);
             res.status(200).json(result);
         }
     };

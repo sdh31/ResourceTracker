@@ -18,6 +18,7 @@ def test_print(desc, expression):
 desc = '#### initialize session ####'
 session_response = r.login_to_session('admin', 'Treeadmin')
 test_print(desc, session_response.status_code < 300)
+
 admin_session = session_response.cookies
 r.session = admin_session
 
@@ -30,6 +31,7 @@ res = r.get_api_token()
 test_print(desc, res.status_code < 300)
 token = r.json.loads(res.content)['results']['token']
 test_print(desc, token != None)
+
 #r.headers['Auth-Token'] = token
 
 desc = '#### get current user ####'
@@ -180,8 +182,6 @@ r.session = admin_session
 desc = "### remove resource as reservation owner"
 res = r.remove_resource_from_reservation(reservation_id, resource_id)
 test_print(desc, res.status_code < 300)
-
-
 
 
 print str(failed) + "tests failed"

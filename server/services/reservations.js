@@ -1,5 +1,5 @@
 var db_sql = require('./db_wrapper');
-var agenda = require('./agenda');
+//var agenda = require('./agenda');
 var reservation_query_builder = require('./query_builders/reservation_query_builder');
 var basic_db_utility = require('./basic_db_utility');
 
@@ -38,7 +38,29 @@ function update_reservation_by_id(reservation, callback){
     basic_db_utility.performSingleRowDBOperation(updateReservationByIdQuery, callback);
 }
 
-function scheduleEmailForReservation(user, reservation) {
+function filterAllowedOverlappingReservations(reservations) {
+
+    var confirmedReservations = [];
+
+    for (var i = 0; i<reservations.length; i++) {
+        var thisReservation = reservations[i];
+        var allConfirmed = true;
+        for (var j = 0; j<thisReservation.resources.length; j++) {
+            if (!thisReservation.resources[j].is_confirmed) {
+                allConfirmed = false;
+                break;
+            }
+        }
+
+        if (allConfirmed) {
+            confirmedReservations.push(thisReservation);
+        }
+    }
+
+    return confirmedReservations;
+}
+
+/*function scheduleEmailForReservation(user, reservation) {
     //Doesn't have a callback so that the other data functions can run first.
     //Also don't really want to throw an error if all of the INSERTS worked correctly
     if (!user.emails_enabled) {
@@ -50,7 +72,7 @@ function scheduleEmailForReservation(user, reservation) {
         };
         agenda.schedule(new Date(reservation.start_time), 'send email', data);
     }
-};
+};*/
 
 function getAllReservationsOnResourceByUsers(resource_id, users, callback) {
     var getAllReservationsOnResourceByUsersQuery = reservation_query_builder.buildQueryForGetAllReservationsOnResourceByUsers(resource_id, users);
@@ -86,7 +108,8 @@ function organizeReservations(reservations) {
             resource_id: thisRow.resource_id,
             name: thisRow.name,
             description: thisRow.description,
-            resource_state: thisRow.resource_state
+            resource_state: thisRow.resource_state,
+            is_confirmed: thisRow.is_confirmed
         };
         if (seenReservationIds.indexOf(thisRow.reservation_id) == -1) {
             var reservationToAdd = {
@@ -118,10 +141,11 @@ module.exports = {
     add_user_reservation_link:add_user_reservation_link,
     get_reservation_by_id: get_reservation_by_id,
     getAllReservationsOnResourcesByUsers: getAllReservationsOnResourcesByUsers,
-    scheduleEmailForReservation: scheduleEmailForReservation,
+    //scheduleEmailForReservation: scheduleEmailForReservation,
     getAllReservationsOnResourceByUsers: getAllReservationsOnResourceByUsers,
     deleteReservationsById: deleteReservationsById,
     getAllReservationsForUser: getAllReservationsForUser,
     organizeReservations: organizeReservations,
-    remove_resource_from_reservation:remove_resource_from_reservation
+    remove_resource_from_reservation:remove_resource_from_reservation,
+    filterAllowedOverlappingReservations: filterAllowedOverlappingReservations
 }

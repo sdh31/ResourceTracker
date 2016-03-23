@@ -5,6 +5,7 @@ module.exports.buildQueryForGetConflictingReservations = function(reservation) {
     var time_check = generate_conflict_expression(reservation);
 
     var resource_filter = squel.expr();
+    
     if("resource_ids" in reservation){
     	for (var i = 0; i < reservation.resource_ids.length; i++){
             resource_filter.or("reservation_resource.resource_id = " + reservation.resource_ids[i]);
@@ -13,6 +14,7 @@ module.exports.buildQueryForGetConflictingReservations = function(reservation) {
     else if("resource_id" in reservation){
         resource_filter.or("reservation_resource.resource_id = " + reservation.resource_id);
     }
+
     var query = squel.select()
         .from("reservation")
         .join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
@@ -84,7 +86,8 @@ module.exports.buildQueryForGetReservationById = function(reservation) {
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .left_join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
+        .left_join("resource", null, "reservation_resource.resource_id = resource.resource_id")
         .join("user", null, "user_reservation.user_id = user.user_id")
         .where("reservation.reservation_id = " + reservation.reservation_id)
         .toString();
