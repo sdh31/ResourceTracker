@@ -154,6 +154,8 @@ router.put('/', function(req, res, next){
 });
 
 router.post('/', auth.is('user'), function(req, res, next){
+    var has_auth = false;
+
     if(!("start_time" in req.body) || !("end_time" in req.body) || !("reservation_id" in req.body)){
         res.status(400).json({result:{err:"missing field"}});
         return;
@@ -161,46 +163,21 @@ router.post('/', auth.is('user'), function(req, res, next){
 
     var updateReservationCallback = function(result) {
         if(result.error){
-            res.status(403).json(result);
-        } else {
+            res.status(400).json(result);
+        } else if(result.results.affectedRows == 0){
+            res.status(403).json(perm_service.denied_error)
+        }else {
             //**Commented this out because the method was commented out in the service
             //reservation_service.scheduleEmailForReservation(req.session.user, req.body);
             res.status(200).json(result);
         }
     };
 
-    var getConflictingReservationsCallback = function(result){
-        if(result.error){
-                    console.log(result)
-            res.status(403).json(result);
-        } else if (result.results.length > 0) {
-            res.status(403).json({results:{err: "conflicting reservations"}});
-        } else {
-            // this means that we can make the reservation
-            reservation_service.update_reservation_by_id(req.body, updateReservationCallback)
-        }
-    };
+    if(perm_service.check_resource_permission(req.session)){
+        has_auth = true;
+    }    
+    reservation_service.update_reservation_by_id(req.body, req.session.user, has_auth, updateReservationCallback)
 
-    var getReservationByIdCallback = function(result) {
-        if (result.error) {
-            res.status(403).json(result);
-        } else {
-            if (req.session.user.user_id == result.results.user_id) {
-                reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
-            } else {
-                // this means that the user doesn't have reservation management AND the reservation isn't theirs
-                res.status(403).json(perm_service.denied_error);
-            }
-        }
-    };
-    if(!perm_service.check_resource_permission(req.session)){
-        
-            // if user does not have reservation management permission, check if this is their own reservation
-            reservation_service.get_reservation_by_id(req.body, getReservationByIdCallback);
-        } else {
-            // if they do have reservation management permission, just let them do what they gotta do
-            reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
-    }
 });
 
 router.delete('/', auth.is('user'), function(req, res, next){
@@ -243,20 +220,20 @@ router.delete('/', auth.is('user'), function(req, res, next){
 });
 
 router.post('/remove_resource', function(req, res, next){
-
+    var has_auth = false;
     var remove_resource_callback = function(result){
-        if(result.error){
-            res.status(400).json({results: {err: "You don't appear to have a reservation with the given ID"}})
+        if(result.error || result.results.affectedRows == 0){
+            res.status(400).json({results: {err: perm_service.denied_error}})
         } else{
             res.status(200).json(result)
         }
     }
 
     if (perm_service.check_reservation_permission(req.session)) {
-        reservation_service.remove_resource_from_reservation(req.body, req.session.user, remove_resource_callback);
-    } else{
-        res.status(403).json(perm_service.denied_error);
-    }
+        has_auth = true;
+    } 
+    reservation_service.remove_resource_from_reservation(req.body, req.session.user, remove_resource_callback);
+
 });
 
 router.post('/deny_request', function(result){

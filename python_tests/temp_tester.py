@@ -140,7 +140,7 @@ test_print(desc, res.status_code < 300)
 test_print(desc, r.json.loads(res.content)['results']['name'] == "serverEdited")
 
 desc =  '#### create reservation ####'
-res = r.create_reservation([no_tags_id, resource_id], 1, 2, 'title', 'description')
+res = r.create_reservation([no_tags_id, resource_id], 0, 2, 'title', 'description')
 test_print(desc, res.status_code < 300)
 reservation_id = r.json.loads(res.content)['results']['insertId']
 
@@ -164,10 +164,15 @@ desc =  '#### delete resource without tags ####'
 res = r.delete_resource(no_tags_id)
 test_print(desc, res.status_code < 300)
 
-desc = '### update reservation ###'
+desc = '### fail to extend reservation ###'
 res = r.update_reservations(resource_id, 200, 201, reservation_id, 'updated_reserv', 'u_desc')
+test_print(desc, res.status_code > 300)
+
+desc = "### successfully update reservation ###"
+res = r.update_reservations(resource_id, 1, 2, reservation_id, 'updated_reserv', 'u_desc')
 test_print(desc, res.status_code < 300)
 
+r.session = ''
 desc = '#### create non-admin session ####'
 session_response = r.login_to_session('rahul', 'rahul123')
 test_print(desc, session_response.status_code < 300)
@@ -182,6 +187,7 @@ r.session = admin_session
 desc = "### remove resource as reservation owner"
 res = r.remove_resource_from_reservation(reservation_id, resource_id)
 test_print(desc, res.status_code < 300)
+
 
 
 print str(failed) + "tests failed"

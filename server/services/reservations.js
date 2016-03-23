@@ -33,8 +33,8 @@ function delete_reservation_by_id(reservation, callback){
     basic_db_utility.performSingleRowDBOperation(deleteReservationByIdQuery, callback);
 }
 
-function update_reservation_by_id(reservation, callback){
-    var updateReservationByIdQuery = reservation_query_builder.buildQueryForUpdateReservationById(reservation);
+function update_reservation_by_id(reservation, user, has_auth, callback){
+    var updateReservationByIdQuery = reservation_query_builder.buildQueryForUpdateReservationById(reservation, user, has_auth);
     basic_db_utility.performSingleRowDBOperation(updateReservationByIdQuery, callback);
 }
 

@@ -9,7 +9,7 @@ headers = {
 	}
 
 session = ''
-baseUrl = 'https://colab-sbx-212.oit.duke.edu'
+baseUrl = 'https://colab-sbx-202.oit.duke.edu'
 
 def send_request(method, params, url):
 	if method == 'GET' or method == 'DELETE':
@@ -45,6 +45,12 @@ def login_to_session(username, password):
 		'permission_level':'admin'
 	}
 	
+	return send_request(method, params, url)
+
+def logout():
+	url = baseUrl + '/user/signout'
+	method = "POST"
+	params = {}
 	return send_request(method, params, url)
 
 def create_user(username, password):

@@ -139,7 +139,7 @@ router.post('/signin', function(req, res, next){
             user.password = '';
             req.session.isValid = true;
             req.session.user = user;
-
+            console.log(req.cookies)
             res.send(user);
 
         } else {
