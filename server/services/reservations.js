@@ -99,6 +99,11 @@ function getAllReservationsForUser(user, callback) {
     basic_db_utility.performMultipleRowDBOperation(getAllReservationsForUserQuery, callback);
 };
 
+function denyResourceReservation(reservation, user, callback){
+    var denyreservationQuery = buildQueryForDenyResourceReservation(reservation, user)
+    basic_db_utility.performSingleRowDBOperation(denyreservationQuery, callback);
+}
+
 function organizeReservations(reservations) {
     var finalReservations = [];
     var seenReservationIds = [];

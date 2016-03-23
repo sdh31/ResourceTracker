@@ -236,8 +236,17 @@ router.post('/remove_resource', function(req, res, next){
 
 });
 
-router.post('/deny_request', function(result){
-    //Gonna end up being basically the same as deleting a reservation
+router.post('/deny_request', function(req, res, next){
+    var deny_resource_callback = function(result){
+        if(result.error){
+            res.status(400).json(result)
+        } else if(result.results.affectedRows == 0){
+            res.status(403).json(perm_service.denied_error)
+        } else{
+            res.status(200).json(result)
+        }
+    }
+    reservation_service.denyResourceReservation(req.body, req.session.user, deny_resource_callback);    
 });
 
 router.post('/confirm_request', function(result){

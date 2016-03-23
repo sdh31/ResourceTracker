@@ -59,10 +59,12 @@ module.exports.buildQueryForCreateReservationResourcesLinkQuery = function(reser
         .toString();
 };
 
-module.exports.buildQueryForUpdateReservationById = function(reservation) {
+module.exports.buildQueryForUpdateReservationById = function(reservation, user, has_auth) {
     var query = squel.update()
-        .table("reservation")
-        .where("reservation_id=" + reservation.reservation_id)
+        .table("reservation inner join user_reservation on user_reservation.reservation_id = reservation.reservation_id")
+        .where("reservation.reservation_id=" + reservation.reservation_id)
+        .where("start_time <= ?", reservation.start_time)
+        .where("end_time >= ?", reservation.end_time)
         .set("start_time", reservation.start_time)
         .set("end_time", reservation.end_time)
 
@@ -71,6 +73,10 @@ module.exports.buildQueryForUpdateReservationById = function(reservation) {
         }
         if("reservation_description" in reservation){
             query.set("reservation_description", reservation.reservation_description)
+        }
+
+        if(!has_auth){
+            query.where("user_id = ?", user.user_id)
         }
         return query.toString();
 };
@@ -166,6 +172,20 @@ module.exports.buildQueryForRemoveResourceFromReservation = function(reservation
         .toString()
 }
 
+module.exports.buildQueryForDenyResourceReservation = function(reservation, user){
+    return squel.delete()
+        .target("reservation")
+        .from("reservation")
+        .join("reservation_resource")
+        .join("resource")
+        .join("resource_group")
+        .join("user_group")
+        .where("reservation_resource.is_confirmed = ?", false)
+        .where("reservation.resource_state = ?", "restricted")
+        .where("resource_group.resource_permission = ?", "manage")
+        .where("user_group.user_id = ?", user.user_id)
+
+}
 var generate_conflict_expression = function(reservation){
     return squel.expr()
         .or_begin()
