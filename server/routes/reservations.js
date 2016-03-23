@@ -5,6 +5,7 @@ var auth = require('../services/authorization');
 var perm_service = require('../services/permissions');
 var group_service = require('../services/groups');
 var resource_service = require('../services/resources');
+var agenda = require('../services/agenda');
 
 router.get('/', auth.is('user'), function(req, res, next){
     var getAllReservationsForUserCallback = function(result){
@@ -29,10 +30,24 @@ router.put('/', function(req, res, next){
         return;
     }
 
+    var resourcesOnReservation = [];
+
     var createReservationResourcesLinkCallback = function(result) {
         if(result.error){
             res.status(403).json(result);
         } else {
+            // schedule the email reminder for this reservation!
+            var reservation = {
+                reservation_id: req.body.reservation_id,
+                resources: resourcesOnReservation,
+                start_time: req.body.start_time,
+                end_time: req.body.end_time,
+                reservation_title: req.body.reservation_title,
+                reservation_description: req.body.reservation_description
+            };
+            agenda.schedule(new Date(reservation.start_time), 'send email', {user: req.session.user, reservation: reservation});
+
+            // set the insertId properly and send back a 200
             result.results.insertId = req.body.reservation_id;
             res.status(200).json(result);
         }
@@ -42,6 +57,7 @@ router.put('/', function(req, res, next){
         if(result.error){
             res.status(403).json(result);
         } else {
+            resourcesOnReservation = result.results;
             reservation_service.create_reservation_resources_link(req.body.reservation_id, result.results, createReservationResourcesLinkCallback);
         }
     };
@@ -60,7 +76,6 @@ router.put('/', function(req, res, next){
         } else {
             // this means that we can add the link to user
             req.body.reservation_id = result.results.insertId;
-            //TODO: reservation_service.scheduleEmailForReservation(req.session.user, req.body);
             reservation_service.add_user_reservation_link(req.session.user, req.body, addUserReservationLinkCallback);
         }
     };

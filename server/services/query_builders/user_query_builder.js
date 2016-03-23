@@ -46,6 +46,7 @@ module.exports.buildQueryForGetUserPermissions = function(user){
                 .field("user.user_id")
                 .field("user.password")
                 .field("user.is_shibboleth")
+                .field("user.email_address")
                 .field("user.emails_enabled")
                 .field("permission_group.group_id")
                 .field("permission_group.group_name")

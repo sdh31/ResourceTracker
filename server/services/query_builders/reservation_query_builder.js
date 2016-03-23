@@ -73,7 +73,8 @@ module.exports.buildQueryForGetReservationById = function(reservation) {
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .left_join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
+        .left_join("resource", null, "reservation_resource.resource_id = resource.resource_id")
         .join("user", null, "user_reservation.user_id = user.user_id")
         .where("reservation.reservation_id = " + reservation.reservation_id)
         .toString();

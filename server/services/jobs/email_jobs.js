@@ -1,115 +1,47 @@
 var db_sql = require('../db_wrapper');
 var squel = require('squel');
-var nodemailer = require('nodemailer');
-
-var smtpConfig = {
-	    host: 'smtp.gmail.com',
-	    port: 465,
-	    secure: true, // use SSL
-	    auth: {
-			user: 'teamscuullc@gmail.com',
-			pass: 'Tree1234'
-	    }
-	};
-
-var transporter = nodemailer.createTransport(smtpConfig);
-
-var setConfigsAndSendReservationStartingEmail = function(user, resource_name) {
-    var mailOptions = {
-	    from: 'Hypotheticorp LLC <asdf@gmail.com>', // sender address
-	    to: user.email_address, // list of receivers
-	    subject: 'Your reservation of ' + resource_name, // Subject line
-	    text: 'Hey '+ user.first_name + ',\n\nBe aware that your reservation is starting now!', // plaintext body
-	    html: '' // html body
-    };
-
-    sendEmail(mailOptions);
-};
-
-var setConfigsAndSendReservationDeletedEmail = function(user, resource_name, reservation) {
-    var mailOptions = {
-	    from: 'Hypotheticorp LLC <asdf@gmail.com>', // sender address
-	    to: user.email_address, // list of receivers
-	    subject: 'Your reservation of ' + resource_name + ' has been deleted' , // Subject line
-	    text: 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation of ' + resource_name + ', which has been scheduled for ' + new Date(reservation.start_time) + ' has been deleted', // plaintext body
-	    html: '' // html body
-    };
-
-    sendEmail(mailOptions);
-};
-
-var sendEmail = function(mailOptions) {
-    transporter.sendMail(mailOptions, function(error, info){
-	    if(error){
-		    return console.log(error);
-	    }
-	    console.log('Message sent: ' + info.response);
-    });
-};
+var email_utility = require('./email_utility');
+var user_service = require('../users');
+var reservation_service = require('../reservations');
+var resource_service = require('../resources');
 
 module.exports = function(agenda) {
 
     agenda.define('notify on delete reservation', function(job) {
-        setConfigsAndSendReservationDeletedEmail(job.attrs.data.user, job.attrs.data.resource_name, job.attrs.data.reservation);        
+        email_utility.setConfigsAndSendReservationDeletedEmail(job.attrs.data.user, job.attrs.data.resource_name, job.attrs.data.reservation);
+    });
+
+    agenda.define('notify on competing reservation cancellation', function(job) {
+        email_utility.setConfigsAndSendCompetingReservationCancelledEmail(job.attrs.data.user, job.attrs.data.reservation);
     });
 	// job.attrs.data has information regarding the job
 	agenda.define('send email', function(job) {
 
-        var getUserInfoQuery = squel.select().from("user").where("user.username = '" + job.attrs.data.user.username + "'").toString();
+        var userInfo = {};
+        var resourcesInfoQueryCallback = function (result) {
+            // can change this to include the actual resources..
+		    email_utility.setConfigsAndSendReservationStartingEmail(userInfo, result.results.length + ' resources');
+        };
 
-        console.log(getUserInfoQuery);
-        db_sql.connection.query(getUserInfoQuery)
-            .on('result', function (row) {
-                if (row.emails_enabled == 1) {
-                    getUserInfoCallback(row);
-                } else {
-                    console.log("EMAILS AINT ENABLED ANYMORE BRUH");
+        var reservationExistsCallback = function(result) {
+            if (result.results.start_time == job.attrs.data.reservation.start_time) {
+                /*var resource_ids = [];
+                var resources = job.attrs.data.reservation.resources;
+                for (var i = 0; i<resources.length; i++) {
+                    resource_ids.push(resources[i].resource_id);
                 }
-            })
-            .on('error', function (err) {
-                console.log("error in checking users email settings when scheduling email");
-                //callback({error: true, err: err});
-            })
-
-        var getUserInfoCallback = function(userInfo) {
-            var reservationExistsQuery = squel.select().from("reservation").where("reservation.reservation_id = '" + job.attrs.data.reservation.reservation_id + "'").toString();
-
-            console.log(reservationExistsQuery);
-
-            // only continue sending email if the reservation still exists
-            db_sql.connection.query(reservationExistsQuery)
-                .on('result', function (row) {
-                    if (row.start_time == job.attrs.data.reservation.start_time) {
-                        reservationExistsCallback(userInfo);
-                    }
-                })
-                .on('error', function (err) {
-                    console.log("error in finding reservation when scheduling email");
-                    //callback({error: true, err: err});
-                })
-        }
-
-
-        var reservationExistsCallback = function(userInfo) {
-            var resourceNameQuery = squel.select().from("resource").where("resource.resource_id = '" + job.attrs.data.reservation.resource_id + "'").toString();
-            console.log(resourceNameQuery);
-
-            db_sql.connection.query(resourceNameQuery)
-                .on('result', function (row) {
-
-                    resourceNameQueryCallback(userInfo, row.name);
-                })
-                .on('error', function (err) {
-                    console.log("error in finding resource name when scheduling email");
-                    //callback({error: true, err: err});
-                })
+                resource_service.get_resources_by_ids(resource_ids, resourcesInfoQueryCallback);*/
+                email_utility.setConfigsAndSendReservationStartingEmail(userInfo, job.attrs.data.reservation.resources.length + ' resources');
+            }
         };
 
-
-        var resourceNameQueryCallback = function (userInfo, resource_name) {
-		    setConfigsAndSendReservationStartingEmail(userInfo, resource_name);
+        var getUserInfoCallback = function(result) {
+            userInfo = result.results;
+            reservation_service.get_reservation_by_id(job.attrs.data.reservation, reservationExistsCallback);
         };
+
+        user_service.get_user_permissions(job.attrs.data.user, getUserInfoCallback);
+
 	});
 }
-
 

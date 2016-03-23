@@ -1,5 +1,5 @@
 var db_sql = require('./db_wrapper');
-var agenda = require('./agenda');
+//var agenda = require('./agenda');
 var reservation_query_builder = require('./query_builders/reservation_query_builder');
 var basic_db_utility = require('./basic_db_utility');
 
@@ -60,7 +60,7 @@ function filterAllowedOverlappingReservations(reservations) {
     return confirmedReservations;
 }
 
-function scheduleEmailForReservation(user, reservation) {
+/*function scheduleEmailForReservation(user, reservation) {
     //Doesn't have a callback so that the other data functions can run first.
     //Also don't really want to throw an error if all of the INSERTS worked correctly
     if (!user.emails_enabled) {
@@ -72,7 +72,7 @@ function scheduleEmailForReservation(user, reservation) {
         };
         agenda.schedule(new Date(reservation.start_time), 'send email', data);
     }
-};
+};*/
 
 function getAllReservationsOnResourceByUsers(resource_id, users, callback) {
     var getAllReservationsOnResourceByUsersQuery = reservation_query_builder.buildQueryForGetAllReservationsOnResourceByUsers(resource_id, users);
@@ -136,7 +136,7 @@ module.exports = {
     add_user_reservation_link:add_user_reservation_link,
     get_reservation_by_id: get_reservation_by_id,
     getAllReservationsOnResourcesByUsers: getAllReservationsOnResourcesByUsers,
-    scheduleEmailForReservation: scheduleEmailForReservation,
+    //scheduleEmailForReservation: scheduleEmailForReservation,
     getAllReservationsOnResourceByUsers: getAllReservationsOnResourceByUsers,
     deleteReservationsById: deleteReservationsById,
     getAllReservationsForUser: getAllReservationsForUser,
