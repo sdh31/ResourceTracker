@@ -131,7 +131,6 @@ router.put('/', function(req, res, next){
 });
 
 router.post('/', auth.is('user'), function(req, res, next){
-
     if(!("start_time" in req.body) || !("end_time" in req.body) || !("reservation_id" in req.body)){
         res.status(400).json({result:{err:"missing field"}});
         return;
@@ -148,6 +147,7 @@ router.post('/', auth.is('user'), function(req, res, next){
 
     var getConflictingReservationsCallback = function(result){
         if(result.error){
+                    console.log(result)
             res.status(403).json(result);
         } else if (result.results.length > 0) {
             res.status(403).json({results:{err: "conflicting reservations"}});
@@ -169,8 +169,8 @@ router.post('/', auth.is('user'), function(req, res, next){
             }
         }
     };
-
     if(!perm_service.check_resource_permission(req.session)){
+        
             // if user does not have reservation management permission, check if this is their own reservation
             reservation_service.get_reservation_by_id(req.body, getReservationByIdCallback);
         } else {
@@ -216,6 +216,33 @@ router.delete('/', auth.is('user'), function(req, res, next){
             hasAuth = true;
     }
         reservation_service.get_reservation_by_id(req.query, getReservationByIdCallback);
+});
+
+router.post('/remove_resource', function(req, res, next){
+
+    var remove_resource_callback = function(result){
+        if(result.error){
+            res.status(400).json({results: {err: "You don't appear to have a reservation with the given ID"}})
+        } else{
+            res.status(200).json(result)
+        }
+    }
+
+    if (perm_service.check_reservation_permission(req.session)) {
+        reservation_service.remove_resource_from_reservation(req.body, req.session.user, remove_resource_callback);
+    } else{
+        res.status(403).json(perm_service.denied_error);
+    }
+});
+
+router.post('/deny_request', function(result){
+    //Gonna end up being basically the same as deleting a reservation
+});
+
+router.post('/confirm_request', function(result){
+    //Check if it is last reservation needed to be confirmed
+    //if yes, delete conflicting reservations
+    //if no, just change status of reservation
 });
 
 module.exports = router;

@@ -152,10 +152,8 @@ router.get('/all', auth.is('user'), function(req, res, next) {
 		if (result.error) {
 		  res.status(400).json(result);
 		} else if (result.empty) {
-			console.log("no resources!");
 			res.send(JSON.stringify(result.resources));
 		} else {
-			console.log('we good, we got resources');
 			res.send(JSON.stringify(result.resources));
 		}
   	};

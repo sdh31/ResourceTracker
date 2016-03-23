@@ -1,14 +1,18 @@
-var squel = require('squel');
+var squel = require('squel').useFlavour('mysql');
 
 module.exports.buildQueryForGetConflictingReservations = function(reservation) {
 
     var time_check = generate_conflict_expression(reservation);
 
     var resource_filter = squel.expr();
-	for (var i = 0; i < reservation.resource_ids.length; i++){
-        resource_filter.or("reservation_resource.resource_id = " + reservation.resource_ids[i]);
+    if("resource_ids" in reservation){
+    	for (var i = 0; i < reservation.resource_ids.length; i++){
+            resource_filter.or("reservation_resource.resource_id = " + reservation.resource_ids[i]);
+        }
     }
-
+    else if("resource_id" in reservation){
+        resource_filter.or("reservation_resource.resource_id = " + reservation.resource_id);
+    }
     var query = squel.select()
         .from("reservation")
         .join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
@@ -16,7 +20,7 @@ module.exports.buildQueryForGetConflictingReservations = function(reservation) {
         .where(resource_filter)
         //NOTE: If the reservation_id is provided, don't include that reservation in conflicts
     if("reservation_id" in reservation){
-        query = query.where("reservation_id !=" + reservation.reservation_id)
+        query = query.where("reservation.reservation_id !=" + reservation.reservation_id)
     }
     return query.order("reservation.reservation_id")
         .toString();
@@ -54,12 +58,19 @@ module.exports.buildQueryForCreateReservationResourcesLinkQuery = function(reser
 };
 
 module.exports.buildQueryForUpdateReservationById = function(reservation) {
-    return squel.update()
+    var query = squel.update()
         .table("reservation")
         .where("reservation_id=" + reservation.reservation_id)
         .set("start_time", reservation.start_time)
         .set("end_time", reservation.end_time)
-        .toString();
+
+        if("reservation_title" in reservation){
+            query.set("reservation_title", reservation.reservation_title)
+        }
+        if("reservation_description" in reservation){
+            query.set("reservation_description", reservation.reservation_description)
+        }
+        return query.toString();
 };
 
 module.exports.buildQueryForDeleteReservationById = function(reservation) {
@@ -140,6 +151,17 @@ module.exports.buildQueryForGetAllReservationsForUser = function(user) {
         .where("user_reservation.user_id = " + user.user_id)
         .toString();
 };
+
+module.exports.buildQueryForRemoveResourceFromReservation = function(reservation, user) {
+    return squel.delete()
+        .target("reservation_resource")
+        .from("reservation_resource")
+        .join("user_reservation", null, "reservation_resource.reservation_id = user_reservation.reservation_id")
+        .where("reservation_resource.reservation_id = ?", reservation.reservation_id)
+        .where("resource_id = ?", reservation.resource_id)
+        .where("user_id = ?", user.user_id)
+        .toString()
+}
 
 var generate_conflict_expression = function(reservation){
     return squel.expr()

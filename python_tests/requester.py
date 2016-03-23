@@ -9,7 +9,7 @@ headers = {
 	}
 
 session = ''
-baseUrl = 'https://colab-sbx-212.oit.duke.edu'
+baseUrl = 'https://colab-sbx-202.oit.duke.edu'
 
 def send_request(method, params, url):
 	if method == 'GET' or method == 'DELETE':
@@ -31,6 +31,7 @@ def send_request(method, params, url):
 			verify = False
 		)
 	return response
+
 
 
 
@@ -274,18 +275,22 @@ def get_reservations(resource_id, start, end ,reservation_id = None):
 
 	return send_request(method, params, url)
 
-def update_reservations(resource_id, start, end, reservation_id):
+def update_reservations(resource_id, start, end, reservation_id, title, description):
 	url = baseUrl + '/reservation'
 	method = "POST"
 
 	params = {
 		'resource_id': resource_id,
-		'reservation_id': reservation_id,
+		'reservation_ids': reservation_id,
 		'start_time': start,
-		'end_time': end,
+		'end_time': end
 	}
 	if reservation_id:
 		params['reservation_id'] = reservation_id
+	if title:
+		params['reservation_title'] = title
+	if description:
+		params['reservation_description'] = description
 
 	return send_request(method, params, url)
 
@@ -363,5 +368,15 @@ def get_api_token():
 	url = baseUrl + '/user/token'
 	method = "POST"
 	params = {}
+
+	return send_request(method, params, url)
+
+def remove_resource_from_reservation(reservation_id, resource_id):
+	url = baseUrl + '/reservation/remove_resource'
+	method = "POST"
+	params = {
+		"reservation_id": reservation_id,
+		"resource_id": resource_id
+	}
 
 	return send_request(method, params, url)

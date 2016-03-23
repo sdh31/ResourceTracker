@@ -38,7 +38,6 @@ router.put('/', function(req,res,next){
         }
     }
     if(!perm_service.check_user_permission(req.session)){
-        console.log()
         res.status(403).json(perm_service.denied_error)
         return;
     }
