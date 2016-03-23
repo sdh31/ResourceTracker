@@ -32,14 +32,14 @@ angular
                 controller: 'SystemPermissionCtrl'
             })
             .when('/user_reservation', {
-                templateUrl: 'views/user_reservation.html',
+                templateUrl: '/views/user_reservation.html',
                 controller: 'UserReservationCtrl'
             })
             .when('/resource_permission', {
                 templateUrl: '/views/resource_permission.html',
                 controller: 'ResourcePermissionCtrl'
             })
-            .when('pending_reservations', {
+            .when('/pending_reservations', {
                 templateUrl: '/views/pending_reservations.html',
                 controller: 'PendingReservationCtrl'
             })

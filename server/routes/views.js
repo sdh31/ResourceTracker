@@ -30,7 +30,7 @@ var loginViews = [
     'token_modal.html',
     'filter_reservation.html',
     'user_reservation.html'
-];
+    ];
 
 loginViews.forEach(function(view) {
      router.get('/views/' + view, function (req, res) {
@@ -84,7 +84,8 @@ resourceManagementViews.forEach(function(view) {
 });
 //RESERVATION MANAGEMENT PERMISSION REQUIRED
 var reservationManagementViews = [
-    'manage_reservation.html'
+    'manage_reservation.html',
+    'pending_reservations.html'
 ];
 reservationManagementViews.forEach(function(view) {
     router.get('/views/' + view, function (req, res) {
