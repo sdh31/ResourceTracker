@@ -167,7 +167,9 @@ angular.module('resourceTracker')
             var reservationData = {
                 start_time: $scope.startReservationTime.valueOf(),
                 end_time: $scope.endReservationTime.valueOf(),
-                resource_ids: []
+                resource_ids: [],
+                reservation_title: $scope.reservationName,
+                reservation_description: $scope.reservationDescription
             };
 
             $scope.resourcesToCreate.forEach(function(resourceToCreate) {
@@ -209,6 +211,7 @@ angular.module('resourceTracker')
                     var resourceData = {id: resource.resource_id, label: resource.name};
                     resourceArray.push(resourceData);
                     $scope.resourceReservationMap[resourceData.id] = resource.reservations;
+                    console.log(resource.reservations);
                 }
             });
         };

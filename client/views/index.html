@@ -52,8 +52,6 @@
     <script type="text/javascript" src="node_modules/bootstrap/dist/js/bootstrap.js"></script>
     <script type="text/javascript" src="node_modules/angular-bootstrap-datetimepicker/src/js/datetimepicker.js"></script>
 
-
-
 </head>
 
 <body ng-app="resourceTracker" ng-controller="MainCtrl">
@@ -113,7 +111,7 @@
                             ng-click="goToUserReservationPage()">
                             <a href="" data-toggle="tab">My Reservations</a></li>
 
-                        <li ng-class="isTabSelected('pending_reservations')"
+                        <li ng-class="isTabSelected('/pending_reservations')"
                             ng-show="user.reservation_management_permission"
                             ng-click="goToPendingReservationsPage()">
                             <a href="" data-toggle="tab">Pending Reservations</a></li>
