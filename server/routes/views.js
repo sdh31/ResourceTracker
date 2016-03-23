@@ -85,7 +85,7 @@ resourceManagementViews.forEach(function(view) {
 //RESERVATION MANAGEMENT PERMISSION REQUIRED
 var reservationManagementViews = [
     'manage_reservation.html',
-    'pending_reservations.html'
+    'incomplete_reservations.html'
 ];
 reservationManagementViews.forEach(function(view) {
     router.get('/views/' + view, function (req, res) {

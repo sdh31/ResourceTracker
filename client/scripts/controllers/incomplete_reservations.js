@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('resourceTracker')
-    .controller('PendingReservationCtrl', function ($scope, $http, $location, resourceService) {
+    .controller('IncompleteReservationCtrl', function ($scope, $http, $location, resourceService) {
 
     	$scope.initializePage = function() {
     		$scope.allResources = [];

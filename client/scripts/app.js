@@ -39,9 +39,9 @@ angular
                 templateUrl: '/views/resource_permission.html',
                 controller: 'ResourcePermissionCtrl'
             })
-            .when('/pending_reservations', {
-                templateUrl: '/views/pending_reservations.html',
-                controller: 'PendingReservationCtrl'
+            .when('/incomplete_reservations', {
+                templateUrl: '/views/incomplete_reservations.html',
+                controller: 'IncompleteReservationCtrl'
             })
             .otherwise({
       		    redirectTo: '/login'
