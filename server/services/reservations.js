@@ -186,6 +186,6 @@ module.exports = {
     organizeReservations: organizeReservations,
     remove_resource_from_reservation:remove_resource_from_reservation,
     filterAllowedOverlappingReservations: filterAllowedOverlappingReservations,
-    filterResourcesByPermission: filterResourcesByPermission
+    filterResourcesByPermission: filterResourcesByPermission,
     denyResourceReservation: denyResourceReservation
 }
