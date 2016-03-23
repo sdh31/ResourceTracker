@@ -69,6 +69,11 @@ function filterAllowedOverlappingReservations(reservations) {
     return confirmedReservations;
 }
 
+function get_unconfirmed_resources_for_reservation(reservation, callback){
+    var getUnconfirmedResourcesQuery = reservation_query_builder.buildQueryForGetUnconfirmedResources(reservation);
+    basic_db_utility.performMultipleRowDBOperation(getUnconfirmedResourcesQuery, callback);
+}
+
 /*function scheduleEmailForReservation(user, reservation) {
     //Doesn't have a callback so that the other data functions can run first.
     //Also don't really want to throw an error if all of the INSERTS worked correctly
@@ -98,7 +103,7 @@ function deleteReservationsById(reservations, callback) {
     basic_db_utility.performSingleRowDBOperation(deleteReservationsByIdQuery, callback);
 };
 
-function remove_resource_from_reservation(reservation, user, callback){
+function remove_resource_from_reservation(reservation, user, has_auth, callback){
     var removeResourceFromReservation = reservation_query_builder.buildQueryForRemoveResourceFromReservation(reservation, user);
     basic_db_utility.performSingleRowDBOperation(removeResourceFromReservation, callback);
 }
@@ -122,8 +127,13 @@ function filterResourcesByPermission(resources, minPermission) {
 };
 
 function denyResourceReservation(reservation, user, callback){
-    var denyreservationQuery = buildQueryForDenyResourceReservation(reservation, user)
-    basic_db_utility.performSingleRowDBOperation(denyreservationQuery, callback);
+    var denyReservationQuery = buildQueryForDenyResourceReservation(reservation, user)
+    basic_db_utility.performSingleRowDBOperation(denyReservationQuery, callback);
+}
+
+function confirmResourceReservation(reservation, user, callback){
+    var confirmReservationQuery = buildQueryForConfirmReservation(reservation, user)
+    basic_db_utility.performSingleRowDBOperation(confirmReservationQuery, callback);
 }
 
 function organizeReservations(reservations) {
@@ -177,4 +187,5 @@ module.exports = {
     remove_resource_from_reservation:remove_resource_from_reservation,
     filterAllowedOverlappingReservations: filterAllowedOverlappingReservations,
     filterResourcesByPermission: filterResourcesByPermission
+    denyResourceReservation: denyResourceReservation
 }

@@ -227,7 +227,7 @@ router.post('/remove_resource', function(req, res, next){
     if (perm_service.check_reservation_permission(req.session)) {
         has_auth = true;
     } 
-    reservation_service.remove_resource_from_reservation(req.body, req.session.user, remove_resource_callback);
+    reservation_service.remove_resource_from_reservation(req.body, req.session.user, has_auth, remove_resource_callback);
 
 });
 
@@ -295,10 +295,25 @@ router.post('/getReservationsByResources', function(req, res, next){
     group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
 
-router.post('/confirm_request', function(result){
+router.post('/confirm_request', function(req, res, next){
+
     //Check if it is last reservation needed to be confirmed
     //if yes, delete conflicting reservations
     //if no, just change status of reservation
+    var check_reservation_confirmation_callback = function(result){
+        if(result.error){
+            res.status(400).json(result);
+        }
+        else if(result.results.length == 0){
+            //fully confirmed: delete conflicting reservations
+            res.status(403).json(perm_service.denied_error);
+        }
+        else{
+            reservation_service.get_unconfirmed_resources_for_reservation(req.body, req.session.user, check_reservation_confirmation_callback)
+            //not fully confirmed: change status of that resource
+        }
+    }
+    reservation_service.confirmResourcereservation(req.body, req.session.user, confirm_resource_callback);
 });
 
 module.exports = router;

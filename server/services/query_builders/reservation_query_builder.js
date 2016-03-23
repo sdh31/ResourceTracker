@@ -81,6 +81,17 @@ module.exports.buildQueryForUpdateReservationById = function(reservation, user, 
         return query.toString();
 };
 
+module.exports.buildQueryForGetUnconfirmedResources = function(reservation){
+    var query = squel.select()
+        .from("resource")
+        .join("reservation_resource")
+        .join("reservation")
+        .where("reservation.reservation_id = ?", reservation.reservation_id)
+        .where("reservation_resource.is_confirmed = ?", false)
+        .where("resource.resource_state = ?", "restricted")
+        .toString()
+}
+
 module.exports.buildQueryForDeleteReservationById = function(reservation) {
 	return squel.delete()
         .from("reservation")
@@ -161,15 +172,20 @@ module.exports.buildQueryForGetAllReservationsForUser = function(user) {
         .toString();
 };
 
-module.exports.buildQueryForRemoveResourceFromReservation = function(reservation, user) {
-    return squel.delete()
+module.exports.buildQueryForRemoveResourceFromReservation = function(reservation, user, has_auth) {
+    var query = squel.delete()
         .target("reservation_resource")
         .from("reservation_resource")
-        .join("user_reservation", null, "reservation_resource.reservation_id = user_reservation.reservation_id")
+        .join("user_reservation")
+        .join("resource_group")
+        .join("user_group")
+        //.where("resource_group.resource_permission = ?", "")
         .where("reservation_resource.reservation_id = ?", reservation.reservation_id)
-        .where("resource_id = ?", reservation.resource_id)
-        .where("user_id = ?", user.user_id)
-        .toString()
+        .where("reservation_resource.resource_id = ?", reservation.resource_id)
+        if(!has_auth){
+            query = query.where("user_reservation.user_id = ?", user.user_id)
+        }
+        return query.toString()
 }
 
 module.exports.buildQueryForDenyResourceReservation = function(reservation, user){
@@ -184,7 +200,20 @@ module.exports.buildQueryForDenyResourceReservation = function(reservation, user
         .where("reservation.resource_state = ?", "restricted")
         .where("resource_group.resource_permission = ?", "manage")
         .where("user_group.user_id = ?", user.user_id)
+        .where("reservation.reservation_id = ?", reservation.reservation_id)
+        .where("resource.resource_id = ?", reservation.resource_id)
+        .toString()
 
+}
+
+module.exports.buildQueryForConfirmResource = function(reservation, user){
+    var quey = squel.update()
+        .table("reservation_resource inner join resource_group inner join user_group")
+        .where("reservation_resource.resource_id = ?", reservation.resource_id)
+        .where("reservation_resource.reservation_id = ?", reservation.reservation_id)
+        .where("user_group.user_id = ?", user.user_id)
+        .where("resource_group.resource_permission = ?", "manage")
+        .toString()
 }
 var generate_conflict_expression = function(reservation){
     return squel.expr()
