@@ -41,29 +41,19 @@ angular.module('resourceTracker')
         };
 
         var getAllResources = function() {
-            return $http.get('/reservation').then(function(response) {   
-                populateResourceArray(response.data.results, $scope.allResources);
+            return $http.get('/resource/all').then(function(response) {   
+                populateResourceArray(response.data, $scope.allResources);
             }, function(error) {
                 console.log(error);
             });
         };
 
         var populateResourceArray = function(resourceData, resourceArray) {
-            var seenResources = [];
-            for (var i = 0; i < resourceData.length; i++) {
-                var resource = resourceData[i];
-                var thisResource = {id: resource.resource_id, label: resource.name};
-                if (seenResources.indexOf(thisResource.id) == -1) {
-                    resourceArray.push(thisResource);
-                    seenResources.push(thisResource.id);
-                }
-                var thisReservation = {reservation_id: resource.reservation_id, start_time: resource.start_time, end_time: resource.end_time};
-                if ($scope.resourceReservationMap[thisResource.id]) {
-                    $scope.resourceReservationMap[thisResource.id].push(thisReservation);
-                } else {
-                    $scope.resourceReservationMap[thisResource.id] = [thisReservation];                
-                }
-            }
+            resourceData.forEach(function(resource) {
+                var resourceData = {id: resource.resource_id, label: resource.name};
+                resourceArray.push(resourceData);
+                $scope.resourceReservationMap[resourceData.id] = resource.reservations;
+            });
         };
 
         $scope.onResourceReservationToggle = function() {

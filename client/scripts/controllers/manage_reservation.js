@@ -43,7 +43,6 @@ angular.module('resourceTracker')
 
         var getAllResources = function() {
             return $http.get('/resource/all').then(function(response) {   
-                console.log(response.data);
                 populateResourceArray(response.data, $scope.allResources);
             }, function(error) {
                 console.log(error);

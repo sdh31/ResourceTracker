@@ -35,7 +35,7 @@ angular.module('resourceTracker')
             });
         };
 
-        $scope.getReservationForSelectedResources = function(){
+        $scope.getReservationsForSelectedResources = function(){
             var rIDArray = [];
             $scope.selectedResourcesIDs.forEach(function(resource){
                 rIDArray.push(resource.id);
@@ -51,6 +51,8 @@ angular.module('resourceTracker')
         };
 
         var createReservationMaps = function(){
+            $scope.reservationToResourceMap.clear();
+            $scope.reservationMap.clear();
             $scope.reservations.forEach(function(res){
                 if(!res.is_confirmed){
                     var res_id = res.reservation_id;
@@ -67,11 +69,12 @@ angular.module('resourceTracker')
                                title: res.reservation_title,
                                start_time: res.start_time};
                     $scope.reservationMap.set(res_id, res);
-                    console.log($scope.reservationMap);                    
                     }
-                    console.log($scope.reservationToResourceMap);
                 }
             });
+            console.log($scope.reservationToResourceMap);      
+            console.log($scope.reservationMap);                    
+            console.log($scope.resourceMap);
         };
 
     	$scope.initializePage();
