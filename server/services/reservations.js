@@ -127,12 +127,17 @@ function filterResourcesByPermission(resources, minPermission) {
 };
 
 function denyResourceReservation(reservation, user, callback){
-    var denyReservationQuery = buildQueryForDenyResourceReservation(reservation, user)
+    var denyReservationQuery = reservation_query_builder.buildQueryForDenyResourceReservation(reservation, user)
     basic_db_utility.performSingleRowDBOperation(denyReservationQuery, callback);
 }
 
+function deleteConflictingReservations(reservation, callback){
+    var deleteConflictingReservationQuery = reservation_query_builder.buildQueryForDeleteConflictingReservations(reservation);
+    basic_db_utility.performSingleRowDBOperation(deleteConflictingReservationQuery, callback)
+}
+
 function confirmResourceReservation(reservation, user, callback){
-    var confirmReservationQuery = buildQueryForConfirmReservation(reservation, user)
+    var confirmReservationQuery = reservation_query_builder.buildQueryForConfirmResource(reservation, user)
     basic_db_utility.performSingleRowDBOperation(confirmReservationQuery, callback);
 }
 
@@ -187,5 +192,8 @@ module.exports = {
     remove_resource_from_reservation:remove_resource_from_reservation,
     filterAllowedOverlappingReservations: filterAllowedOverlappingReservations,
     filterResourcesByPermission: filterResourcesByPermission,
-    denyResourceReservation: denyResourceReservation
+    denyResourceReservation: denyResourceReservation,
+    confirmResourceReservation: confirmResourceReservation,
+    deleteConflictingReservations:deleteConflictingReservations,
+    get_unconfirmed_resources_for_reservation:get_unconfirmed_resources_for_reservation
 }

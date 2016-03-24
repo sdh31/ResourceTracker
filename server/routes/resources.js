@@ -67,7 +67,7 @@ router.put('/', function(req, res, next){
             res.status(400).json(result);
         } else {
             var group_ids = [result.results.group_id];
-            var resource_permissions = ['reserve'];
+            var resource_permissions = ['manage'];
             res_service.addGroupPermissionToResource({resource_id: resource_id, group_ids: group_ids, resource_permissions: resource_permissions}, addAdminGroupPermissionCallback);
         }
     };    
@@ -91,7 +91,7 @@ router.put('/', function(req, res, next){
         } else {
             var group_ids = [result.results.group_id];
             // TODO: not sure if this should be 'view' or 'reserve'; helps with testing for it to be 'reserve' for now
-            var resource_permissions = ['reserve'];
+            var resource_permissions = ['manage'];
             res_service.addGroupPermissionToResource({resource_id: resource_id, group_ids: group_ids, resource_permissions: resource_permissions}, addGroupPermissionCallback);
         }
     };

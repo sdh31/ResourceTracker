@@ -300,20 +300,52 @@ router.post('/confirm_request', function(req, res, next){
     //Check if it is last reservation needed to be confirmed
     //if yes, delete conflicting reservations
     //if no, just change status of reservation
+    var delete_conflicting_reservation_callback = function(result){
+        if(result.error){
+            res.status(400).json(result);
+        }
+        else{
+            res.status(200).json(result);
+        }
+    }
     var check_reservation_confirmation_callback = function(result){
         if(result.error){
             res.status(400).json(result);
         }
         else if(result.results.length == 0){
-            //fully confirmed: delete conflicting reservations
+            reservation_service.deleteConflictingReservations(req.body, delete_conflicting_reservation_callback)
+        }
+        else{
+            res.status(200).json(result)
+        }
+    }
+
+    var confirm_resource_callback = function(result){
+        if(result.error){
+            res.status(400).json(result);
+        }
+        else if(result.results.affectedRows == 0){
             res.status(403).json(perm_service.denied_error);
         }
         else{
-            reservation_service.get_unconfirmed_resources_for_reservation(req.body, req.session.user, check_reservation_confirmation_callback)
-            //not fully confirmed: change status of that resource
+            reservation_service.get_unconfirmed_resources_for_reservation(req.body, check_reservation_confirmation_callback)
         }
     }
-    reservation_service.confirmResourcereservation(req.body, req.session.user, confirm_resource_callback);
+    var get_reservation_info_callback = function(result){
+        if(result.error){
+            res.status(400).json(result);
+        }
+        else if(result.results.length == 0){
+            res.status(403).json(perm_service.denied_error)
+        }
+        else{
+            req.body.start_time = result.results.start_time;
+            req.body.end_time = result.results.end_time;
+            console.log(req.body.resource_id)
+            reservation_service.confirmResourceReservation(req.body, req.session.user, confirm_resource_callback);
+        }
+    }
+    reservation_service.get_reservation_by_id(req.body, get_reservation_info_callback);
 });
 
 module.exports = router;

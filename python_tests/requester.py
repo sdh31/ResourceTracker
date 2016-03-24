@@ -9,7 +9,7 @@ headers = {
 	}
 
 session = ''
-baseUrl = 'https://colab-sbx-212.oit.duke.edu'
+baseUrl = 'https://colab-sbx-202.oit.duke.edu'
 
 def send_request(method, params, url):
 	if method == 'GET' or method == 'DELETE':
@@ -394,4 +394,24 @@ def remove_resource_from_reservation(reservation_id, resource_id):
 		"resource_id": resource_id
 	}
 
+	return send_request(method, params, url)
+
+def confirm_resource_reservation(resource_id, reservation_id):
+	url = baseUrl + '/reservation/confirm_request'
+	method = "POST"
+	params = {
+		"reservation_id": reservation_id,
+		"resource_id": resource_id
+	}
+
+	return send_request(method, params, url)
+
+def deny_resource_reservation(resource_id, reservation_id):
+	url = baseUrl + '/reservation/deny_request'
+	method = "POST"
+	params = {
+		"reservation_id": reservation_id,
+		"resource_id": resource_id
+	}
+	
 	return send_request(method, params, url)
