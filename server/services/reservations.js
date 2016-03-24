@@ -19,7 +19,7 @@ function get_reservations_by_resources(body, callback) {
 
 function get_reservation_by_id(reservation, callback){
     var getReservationByIdQuery = reservation_query_builder.buildQueryForGetReservationById(reservation);
-    basic_db_utility.performSingleRowDBOperation(getReservationByIdQuery, callback);
+    basic_db_utility.performMultipleRowDBOperation(getReservationByIdQuery, callback);
 }
 
 function create_reservation_resources_link(reservation_id, resources, callback) {

@@ -208,6 +208,20 @@ r.session = admin_session
 #res = r.remove_resource_from_reservation(reservation_id2, resource_id)
 #test_print(desc, res.status_code < 300)
 
+desc =  '#### create a restricted resource ####'
+res = r.create_resource("restrictedRes", "restrictedDesc", 'restricted')
+test_print(desc, res.status_code < 300)
+restricted_resource_id = r.json.loads(res.content)['insertId']
+
+desc =  '#### create reservation on restricted resource ####'
+res = r.create_reservation([restricted_resource_id], 0, 2, 'title', 'description')
+test_print(desc, res.status_code < 300)
+restricted_reservation_id = r.json.loads(res.content)['results']['insertId']
+
+desc =  '#### delete first reservation that was made ####'
+res = r.delete_reservation(reservation_id)
+test_print(desc, res.status_code < 300)
+
 
 
 

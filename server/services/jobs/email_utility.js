@@ -33,21 +33,38 @@ var createMailOptions = function(from, to, subject, text, html) {
     return mailOptions;
 };
 
-module.exports.setConfigsAndSendReservationStartingEmail = function(user, resource_blurb) {
+module.exports.sendReservationStartingEmail = function(user, resource_blurb) {
 
-    
     var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation of ' + resource_blurb, 'Hey '+ user.first_name + ',\n\nBe aware that your reservation is starting now!', '');
 
     sendEmail(mailOptions);
 };
 
-module.exports.setConfigsAndSendReservationDeletedEmail = function(user, resource_name, reservation) {
-    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation of ' + resource_name + ' has been deleted', 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation of ' + resource_name + ', which has been scheduled for ' + new Date(reservation.start_time) + ' has been deleted', '');
+module.exports.sendReservationNotYetApprovedEmail = function(user, reservation) {
+    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation for ' + new Date(reservation.start_time), 'Hey '+ user.first_name + " " + user.last_name + ',\n\nThis is a warning that your reservation that is scheduled for ' + new Date(reservation.start_time) + ' still needs one or more approvals ', '');
 
     sendEmail(mailOptions);
 };
 
-module.exports.setConfigsAndSendCompetingReservationCancelledEmail = function (user, reservation) {
+module.exports.sendReservationCancelledDueToResourcesNotApprovedInTimeEmail = function(user, reservation) {
+    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation for ' + new Date(reservation.start_time), 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation which had been scheduled for ' + new Date(reservation.start_time) + ' has been cancelled because all of the restricted resources had not been approved in time. Please try again! ' , '');
+
+    sendEmail(mailOptions);
+};
+
+module.exports.sendReservationCancelledOnResourceDenialEmail = function(user, reservation, resource_name) {
+    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation for ' + new Date(reservation.start_time), 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation which had been scheduled for ' + new Date(reservation.start_time) + ' has been cancelled because a resource manager denied your request for ' + resource_name + '.', '');
+
+    sendEmail(mailOptions);
+};
+
+module.exports.sendReservationDeletedEmail = function(user, reservation) {
+    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation for ' + new Date(reservation.start_time), 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation which had been scheduled for ' + new Date(reservation.start_time) + ' has been deleted', '');
+
+    sendEmail(mailOptions);
+};
+
+module.exports.sendCompetingReservationCancelledEmail = function (user, reservation) {
     var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation of ' + reservation.resources, 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation of ' + reservation.resources + ', which has been scheduled for ' + new Date(reservation.start_time) + ' has been cancelled because a resource manager approved another reservation that competed with yours. Yours was necessarily deleted as a result.', '');
 
     sendEmail(mailOptions);
