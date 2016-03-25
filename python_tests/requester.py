@@ -26,6 +26,7 @@ def test_print(desc, expression):
 
 def finish_test(test_name):
 	global failed, passed
+	logout()
 	print ""
 	print test_name + " has finished with:"
 	print str(failed) + "tests failed"
