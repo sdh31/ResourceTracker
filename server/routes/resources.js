@@ -20,6 +20,7 @@ router.get('/', function(req, res, next){
     };
 
     var checkPermissionForResourceCallback = function (result) {
+        console.log(result)
         if (result.error) {
             res.status(400).json(result);
         } else if (result.results.length == 0) {
@@ -67,7 +68,7 @@ router.put('/', function(req, res, next){
             res.status(400).json(result);
         } else {
             var group_ids = [result.results.group_id];
-            var resource_permissions = ['reserve'];
+            var resource_permissions = perm_service.get_permission_id(['admin']);
             res_service.addGroupPermissionToResource({resource_id: resource_id, group_ids: group_ids, resource_permissions: resource_permissions}, addAdminGroupPermissionCallback);
         }
     };    
@@ -91,7 +92,7 @@ router.put('/', function(req, res, next){
         } else {
             var group_ids = [result.results.group_id];
             // TODO: not sure if this should be 'view' or 'reserve'; helps with testing for it to be 'reserve' for now
-            var resource_permissions = ['reserve'];
+            var resource_permissions = perm_service.get_permission_id(['admin']);
             res_service.addGroupPermissionToResource({resource_id: resource_id, group_ids: group_ids, resource_permissions: resource_permissions}, addGroupPermissionCallback);
         }
     };
@@ -189,6 +190,11 @@ router.post('/addPermission', function(req, res, next) {
         res.status(403).json(perm_service.denied_error)
         return;
     }
+     if (req.body.group_ids.length != req.body.resource_permissions.length) {
+        res.status(400).json({error: true, err: "need same amount of permissions as resources"})
+        return;
+    }
+
 
     res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);
 });

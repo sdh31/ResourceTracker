@@ -114,11 +114,10 @@ function getAllReservationsForUser(user, callback) {
 };
 
 function filterResourcesByPermission(resources, minPermission) {
-
     var resourcesWithPermission = [];
-
+    console.log(minPermission)
     for (var i = 0; i<resources.length; i++) {
-        if ((resources[i].resource_permission == minPermission || resources[i].resource_permission == 'manage') && resourcesWithPermission.indexOf(resources[i].resource_id) == -1) {
+        if ((resources[i].resource_permission >= minPermission) && resourcesWithPermission.indexOf(resources[i].resource_id) == -1) {
             resourcesWithPermission.push(resources[i].resource_id);
         }
     }

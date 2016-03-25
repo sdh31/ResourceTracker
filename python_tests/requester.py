@@ -15,6 +15,12 @@ baseUrl = 'https://colab-sbx-202.oit.duke.edu'
 passed = 0
 failed = 0
 
+permissions = {
+	"view": 0,
+	"reserve": 1,
+	"manage": 2
+}
+
 def test_print(desc, expression):
 	global failed, passed
 	if not expression:
