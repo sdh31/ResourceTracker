@@ -145,9 +145,10 @@ test_print(desc, res.status_code < 300)
 test_print(desc, r.json.loads(res.content)['results']['name'] == "serverEdited")
 
 desc =  '#### create reservation ####'
-res = r.create_reservation([no_tags_id, resource_id, restricted_id], 0, 2, 'title', 'description')
+res = r.create_reservation([no_tags_id, restricted_id, resource_id], 0, 2, 'title', 'description')
 test_print(desc, res.status_code < 300)
 reservation_id = r.json.loads(res.content)['results']['insertId']
+res = r.get_reservations([resource_id],0, 999999 )
 
 desc =  '#### create an aliasing reservation ####'
 res = r.create_reservation([resource_id], 2, 3, 'title', 'description')
@@ -190,7 +191,6 @@ test_print(desc, res.status_code < 300)
 desc = "### confirm request for resource ###"
 res = r.confirm_resource_reservation(restricted_id, reservation_id2)
 test_print(desc, res.status_code < 300)
-print reservation_id2
 
 r.session = ''
 desc = '#### create non-admin session ####'
@@ -204,9 +204,9 @@ res = r.remove_resource_from_reservation(reservation_id, resource_id)
 test_print(desc, res.status_code > 300)
 r.session = admin_session
 
-#desc = "### remove resource from reservation as reservation owner"
-#res = r.remove_resource_from_reservation(reservation_id2, resource_id)
-#test_print(desc, res.status_code < 300)
+desc = "### remove resource from reservation as reservation owner"
+res = r.remove_resource_from_reservation(reservation_id2, resource_id)
+test_print(desc, res.status_code < 300)
 
 desc =  '#### create a restricted resource ####'
 res = r.create_resource("restrictedRes", "restrictedDesc", 'restricted')
@@ -217,10 +217,6 @@ desc =  '#### create reservation on restricted resource ####'
 res = r.create_reservation([restricted_resource_id], 0, 2, 'title', 'description')
 test_print(desc, res.status_code < 300)
 restricted_reservation_id = r.json.loads(res.content)['results']['insertId']
-
-desc =  '#### delete first reservation that was made ####'
-res = r.delete_reservation(reservation_id)
-test_print(desc, res.status_code < 300)
 
 
 

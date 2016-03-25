@@ -205,9 +205,9 @@ module.exports.buildQueryForRemoveResourceFromReservation = function(reservation
     var query = squel.delete()
         .target("reservation_resource")
         .from("reservation_resource")
-        .join("user_reservation")
-        .join("resource_group")
-        .join("user_group")
+        .join("user_reservation", null, "user_reservation.reservation_id = reservation_resource.reservation_id")
+        .join("resource_group", null, "reservation_resource.resource_id = resource_group.resource_id")
+        .join("user_group", null, "user_group.group_id = resource_group.resource_id")
         //.where("resource_group.resource_permission = ?", "")
         .where("reservation_resource.reservation_id = ?", reservation.reservation_id)
         .where("reservation_resource.resource_id = ?", reservation.resource_id)
@@ -221,10 +221,10 @@ module.exports.buildQueryForDenyResourceReservation = function(reservation, user
     return squel.delete()
         .target("reservation")
         .from("reservation")
-        .join("reservation_resource")
-        .join("resource")
-        .join("resource_group")
-        .join("user_group")
+        .join("reservation_resource", null, "reservation_resource.reservation_id = reservation.reservation_id")
+        .join("resource", null, "resource.resource_id = reservation_resource.resource_id")
+        .join("resource_group", null, "resource.resource_id = resource_group.resource_id")
+        .join("user_group", null, "user_group.group_id = resource_group.group_id")
         .where("reservation_resource.is_confirmed = ?", false)
         .where("resource.resource_state = ?", "restricted")
 //        .where("resource_group.resource_permission = ?", "manage")
@@ -236,8 +236,10 @@ module.exports.buildQueryForDenyResourceReservation = function(reservation, user
 }
 
 module.exports.buildQueryForConfirmResource = function(reservation, user){
+    var join_resource_group = " INNER JOIN resource_group ON reservation_resource.resource_id = resource_group.resource_id";
+    var join_user_group = " INNER JOIN user_group ON user_group.group_id = resource_group.group_id"
     var query = squel.update()
-        .table("reservation_resource inner join resource_group inner join user_group")
+        .table("reservation_resource" + join_resource_group + join_user_group)
         .where("reservation_resource.resource_id = ?", reservation.resource_id)
         .where("reservation_resource.reservation_id = ?", reservation.reservation_id)
      //   .where("user_group.user_id = ?", user.user_id)
