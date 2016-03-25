@@ -202,6 +202,7 @@ desc = "### fail to remove resource from someone else's reservation ###"
 r.session = rahul_session
 res = r.remove_resource_from_reservation(reservation_id, resource_id)
 test_print(desc, res.status_code > 300)
+print res.status_code
 r.session = admin_session
 
 desc = "### remove resource from reservation as reservation owner"

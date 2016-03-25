@@ -119,6 +119,7 @@ module.exports.buildQueryForGetUnconfirmedResources = function(reservation){
         .where("resource.resource_state = ?", "restricted")
         .toString()
     return query
+
 }
 
 module.exports.buildQueryForDeleteReservationById = function(reservation) {
@@ -205,6 +206,7 @@ module.exports.buildQueryForRemoveResourceFromReservation = function(reservation
     var query = squel.delete()
         .target("reservation_resource")
         .from("reservation_resource")
+
         .join("user_reservation", null, "user_reservation.reservation_id = reservation_resource.reservation_id")
         .join("resource_group", null, "reservation_resource.resource_id = resource_group.resource_id")
         .join("user_group", null, "user_group.group_id = resource_group.resource_id")
@@ -233,6 +235,15 @@ module.exports.buildQueryForDenyResourceReservation = function(reservation, user
         .where("resource.resource_id = ?", reservation.resource_id)
         .toString()
 
+
+module.exports.buildQueryForConfirmResource = function(reservation, user){
+    var quey = squel.update()
+        .table("reservation_resource inner join resource_group inner join user_group")
+        .where("reservation_resource.resource_id = ?", reservation.resource_id)
+        .where("reservation_resource.reservation_id = ?", reservation.reservation_id)
+        .where("user_group.user_id = ?", user.user_id)
+        .where("resource_group.resource_permission = ?", "manage")
+        .toString()
 }
 
 module.exports.buildQueryForConfirmResource = function(reservation, user){

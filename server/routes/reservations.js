@@ -349,6 +349,7 @@ router.post('/confirm_request', function(req, res, next){
             res.status(200).json(result);
         }
     }
+
     var check_reservation_confirmation_callback = function(result){
         if(result.error){
             res.status(400).json(result);
@@ -386,6 +387,7 @@ router.post('/confirm_request', function(req, res, next){
         }
     }
     reservation_service.get_reservation_by_id(req.body, get_reservation_info_callback);
+
 });
 
 module.exports = router;
