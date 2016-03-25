@@ -112,8 +112,8 @@ module.exports.buildQueryForUpdateReservationById = function(reservation, user, 
 module.exports.buildQueryForGetUnconfirmedResources = function(reservation){
     var query = squel.select()
         .from("resource")
-        .join("reservation_resource")
-        .join("reservation")
+        .join("reservation_resource", null, "resource.resource_id = reservation_resource.resource_id")
+        .join("reservation", null, "reservation_resource.reservation_id = reservation.reservation_id")
         .where("reservation.reservation_id = ?", reservation.reservation_id)
         .where("reservation_resource.is_confirmed = ?", false)
         .where("resource.resource_state = ?", "restricted")
