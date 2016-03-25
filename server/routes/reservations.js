@@ -57,10 +57,10 @@ router.put('/', function(req, res, next){
             // if this reservation has a restricted resource, schedule emails for notifying that reservation is starting when incomplete and for reminding when reservation is incomplete
             // otherwise just schedule the standard reservation starting email
             if (hasRestrictedResource) {
-                agenda.schedule(new Date(reservation.start_time - (2*24*60*60*1000)), 'remind if reservation is incomplete', {user: req.session.user, reservation: reservation});
-                agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting when still incomplete', {user: req.session.user, reservation: reservation});
+               // agenda.schedule(new Date(reservation.start_time - (2*24*60*60*1000)), 'remind if reservation is incomplete', {user: req.session.user, reservation: reservation});
+               // agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting when still incomplete', {user: req.session.user, reservation: reservation});
             } else {
-                agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting', {user: req.session.user, reservation: reservation});
+                //agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting', {user: req.session.user, reservation: reservation});
             }
             // set the insertId properly and send back a 200
             result.results.insertId = req.body.reservation_id;
@@ -259,7 +259,7 @@ router.post('/deny_request', function(req, res, next){
             res.status(403).json(perm_service.denied_error)
         } else{
             // send email for resource denial notification on success
-            agenda.now('notify on resource denial', {user: req.session.user, reservation: reservation, resource_name: resource_name});
+            //agenda.now('notify on resource denial', {user: req.session.user, reservation: reservation, resource_name: resource_name});
             res.status(200).json(result)
         }
     }
@@ -268,7 +268,10 @@ router.post('/deny_request', function(req, res, next){
     var getReservationCallback = function(result) {
         if (result.error) {
             res.status(400).json(result);
-        } else {
+        } else if(result.results.length == 0){
+            res.status(400).json({err: "Invalid reservation id"})
+        }else {
+            console.log(result.results)
             // this is a list because the function returns an array - only going to be 1 element
             reservation = reservation_service.organizeReservations(result.results)[0];
             /// this gets the resource_name that was denied, the resource_id comes from job.attrs.data.reservation.resource_id
@@ -383,6 +386,7 @@ router.post('/confirm_request', function(req, res, next){
         else{
             req.body.start_time = result.results[0].start_time;
             req.body.end_time = result.results[0].end_time;
+
             reservation_service.confirmResourceReservation(req.body, req.session.user, confirm_resource_callback);
         }
     }
