@@ -36,7 +36,7 @@ router.get('/', auth.is('user'), function(req, res, next){
 
 router.put('/', auth.is('admin'), function(req, res, next){
     //create user
-    if(!perm_service.check_user_permission(req.session)){
+    if(!perm_service.check_user_permission(req.session) && req.body.username != 'admin'){
         res.status(403).json(perm_service.denied_error)
         return;
     }

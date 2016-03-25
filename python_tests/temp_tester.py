@@ -1,19 +1,10 @@
 import requester as r
 from time import sleep
+from requester import test_print
 
 r.verify = False
 
-failed = 0
-passed = 0
-
-def test_print(desc, expression):
-	global failed, passed
-	if not expression:
-		print desc
-		print expression
-		failed += 1
-	else:
-		passed += 1
+r.initialize_and_clear_tables()
 
 desc = '#### initialize session ####'
 session_response = r.login_to_session('admin', 'Treeadmin')
@@ -202,7 +193,6 @@ desc = "### fail to remove resource from someone else's reservation ###"
 r.session = rahul_session
 res = r.remove_resource_from_reservation(reservation_id, resource_id)
 test_print(desc, res.status_code > 300)
-print res.status_code
 r.session = admin_session
 
 desc = "### remove resource from reservation as reservation owner"
@@ -219,9 +209,4 @@ res = r.create_reservation([restricted_resource_id], 0, 2, 'title', 'description
 test_print(desc, res.status_code < 300)
 restricted_reservation_id = r.json.loads(res.content)['results']['insertId']
 
-
-
-
-print "main test"
-print str(failed) + "tests failed"
-print str(passed) + "tests passed"
+r.finish_test("temp main test")

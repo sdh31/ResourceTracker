@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 
 requests.packages.urllib3.disable_warnings()
 
@@ -10,6 +11,28 @@ headers = {
 
 session = ''
 baseUrl = 'https://colab-sbx-202.oit.duke.edu'
+
+passed = 0
+failed = 0
+
+def test_print(desc, expression):
+	global failed, passed
+	if not expression:
+		print desc
+		print expression
+		failed += 1
+	else:
+		passed += 1
+
+def finish_test(test_name):
+	global failed, passed
+	print ""
+	print test_name + " has finished with:"
+	print str(failed) + "tests failed"
+	print str(passed) + "tests passed"
+	print ""
+	passed = 0
+	failed = 0
 
 def send_request(method, params, url):
 	if method == 'GET' or method == 'DELETE':
@@ -32,8 +55,11 @@ def send_request(method, params, url):
 		)
 	return response
 
-
-
+def initialize_and_clear_tables():
+	os.system("mysql -u root -pdb test_db -e 'DROP DATABASE test_db; CREATE DATABASE test_db;'")
+	os.system("mysql -u root -pdb test_db < ~/ResourceTracker/server/create_tables.sql")
+	res = initialize_admin_user()
+	test_print("initialize create", res.status_code < 300)
 
 def login_to_session(username, password):
 	url = baseUrl + '/user/signin'
@@ -53,7 +79,7 @@ def logout():
 	params = {}
 	return send_request(method, params, url)
 
-def create_user(username, password):
+def create_user (username, password):
 	url = baseUrl + '/user'
 	method = "PUT"
 	 
@@ -66,6 +92,25 @@ def create_user(username, password):
         'last_name': 'abcd',
 		'is_shibboleth': 0
 	}
+	return send_request(method, params, url)
+
+def initialize_admin_user():
+	url = baseUrl + '/user'
+	method = "PUT"
+	 
+
+	params = {
+		'username': 'admin',
+		'password': 'Treeadmin',
+		'user_management_permission': 1,
+		'resource_management_permission': 1,
+		'reservation_management_permission': 1,
+        'is_shibboleth': 0,
+		'first_name': 'admin',
+		'last_name': 'admin',
+		'email_address': 'admin@admin.com',
+        'emails_enabled': 1
+	};
 	return send_request(method, params, url)
 
 def update_user(username, newUsername = None, password = None, email_address = None):
