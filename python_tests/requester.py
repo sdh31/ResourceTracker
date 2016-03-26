@@ -467,3 +467,5 @@ def deny_resource_reservation(resource_id, reservation_id):
 	}
 	
 	return send_request(method, params, url)
+
+	

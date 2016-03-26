@@ -122,12 +122,25 @@ router.post('/', function(req, res, next){
             res.status(200).json(result);
         }
     }
+
+    var get_overlapping_reservation_callback = function(result){
+        console.log(result)
+        if(result.error){
+            res.status(400).json(result);
+        } else if(result.results.length > 0 && req.body.resource_state != 'restricted' && result.results[0]['resource_state'] == 'restricted'){
+            result.err = "This resource is oversubscribed. Please resolve all conflicts before removing restriction"
+            res.status(400).json(result)
+        }  
+        else{
+            res_service.update_resource_by_id(req.body, update_resource_callback);
+        }
+    }
     if(!perm_service.check_resource_permission(req.session)){
         res.status(403).json(perm_service.denied_error)
         return;
     }
 
-    res_service.update_resource_by_id(req.body, update_resource_callback);
+    reservation_service.getOverlappingReservationsByResource(req.body, get_overlapping_reservation_callback)
 
 });
 
@@ -315,4 +328,5 @@ router.get('/getPermission', function(req, res, next) {
 
     res_service.getGroupPermissionToResource(req.query, getGroupPermissionCallback);
 });
+
 module.exports = router;

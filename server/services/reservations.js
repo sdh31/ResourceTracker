@@ -125,6 +125,11 @@ function filterResourcesByPermission(resources, minPermission) {
     return resourcesWithPermission;
 };
 
+function getOverlappingReservationsByResource(reservation, callback){
+    var getoverlappingQuery = reservation_query_builder.buildQueryForGetOverlappingReservationsByResource(reservation)
+    basic_db_utility.performMultipleRowDBOperation(getoverlappingQuery, callback)
+}
+
 function denyResourceReservation(reservation, user, callback){
     var denyReservationQuery = reservation_query_builder.buildQueryForDenyResourceReservation(reservation, user)
     basic_db_utility.performSingleRowDBOperation(denyReservationQuery, callback);
@@ -194,5 +199,6 @@ module.exports = {
     denyResourceReservation: denyResourceReservation,
     confirmResourceReservation: confirmResourceReservation,
     deleteConflictingReservations:deleteConflictingReservations,
-    get_unconfirmed_resources_for_reservation:get_unconfirmed_resources_for_reservation
+    get_unconfirmed_resources_for_reservation:get_unconfirmed_resources_for_reservation,
+    getOverlappingReservationsByResource: getOverlappingReservationsByResource
 }

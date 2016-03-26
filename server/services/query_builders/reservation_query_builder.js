@@ -27,6 +27,35 @@ module.exports.buildQueryForGetConflictingReservations = function(reservation) {
         .toString();
 };
 
+module.exports.buildQueryForGetOverlappingReservationsByResource = function(reservation){
+    /*
+    Query to find all reservations that overlap another reservaton given a resource. 
+    This can be used to tell whether a resource is oversubscribed
+    */
+    var overlapping_query = squel.expr()
+        .or_begin()
+            .or_begin()
+                .and("reservation.start_time > res2.start_time")
+                .and("reservation.start_time < res2.end_time")
+            .end()
+            .or_begin()
+                .and("reservation.start_time < res2.start_time")               
+                .and("reservation.end_time > res2.end_time")
+            .end()
+        .end()
+
+    var query = squel.select()
+        .from("reservation")
+        .field("reservation.reservation_id")
+        .field("resource.resource_state")
+        .join("reservation_resource",null, "reservation.reservation_id = reservation_resource.reservation_id")
+        .join("resource", null, "resource.resource_id = reservation_resource.resource_id")
+        .join("reservation", "res2", overlapping_query)
+        .where("reservation_resource.resource_id = ?", reservation.resource_id)
+        .toString()
+    return query;
+}
+
 module.exports.buildQueryForDeleteConflictingReservations = function(reservation){
     var time_check = generate_conflict_expression(reservation);
     var resource_filter = buildResourceFilter(reservation);

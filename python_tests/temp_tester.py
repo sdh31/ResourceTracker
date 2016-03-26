@@ -209,4 +209,5 @@ res = r.create_reservation([restricted_resource_id], 0, 2, 'title', 'description
 test_print(desc, res.status_code < 300)
 restricted_reservation_id = r.json.loads(res.content)['results']['insertId']
 
+
 r.finish_test("temp main test")
