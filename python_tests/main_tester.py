@@ -1,2 +1,3 @@
 import temp_tester
 import confirm_deny
+import tag_filter_permission_test

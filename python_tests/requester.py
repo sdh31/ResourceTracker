@@ -244,7 +244,7 @@ def remove_group_permission_to_resource(resource_id, group_ids):
 	return send_request(method, params, url)
 
 def filter_tags(included_tags, excluded_tags, start_time, end_time):
- 	url = baseUrl + '/resource/filter'
+ 	url = baseUrl + '/tag/filter'
  	method = "POST"
  
  	params = {

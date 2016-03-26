@@ -20,7 +20,6 @@ router.get('/', function(req, res, next){
     };
 
     var checkPermissionForResourceCallback = function (result) {
-        console.log(result)
         if (result.error) {
             res.status(400).json(result);
         } else if (result.results.length == 0) {
@@ -177,7 +176,7 @@ router.get('/all', auth.is('user'), function(req, res, next) {
 
 // req.body should have resource_id, group_ids, resource_permissions and group_ids.length == resource_permissions.length
 router.post('/addPermission', function(req, res, next) {
-    
+
     var addGroupPermissionCallback = function(result){
         if (result.error){
             res.status(400).json(result);
@@ -194,8 +193,6 @@ router.post('/addPermission', function(req, res, next) {
         res.status(400).json({error: true, err: "need same amount of permissions as resources"})
         return;
     }
-
-
     res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);
 });
 
