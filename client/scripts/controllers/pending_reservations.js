@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('resourceTracker')
-    .controller('PendingReservationCtrl', function ($scope, $http, $location, resourceService, $filter) {
+    .controller('PendingReservationCtrl', function ($scope, $http, $filter) {
 
     	$scope.initializePage = function() {
     		$scope.selectedResourcesIDs = [];
@@ -59,7 +59,7 @@ angular.module('resourceTracker')
                         resource_info.reservations = reservationList;
                         $scope.resourcesToDisplayMap.set(resource_id, resource_info);
                     } else{
-                        var resource_info = {name: resource.name, description: resource.description,
+                        var resource_info = {expanded: false, name: resource.name, description: resource.description,
                                             resource_id: resource.resource_id, permission: resource.resource_permission,
                                             state: resource.resource_state, tags: resource.tags, reservations: [reserv]};
                         $scope.resourcesToDisplayMap.set(resource_id, resource_info);
@@ -78,8 +78,6 @@ angular.module('resourceTracker')
             return rList;
         }
 
-    	$scope.initializePage();
-
         var processReservationTimes = function(reserv){
             var start_time = $filter('date')(reserv.start_time, "short");
             var end_time = $filter('date')(reserv.end_time, "short");
@@ -90,28 +88,76 @@ angular.module('resourceTracker')
 
         $scope.approveReservation = function(reserv){
             console.log(reserv);
+            console.log($scope.resourcesToDisplay);
+            var result = confirm("Are you sure you want to approve resource " + $scope.resourceMap.get(reserv.resource_id).name + " and delete reservation " + reserv.reservation_title + "?");
             var reqBody = {resource_id: reserv.resource_id, reservation_id: reserv.reservation_id};
-            var result = confirm("Are you sure you want to approve")
-            $http.post('/reservation/confirm_request', reqBody).then(function(response) {
-                console.log(response);
-            }, function(error){
-                console.log(error);
-            });
-
+            if(result){
+                $http.post('/reservation/confirm_request', reqBody).then(function(response) {
+                    clearReservationAfterApproval(reserv);
+                }, function(error){
+                    console.log(error);
+                });
+            }
         };
 
         $scope.denyReservation = function(reserv){
-            console.log(reserv);
             var reqBody = {resource_id: reserv.resource_id, reservation_id: reserv.reservation_id};
             var result = confirm("Are you sure you want to deny resource " + $scope.resourceMap.get(reserv.resource_id).name + " and delete reservation " + reserv.reservation_title + "?");
             if(result){       
                 $http.post('/reservation/deny_request', reqBody).then(function(response) {
-                    confirm
-                    console.log(response);
+                    clearReservationAfterDeny(reserv);
                 }, function(error){
                     console.log(error);
                 });     
             };  
-        }
+        };
+
+        var clearReservationAfterApproval = function(reserv){
+            var findResource = function(resource){
+                return reserv.resource_id == resource.resource_id;
+            };
+            var resourceToUpdate = $scope.resourcesToDisplay.find(findResource);
+            var findReservation = function(reservation){
+                return reserv.reservation_id == reservation.reservation_id;
+            };
+            var reservations = resourceToUpdate.reservations;
+            var reservationToRemove = reservations.find(findReservation);
+            var index = reservations.indexOf(reservationToRemove)
+            $scope.resourcesToDisplay.find(findResource).reservations.splice(index, 1);
+            if(reservations.length == 0){
+                removeResourceFromDisplay(resourceToUpdate);
+            }
+        };
+
+        var clearReservationAfterDeny = function(reserv){
+            var resourcesToRemove = [];
+            $scope.resourcesToDisplay.forEach(function(resource){
+                var reservations = resource.reservations;
+                var findReservation = function(reservation){
+                    return reserv.reservation_id == reservation.reservation_id;
+                };
+                var reservationToRemove = reservations.find(findReservation);
+                var index = reservations.indexOf(reservationToRemove);
+                if(index != -1){
+                    resource.reservations.splice(index, 1);
+                    if(reservations.length == 0){
+                        resourcesToRemove.push(resource);
+                    }
+                }
+            });
+            resourcesToRemove.forEach(function(resource){
+                removeResourceFromDisplay(resource);
+            });
+        };
+
+        var removeResourceFromDisplay = function(resource){
+            var index = $scope.resourcesToDisplay.indexOf(resource);
+            $scope.resourcesToDisplay.splice(index, 1);
+        };
+
+
+
+
+        $scope.initializePage();
 
 	});
