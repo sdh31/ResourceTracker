@@ -57,11 +57,6 @@ id:id of resource to delete
 };
 
 function addGroupPermissionToResource(body, callback) {
-
-    if (body.group_ids.length != body.resource_permissions.length) {
-        callback({error: true});
-        return;
-    }
     
     var addGroupPermissionToResourceQuery = resource_query_builder.buildQueryForAddGroupPermissionToResource(body);
     basic_db_utility.performSingleRowDBOperation(addGroupPermissionToResourceQuery, callback);

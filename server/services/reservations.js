@@ -19,7 +19,7 @@ function get_reservations_by_resources(body, callback) {
 
 function get_reservation_by_id(reservation, callback){
     var getReservationByIdQuery = reservation_query_builder.buildQueryForGetReservationById(reservation);
-    basic_db_utility.performSingleRowDBOperation(getReservationByIdQuery, callback);
+    basic_db_utility.performMultipleRowDBOperation(getReservationByIdQuery, callback);
 }
 
 function create_reservation_resources_link(reservation_id, resources, callback) {
@@ -69,6 +69,11 @@ function filterAllowedOverlappingReservations(reservations) {
     return confirmedReservations;
 }
 
+function get_unconfirmed_resources_for_reservation(reservation, callback){
+    var getUnconfirmedResourcesQuery = reservation_query_builder.buildQueryForGetUnconfirmedResources(reservation);
+    basic_db_utility.performMultipleRowDBOperation(getUnconfirmedResourcesQuery, callback);
+}
+
 /*function scheduleEmailForReservation(user, reservation) {
     //Doesn't have a callback so that the other data functions can run first.
     //Also don't really want to throw an error if all of the INSERTS worked correctly
@@ -98,7 +103,7 @@ function deleteReservationsById(reservations, callback) {
     basic_db_utility.performSingleRowDBOperation(deleteReservationsByIdQuery, callback);
 };
 
-function remove_resource_from_reservation(reservation, user, callback){
+function remove_resource_from_reservation(reservation, user, has_auth, callback){
     var removeResourceFromReservation = reservation_query_builder.buildQueryForRemoveResourceFromReservation(reservation, user);
     basic_db_utility.performSingleRowDBOperation(removeResourceFromReservation, callback);
 }
@@ -109,11 +114,10 @@ function getAllReservationsForUser(user, callback) {
 };
 
 function filterResourcesByPermission(resources, minPermission) {
-
     var resourcesWithPermission = [];
-
+    console.log(minPermission)
     for (var i = 0; i<resources.length; i++) {
-        if ((resources[i].resource_permission == minPermission || resources[i].resource_permission == 'manage') && resourcesWithPermission.indexOf(resources[i].resource_id) == -1) {
+        if ((resources[i].resource_permission >= minPermission) && resourcesWithPermission.indexOf(resources[i].resource_id) == -1) {
             resourcesWithPermission.push(resources[i].resource_id);
         }
     }
@@ -121,9 +125,24 @@ function filterResourcesByPermission(resources, minPermission) {
     return resourcesWithPermission;
 };
 
+function getOverlappingReservationsByResource(reservation, callback){
+    var getoverlappingQuery = reservation_query_builder.buildQueryForGetOverlappingReservationsByResource(reservation)
+    basic_db_utility.performMultipleRowDBOperation(getoverlappingQuery, callback)
+}
+
 function denyResourceReservation(reservation, user, callback){
-    var denyreservationQuery = buildQueryForDenyResourceReservation(reservation, user)
-    basic_db_utility.performSingleRowDBOperation(denyreservationQuery, callback);
+    var denyReservationQuery = reservation_query_builder.buildQueryForDenyResourceReservation(reservation, user)
+    basic_db_utility.performSingleRowDBOperation(denyReservationQuery, callback);
+}
+
+function deleteConflictingReservations(reservation, callback){
+    var deleteConflictingReservationQuery = reservation_query_builder.buildQueryForDeleteConflictingReservations(reservation);
+    basic_db_utility.performSingleRowDBOperation(deleteConflictingReservationQuery, callback)
+}
+
+function confirmResourceReservation(reservation, user, callback){
+    var confirmReservationQuery = reservation_query_builder.buildQueryForConfirmResource(reservation, user)
+    basic_db_utility.performSingleRowDBOperation(confirmReservationQuery, callback);
 }
 
 function organizeReservations(reservations) {
@@ -176,5 +195,10 @@ module.exports = {
     organizeReservations: organizeReservations,
     remove_resource_from_reservation:remove_resource_from_reservation,
     filterAllowedOverlappingReservations: filterAllowedOverlappingReservations,
-    filterResourcesByPermission: filterResourcesByPermission
+    filterResourcesByPermission: filterResourcesByPermission,
+    denyResourceReservation: denyResourceReservation,
+    confirmResourceReservation: confirmResourceReservation,
+    deleteConflictingReservations:deleteConflictingReservations,
+    get_unconfirmed_resources_for_reservation:get_unconfirmed_resources_for_reservation,
+    getOverlappingReservationsByResource: getOverlappingReservationsByResource
 }

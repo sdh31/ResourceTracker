@@ -1,19 +1,10 @@
 import requester as r
 from time import sleep
+from requester import test_print
 
 r.verify = False
 
-failed = 0
-passed = 0
-
-def test_print(desc, expression):
-	global failed, passed
-	if not expression:
-		print desc
-		print expression
-		failed += 1
-	else:
-		passed += 1
+r.initialize_and_clear_tables()
 
 desc = '#### initialize session ####'
 session_response = r.login_to_session('admin', 'Treeadmin')
@@ -43,6 +34,11 @@ res = r.get_all_users()
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 test_print(desc, r.json.loads(res.content)['results'][0]['email_address'] == 'jag.buddhavarapu@gmail.com')
 
+desc = '#### create restricted resource ###'
+res = r.create_resource("restricted", "restricted", "restricted")
+test_print(desc, res.status_code < 300)
+restricted_id = r.json.loads(res.content)['insertId']
+
 desc = '#### create resource with tags ####'
 res = r.create_resource("server1", "this is a server", 'free')
 test_print(desc, res.status_code < 300)
@@ -70,10 +66,10 @@ res = r.get_group_permission_to_resource(resource_id)
 test_print(desc, res.status_code < 300)
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 
-desc =  '#### get all resources and make sure there are 2 ####'
+desc =  '#### get all resources and make sure there are 3 ####'
 res = r.get_all_resources()
 test_print(desc, res.status_code < 300)
-test_print(desc, len(r.json.loads(res.content)) == 2)
+test_print(desc, len(r.json.loads(res.content)) == 3)
 
 desc =  '#### create another user ####' 
 res = r.create_user('rahul', 'rahul123')
@@ -118,7 +114,7 @@ test_print(desc, r.json.loads(res.content)['results'][0]['username'] == 'admin')
 test_print(desc, r.json.loads(res.content)['results'][0]['first_name'] == 'admin')
 
 desc =  '#### add view permission to the group for the resource with tags ####'
-res = r.add_group_permission_to_resource(resource_id, [group_id], ['view'])
+res = r.add_group_permission_to_resource(resource_id, [group_id], [r.permissions['view']])
 test_print(desc, res.status_code < 300)
 
 desc =  '#### get permissions for resource with tags and make sure we good ####'
@@ -127,7 +123,7 @@ test_print(desc, res.status_code < 300)
 test_print(desc, r.json.loads(res.content)['results'][1]['group_id'] == group_id)
 
 desc =  '#### add view permission to the group for the resource without tags ####'
-res = r.add_group_permission_to_resource(no_tags_id, [group_id], ['view'])
+res = r.add_group_permission_to_resource(no_tags_id, [group_id], [r.permissions['view']])
 test_print(desc, res.status_code < 300)
 
 desc =  '#### update resource with tags ####'
@@ -140,9 +136,10 @@ test_print(desc, res.status_code < 300)
 test_print(desc, r.json.loads(res.content)['results']['name'] == "serverEdited")
 
 desc =  '#### create reservation ####'
-res = r.create_reservation([no_tags_id, resource_id], 0, 2, 'title', 'description')
+res = r.create_reservation([no_tags_id, restricted_id, resource_id], 0, 2, 'title', 'description')
 test_print(desc, res.status_code < 300)
 reservation_id = r.json.loads(res.content)['results']['insertId']
+res = r.get_reservations([resource_id],0, 999999 )
 
 desc =  '#### create an aliasing reservation ####'
 res = r.create_reservation([resource_id], 2, 3, 'title', 'description')
@@ -153,8 +150,9 @@ res = r.create_reservation([resource_id], 3, 3, 'title', 'description')
 test_print(desc, res.status_code >= 400)
 
 desc =  '#### create another valid reservation ####'
-res = r.create_reservation([resource_id], 3, 4, 'title', 'description')
+res = r.create_reservation([resource_id, restricted_id], 3, 4, 'title', 'description')
 test_print(desc, res.status_code < 300)
+reservation_id2 = r.json.loads(res.content)['results']['insertId']
 
 desc =  '#### get all reservations ####'
 res = r.get_reservations(resource_id, 0, 99999)
@@ -165,7 +163,7 @@ res = r.update_reservations(resource_id, 200, 201, reservation_id, 'updated_rese
 test_print(desc, res.status_code > 300)
 
 desc = "### successfully update reservation ###"
-res = r.update_reservations(resource_id, 1, 2, reservation_id, 'updated_reserv', 'u_desc')
+res = r.update_reservations(restricted_id, 1, 2, reservation_id, 'updated_reserv', 'u_desc')
 test_print(desc, res.status_code < 300)
 
 desc = "### get all reservations for resource_id and no_tags_id"
@@ -175,6 +173,14 @@ test_print(desc, res.status_code < 300)
 
 desc =  '#### delete resource without tags ####'
 res = r.delete_resource(no_tags_id)
+test_print(desc, res.status_code < 300)
+
+desc = "### deny request for resource ###"
+res = r.deny_resource_reservation(restricted_id, reservation_id)
+test_print(desc, res.status_code < 300)
+
+desc = "### confirm request for resource ###"
+res = r.confirm_resource_reservation(restricted_id, reservation_id2)
 test_print(desc, res.status_code < 300)
 
 r.session = ''
@@ -189,13 +195,19 @@ res = r.remove_resource_from_reservation(reservation_id, resource_id)
 test_print(desc, res.status_code > 300)
 r.session = admin_session
 
-desc = "### remove resource as reservation owner"
-res = r.remove_resource_from_reservation(reservation_id, resource_id)
+desc = "### remove resource from reservation as reservation owner"
+res = r.remove_resource_from_reservation(reservation_id2, resource_id)
 test_print(desc, res.status_code < 300)
 
+desc =  '#### create a restricted resource ####'
+res = r.create_resource("restrictedRes", "restrictedDesc", 'restricted')
+test_print(desc, res.status_code < 300)
+restricted_resource_id = r.json.loads(res.content)['insertId']
+
+desc =  '#### create reservation on restricted resource ####'
+res = r.create_reservation([restricted_resource_id], 0, 2, 'title', 'description')
+test_print(desc, res.status_code < 300)
+restricted_reservation_id = r.json.loads(res.content)['results']['insertId']
 
 
-print str(failed) + "tests failed"
-print str(passed) + "tests passed"
-
-
+r.finish_test("temp main test")
