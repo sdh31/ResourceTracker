@@ -130,7 +130,8 @@ function organizeResources(resources) {
             username: thisResource.username,
             first_name: thisResource.first_name,
             last_name: thisResource.last_name,
-            user_id: thisResource.user_id
+            user_id: thisResource.user_id,
+            is_confirmed: thisResource.is_confirmed
         };
 		var index = resourceExists(thisResource, resourcesToSend);
 		if (index != -1) {
@@ -153,7 +154,6 @@ function organizeResources(resources) {
 			var resource = {
 				name: thisResource.name,
 				description: thisResource.description,
-				//max_users: thisResource.max_users,
                 resource_state: thisResource.resource_state,
 				tags: tag,
 				resource_id: thisResource.resource_id,
