@@ -38,7 +38,6 @@ router.put('/', function(req,res,next){
         }
     }
     if(!perm_service.check_user_permission(req.session)){
-        console.log()
         res.status(403).json(perm_service.denied_error)
         return;
     }
@@ -78,7 +77,7 @@ router.delete('/', function(req,res,next){
 
     var deleteReservationsCallback = function(result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             group_service.delete_group_by_id(req.query, delete_group_callback);
         }
@@ -86,7 +85,7 @@ router.delete('/', function(req,res,next){
 
     var getReservationsCallback = function(result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             if (result.results.length == 0) {
                 res.status(200).json(result);
@@ -101,7 +100,7 @@ router.delete('/', function(req,res,next){
 
     var checkPermissionForResourceCallback = function (result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var groupsThatHaveReservePermission = [];
 
@@ -135,7 +134,7 @@ router.delete('/', function(req,res,next){
 
     var getAllGroupsForUsersCallback = function(result) {
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             allGroupsForUsers = result.results;
 
@@ -150,7 +149,7 @@ router.delete('/', function(req,res,next){
 
     var getUsersInGroupsCallback = function(result){
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             allUsers = result.results;
             group_service.get_all_groups_for_users(result.results, getAllGroupsForUsersCallback);
@@ -221,7 +220,7 @@ router.post('/removeUsers', function(req,res,next){
 
     var getReservationsCallback = function(result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             if (result.results.length == 0) {
                 res.status(200).json(result);
@@ -236,7 +235,7 @@ router.post('/removeUsers', function(req,res,next){
 
     var checkPermissionForResourceCallback = function (result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var groupsThatHaveReservePermission = [];
 
@@ -267,7 +266,7 @@ router.post('/removeUsers', function(req,res,next){
 
     var getAllGroupsForUsersCallback = function(result) {
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             allGroupsForUsers = result.results;
 

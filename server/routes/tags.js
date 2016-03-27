@@ -13,7 +13,7 @@ router.get('/', auth.is('user'), function(req, res, next){
     }
 	var tags_callback = function(result){
 		if (result.error == true){
-			res.sendStatus(400);
+			res.status(400).json(result);
 		} else {
 			res.send(JSON.stringify(result));
 		}
@@ -30,7 +30,7 @@ router.post('/filter', auth.is('user'), function(req, res, next){
     }
     var filter_callback = function(result){
 		if (result.error == true){
-		  res.sendStatus(400);
+		  res.status(400).json(result);
 		} else {
 			res.send(JSON.stringify(result));
 		}
@@ -43,7 +43,7 @@ router.post('/filter', auth.is('user'), function(req, res, next){
 
     var getAllGroupsForUserCallback = function(result){
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var group_ids = [];
             for (var i = 0; i<result.results.length; i++) {
@@ -63,9 +63,14 @@ router.put('/', auth.is('user'), function(req, res, next){
         return;
     }
 
+    // make sure that there are tags
+    if (req.body.addedTags == null || req.body.addedTags.length == 0) {
+        res.sendStatus(400);
+    }
+
     var createResourceTagLinkCallback = function(result){
         if (result.error){
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             res.sendStatus(200);
         } 
@@ -73,7 +78,7 @@ router.put('/', auth.is('user'), function(req, res, next){
 
     var selectTagIdsCallback = function(result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var tag_ids = [];
             for (var i = 0; i<result.results.length; i++) {
@@ -85,7 +90,7 @@ router.put('/', auth.is('user'), function(req, res, next){
 
     var createTagCallback = function(result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             tag_service.select_tag_ids(req.body.addedTags, selectTagIdsCallback);
         }
@@ -93,7 +98,7 @@ router.put('/', auth.is('user'), function(req, res, next){
 
     var initialSelectTagsIdsCallback = function(result) {
         if (result.error) {
-            res.sendStatus(400);
+            res.status(400).json(result);
         } else {
             var addedTags = [];
 
@@ -111,7 +116,11 @@ router.put('/', auth.is('user'), function(req, res, next){
                     addedTags.splice(addedTags.indexOf(tag_names[i]), 1);
                 }
             }
-            tag_service.create_tag(addedTags, createTagCallback);
+            if (addedTags.length > 0) {
+                tag_service.create_tag(addedTags, createTagCallback);
+            } else {
+                tag_service.select_tag_ids(req.body.addedTags, selectTagIdsCallback);
+            }
         }
     }
 
@@ -125,7 +134,7 @@ router.post('/', auth.is('user'), function(req, res, next){
     }
     var delete_callback = function(result){
         if (result.error == true){
-			res.sendStatus(400);
+			res.status(400).json(result);
         } else {
         	res.sendStatus(200);
 		}

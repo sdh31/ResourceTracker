@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 
 requests.packages.urllib3.disable_warnings()
 
@@ -10,6 +11,35 @@ headers = {
 
 session = ''
 baseUrl = 'https://colab-sbx-202.oit.duke.edu'
+
+passed = 0
+failed = 0
+
+permissions = {
+	"view": 0,
+	"reserve": 1,
+	"manage": 2
+}
+
+def test_print(desc, expression):
+	global failed, passed
+	if not expression:
+		print desc
+		print expression
+		failed += 1
+	else:
+		passed += 1
+
+def finish_test(test_name):
+	global failed, passed
+	logout()
+	print ""
+	print test_name + " has finished with:"
+	print str(failed) + "tests failed"
+	print str(passed) + "tests passed"
+	print ""
+	passed = 0
+	failed = 0
 
 def send_request(method, params, url):
 	if method == 'GET' or method == 'DELETE':
@@ -32,7 +62,11 @@ def send_request(method, params, url):
 		)
 	return response
 
-
+def initialize_and_clear_tables():
+	os.system("mysql -u root -pdb test_db -e 'DROP DATABASE test_db; CREATE DATABASE test_db;'")
+	os.system("mysql -u root -pdb test_db < ~/ResourceTracker/server/create_tables.sql")
+	res = initialize_admin_user()
+	test_print("initialize create", res.status_code < 300)
 
 def login_to_session(username, password):
 	url = baseUrl + '/user/signin'
@@ -46,7 +80,13 @@ def login_to_session(username, password):
 	
 	return send_request(method, params, url)
 
-def create_user(username, password):
+def logout():
+	url = baseUrl + '/user/signout'
+	method = "POST"
+	params = {}
+	return send_request(method, params, url)
+
+def create_user (username, password):
 	url = baseUrl + '/user'
 	method = "PUT"
 	 
@@ -59,6 +99,25 @@ def create_user(username, password):
         'last_name': 'abcd',
 		'is_shibboleth': 0
 	}
+	return send_request(method, params, url)
+
+def initialize_admin_user():
+	url = baseUrl + '/user'
+	method = "PUT"
+	 
+
+	params = {
+		'username': 'admin',
+		'password': 'Treeadmin',
+		'user_management_permission': 1,
+		'resource_management_permission': 1,
+		'reservation_management_permission': 1,
+        'is_shibboleth': 0,
+		'first_name': 'admin',
+		'last_name': 'admin',
+		'email_address': 'admin@admin.com',
+        'emails_enabled': 1
+	};
 	return send_request(method, params, url)
 
 def update_user(username, newUsername = None, password = None, email_address = None):
@@ -123,19 +182,19 @@ def get_all_resources():
 
 	return send_request(method, params, url)
 
-def create_resource(name, description, max_users=None):
+def create_resource(name, description, resource_state):
 	url = baseUrl + '/resource'
 	method = "PUT"
 
 	params = {
 	'name': name,
 	'description':description,
-	'max_users': max_users
+	'resource_state': resource_state
 	}
 
 	return send_request(method, params, url)
 
-def update_resource(id, name = None, description = None, max_users = None):
+def update_resource(id, name = None, description = None, resource_state = None):
 	url = baseUrl + '/resource'
 	method = "POST"
     
@@ -146,8 +205,8 @@ def update_resource(id, name = None, description = None, max_users = None):
 		params['name'] = name
 	if description:
 		params['description'] = description
-	if max_users:
-		params['max_users'] = max_users
+	if resource_state:
+		params['resource_state'] = resource_state
 
 	return send_request(method, params, url)
 
@@ -185,7 +244,7 @@ def remove_group_permission_to_resource(resource_id, group_ids):
 	return send_request(method, params, url)
 
 def filter_tags(included_tags, excluded_tags, start_time, end_time):
- 	url = baseUrl + '/resource/filter'
+ 	url = baseUrl + '/tag/filter'
  	method = "POST"
  
  	params = {
@@ -236,14 +295,16 @@ def get_all_tags():
  	return send_request(method, params, url)
  
 
-def create_reservation(resource_id, start, end):
+def create_reservation(resource_ids, start, end, title, description):
 	url = baseUrl + '/reservation'
 	method = "PUT"
 
 	params = {
-		'resource_id':resource_id,
+		'resource_ids':resource_ids,
 		'start_time':start,
-		'end_time':end
+		'end_time':end,
+		'reservation_title':title,
+		'reservation_description':description
 	}
 
 	return send_request(method, params, url)
@@ -272,19 +333,32 @@ def get_reservations(resource_id, start, end ,reservation_id = None):
 
 	return send_request(method, params, url)
 
-def update_reservations(resource_id, start, end, reservation_id):
+def update_reservations(resource_id, start, end, reservation_id, title, description):
 	url = baseUrl + '/reservation'
 	method = "POST"
 
 	params = {
 		'resource_id': resource_id,
-		'reservation_id': reservation_id,
+		'reservation_ids': reservation_id,
 		'start_time': start,
-		'end_time': end,
+		'end_time': end
 	}
 	if reservation_id:
 		params['reservation_id'] = reservation_id
+	if title:
+		params['reservation_title'] = title
+	if description:
+		params['reservation_description'] = description
 
+	return send_request(method, params, url)
+
+def get_reservations_by_resources(resource_ids):
+	url = baseUrl + '/reservation/getReservationsByResources';
+	method = "POST";
+
+	params = {
+		'resource_ids': resource_ids
+	}
 	return send_request(method, params, url)
 
 def create_group(name, description, user_permissions, resource_permissions, reservation_permissions, privacy):
@@ -363,3 +437,35 @@ def get_api_token():
 	params = {}
 
 	return send_request(method, params, url)
+
+def remove_resource_from_reservation(reservation_id, resource_id):
+	url = baseUrl + '/reservation/remove_resource'
+	method = "POST"
+	params = {
+		"reservation_id": reservation_id,
+		"resource_id": resource_id
+	}
+
+	return send_request(method, params, url)
+
+def confirm_resource_reservation(resource_id, reservation_id):
+	url = baseUrl + '/reservation/confirm_request'
+	method = "POST"
+	params = {
+		"reservation_id": reservation_id,
+		"resource_id": resource_id
+	}
+
+	return send_request(method, params, url)
+
+def deny_resource_reservation(resource_id, reservation_id):
+	url = baseUrl + '/reservation/deny_request'
+	method = "POST"
+	params = {
+		"reservation_id": reservation_id,
+		"resource_id": resource_id
+	}
+	
+	return send_request(method, params, url)
+
+	

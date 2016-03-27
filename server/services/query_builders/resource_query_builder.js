@@ -10,12 +10,23 @@ module.exports.buildQueryForGetResourceById = function(resource) {
     return query.toString();
 };
 
+module.exports.buildQueryForGetResourcesByIds = function (resource_ids) {
+    
+    var resourceIdFilter = squel.expr();
+
+    for (var i = 0; i<resource_ids.length; i++) {
+        resourceIdFilter.or("resource_id = " + resource_ids[i]);
+    }
+
+    return squel.select().from("resource").where(resourceIdFilter).toString();
+};
+
 module.exports.buildQueryForCreateResource = function(resource) {
     return squel.insert()
 		.into('resource')
 		.set("name", resource.name)
 		.set("description", resource.description)
-		.set("max_users", resource.max_users)
+		.set("resource_state", resource.resource_state)
 		.toString();
 };
 
@@ -33,8 +44,8 @@ module.exports.buildQueryForUpdateResource = function(resource) {
         query.set("description", resource.description);
     }
 
-    if (("max_users" in resource)){
-        query.set("max_users", resource.max_users);
+    if (("resource_state" in resource)){
+        query.set("resource_state", resource.resource_state);
     }
 
     return query.toString();
@@ -44,9 +55,10 @@ module.exports.buildQueryForCheckReservationsOnDeleteResource = function(resourc
     return squel.select()
             .from("reservation")
             .left_join("user_reservation", null, "reservation.reservation_id = user_reservation.reservation_id")
-            .left_join("resource", null, "reservation.resource_id = resource.resource_id")
+            .left_join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
+            .left_join("resource", null, "reservation_resource.resource_id = resource.resource_id")
             .left_join("user", null, "user_reservation.user_id = user.user_id")
-            .where("reservation.resource_id = '" + resource.resource_id + "'")
+            .where("reservation_resource.resource_id = '" + resource.resource_id + "'")
             .toString();
 };
 

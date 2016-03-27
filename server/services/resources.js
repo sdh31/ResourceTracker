@@ -12,6 +12,11 @@ function get_resource_by_id(resource, callback){
     basic_db_utility.performSingleRowDBOperation(getResourceByIdQuery, callback);
 };
 
+function get_resources_by_ids(resource_ids, callback) {
+    var getResourceByIdsQuery = resource_query_builder.buildQueryForGetResourcesByIds(resource_ids);
+    basic_db_utility.performMultipleRowDBOperation(getResourceByIdsQuery, callback);
+};
+
 function create_resource(resource, callback){
     /*
     Create a resource, given all parameters 
@@ -52,11 +57,6 @@ id:id of resource to delete
 };
 
 function addGroupPermissionToResource(body, callback) {
-
-    if (body.group_ids.length != body.resource_permissions.length) {
-        callback({error: true});
-        return;
-    }
     
     var addGroupPermissionToResourceQuery = resource_query_builder.buildQueryForAddGroupPermissionToResource(body);
     basic_db_utility.performSingleRowDBOperation(addGroupPermissionToResourceQuery, callback);
@@ -105,6 +105,7 @@ var notifyUserOnReservationDelete = function(row) {
 
 module.exports = {
 	get_resource_by_id: get_resource_by_id,
+    get_resources_by_ids: get_resources_by_ids,
 	create_resource: create_resource,
     update_resource_by_id: update_resource_by_id,
     delete_resource_by_id:delete_resource_by_id,

@@ -3,7 +3,6 @@
 angular.module('resourceTracker')
     .controller('ViewResourceCtrl', function ($scope, $http, $location, resourceService) {
         
-
         $scope.clearError();
         $scope.clearSuccess();
 
@@ -16,6 +15,7 @@ angular.module('resourceTracker')
 		var oldTags = [];
 		var oldName = "";
 		var oldDescription = "";
+        var oldResourceState = "";
 
 		$scope.isResourceSelected = function() {
 			return $scope.selectedResource.name && $scope.selectedResource.name.length > 0;
@@ -29,6 +29,7 @@ angular.module('resourceTracker')
 			$scope.currentTag = '';
 			oldName = $scope.selectedResource.name;
 			oldDescription = $scope.selectedResource.description;
+            oldResourceState = $scope.selectedResource.resource_state;
 			oldTags = [];
 			$scope.editingResource.tags = []; 
 
@@ -39,12 +40,13 @@ angular.module('resourceTracker')
 			}
 
 			$scope.editingResource.resource_id = $scope.selectedResource.resource_id;
-			$scope.editingResource.max_users = $scope.selectedResource.max_users;
+			$scope.editingResource.resource_state = oldResourceState;
 			$scope.editingResource.name = oldName;
 			$scope.editingResource.description = oldDescription;
 		};
 
 		$scope.revertEditing = function() {
+            $scope.editingResource.resource_state = oldResourceState;
 			$scope.editingResource.name = oldName;
 			$scope.editingResource.description = oldDescription;
 			$scope.editingResource.tags = oldTags;

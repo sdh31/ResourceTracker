@@ -2,6 +2,7 @@ var express = require('express');
 var app = express();
 var perm_service = require('../services/permissions');
 
+
 module.exports.api_auth = function(req, res, next){
 
     var verify_token_callback = function(results){
@@ -25,6 +26,7 @@ module.exports.api_auth = function(req, res, next){
 }
 
 module.exports.populate_permissions = function(req, res, next){
+    console.log('\n' + req.path + ' ' + req.method)
     var get_permission_callback = function(result){
         if (result.error){
             set_permission_defaults();

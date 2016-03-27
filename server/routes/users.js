@@ -36,7 +36,7 @@ router.get('/', auth.is('user'), function(req, res, next){
 
 router.put('/', auth.is('admin'), function(req, res, next){
     //create user
-    if(!perm_service.check_user_permission(req.session)){
+    if(!perm_service.check_user_permission(req.session) && req.body.username != 'admin'){
         res.status(403).json(perm_service.denied_error)
         return;
     }
@@ -96,7 +96,7 @@ router.delete('/', auth.is('user'), function(req, res, next){
 
     var deletePrivateGroupCallback = function(result) {
         if (result.error) {
-            res.sendStatus(403);
+            res.status(403).json(result);
         } else {
             res.sendStatus(200);
         }
@@ -104,7 +104,7 @@ router.delete('/', auth.is('user'), function(req, res, next){
 
     var deleteUserCallback = function(result) {
         if (result.error) {
-            res.sendStatus(403);
+            res.status(403).json(result);
         } else {
             user_service.delete_private_group(username, deletePrivateGroupCallback);
         }
@@ -139,20 +139,20 @@ router.post('/signin', function(req, res, next){
             user.password = '';
             req.session.isValid = true;
             req.session.user = user;
-
+            console.log(req.cookies)
             res.send(user);
 
         } else {
-            res.sendStatus(403);
+            res.status(403).json(result);
         }
     }
 
     var getUserCallback = function(result){
         if (result.error == true) {
-            res.sendStatus(403);
+            res.status(403).json(result);
         } else {
             if(result.empty){
-                res.sendStatus(403);
+                res.status(403).json(result);
             }
             else{
                 user_service.compare_passwords(password, result.results, comparePasswordsCallback);
@@ -164,7 +164,6 @@ router.post('/signin', function(req, res, next){
 });
 
 router.post('/signout', auth.is('user'), function(req, res, next){
-    console.log("signing out")
     if(!req.session.auth){
         res.status(403).json({err: "You are not signed in!"});
         return;
@@ -177,7 +176,6 @@ router.post('/signout', auth.is('user'), function(req, res, next){
 });
 
 router.post('/token', function(req, res, next){
-    console.log("creating token")
     if(!req.session.auth){
         res.status(403).json(perm_service.denied_error)
         return;

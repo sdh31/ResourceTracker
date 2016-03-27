@@ -9,6 +9,24 @@ var secret_token = "so secret"
 var denied_error = {
     err: "You do not have the requisite permissions to perform this action"
 }
+var resource_permissions = {
+    view: 0,
+    reserve: 1,
+    manage: 2,
+    admin: 10
+}
+
+function get_permission_id(permission_list){
+    var permission_id_list = []
+    for(var i = 0; i < permission_list.length; i++){
+        if(!(permission_list[i] in resource_permissions)){
+            console.log("invalid permission name " + permission_list[i])
+            return null
+        }
+        permission_id_list.push(resource_permissions[permission_list[i]])
+    }
+    return permission_id_list;
+}
 
 function generate_api_auth_token(payload, callback){
     var username = payload.username;
@@ -113,5 +131,6 @@ module.exports = {
     check_user_permission:check_user_permission,
     check_resource_permission:check_resource_permission,
     check_reservation_permission:check_reservation_permission,
-    denied_error:denied_error
+    denied_error:denied_error,
+    get_permission_id: get_permission_id
 }

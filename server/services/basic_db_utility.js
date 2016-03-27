@@ -10,6 +10,7 @@ module.exports.performSingleRowDBOperation = function(query, callback) {
 	        results = row;
 	    })
 	    .on('error', function (err) {
+            console.log(err)
 	        error = true;
             err = err;
 	    })
@@ -28,6 +29,7 @@ module.exports.performMultipleRowDBOperation = function(query, callback) {
             results.push(row);
         })
         .on('error', function (err) {
+            console.log(err)
             error = true;
             err = err;
         })
