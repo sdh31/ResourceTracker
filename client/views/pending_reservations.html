@@ -2,39 +2,52 @@
 <div class="row vertical-align">
 <div class="input-group panel panel-default col-md-12" id="login" aria-describedby="sizing-addon3" style="display: inline-block; width: auto;">
     <div class="panel-body">
-        <div class="control-group">
-            <span ng-dropdown-multiselect="" options="resourcesToDisplay" selected-model="selectedResourcesIDs"
+        <div class="control-group" style="text-align:center;">
+            <span ng-dropdown-multiselect="" options="allResources" selected-model="selectedResourcesIDs"
                   extra-settings="{enableSearch: true}"
                   translation-texts="{buttonDefaultText: 'Select one or more resource'}"></span> <br/><br/>
             <button type="button"
                     class="btn btn-primary btn-md"
-                    ng-click="getReservationsForSelectedResources()">Get Reservations!</button>
+                    ng-click="getReservationsForSelectedResources()">Get Resources!</button>
         </div>
-        <div ng-show="showReservations">
-            <table>
+        <div ng-if="showReservations">
+            <table class="table">
                 <thead>
                     <tr>
-                        <th style="width: 30px; text-align: center;">See Resources</th>
-                        <th style="width: 100px; text-align: center;">Title</th>
-                        <th style="width: 200px; text-align: center;">Description</th>
-                        <th style="width: 150px; text-align: center;">Start Time</th>
-                        <th style="width: 150px; text-align: center;">End Time</th>
+                        <th style="width: 100px;">Resource</th>
+                        <th style="width: 200px;">Description</th>
+                        <th style="width: 30px;">Reservations</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr ng-repeat-start="reservation in reservationsToDisplay">
-                        <td style="text-align: center;">
-                            <button ng-if="reservation.expanded" ng-click="reservation.expanded = false">-</button>
-                            <button ng-if="!reservation.expanded" ng-click="reservation.expanded = true">+</button>
+                <tbody ng-repeat="resource in resourcesToDisplay">
+                    <tr>
+                        <td>{{resource.name}}</td>
+                        <td>{{resource.description}}</td>
+                        <td>
+                            <button ng-if="resource.expanded" ng-click="resource.expanded = false">-</button>
+                            <button ng-if="!resource.expanded" ng-click="resource.expanded = true">+</button>
                         </td>
-                        <td style="text-align: center;">{{reservation.title}}</td>
-                        <td style="text-align: center;">{{reservation.description}}</td>
-                        <td style="text-align: center;">{{reservation.start_time}}</td>
-                        <td style="text-align: center;">{{reservation.end_time}}</td>
                         <br/><br/>
                     </tr>
-                    <tr ng-if="reservation.expanded" ng-repeat-end="">
-                        <td colspan="3">test</td>
+                    <tr ng-if="resource.expanded" >
+                        <td COLSPAN=3 style="padding-left:30px; border-top: none;">
+                            <table cellpadding="3" cellspacing="3">
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Description</th>
+                                    <th>Start time</th>
+                                    <th>End time</th>                                
+                                </tr>
+                                <tr ng-repeat="reservation in resource.reservations">
+                                    <td>{{reservation.reservation_title}}</td>
+                                    <td>{{reservation.reservation_description}}</td>
+                                    <td>{{reservation.start_time}}</td>
+                                    <td>{{reservation.end_time}}</td>
+                                    <td><button ng-click="approveReservation(reservation)">Approve</td>
+                                    <td><button ng-click="denyReservation(reservation)">Deny</td>
+                                </tr>
+                            </table>
+                        </td>
                     </tr>
                 </tbody>
             </table>

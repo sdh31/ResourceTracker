@@ -42,6 +42,9 @@ textarea {
   width: 450px;
 }
 
+th, td {
+  text-align: center;
+}
 .cursor tr {
     cursor: pointer;
 }

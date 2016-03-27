@@ -5,19 +5,18 @@ angular.module('resourceTracker')
 
     	$scope.initializePage = function() {
     		$scope.selectedResourcesIDs = [];
-    		$scope.resourcesToDisplay = [];
+    		$scope.allResources = [];
             // resource_id to its resource
             $scope.resourceMap = new Map();
-            $scope.reservations = [];
-            $scope.reservationsToDisplay = [];
+            $scope.resourcesToDisplayMap = new Map();            
+            $scope.resourcesToDisplay = [];
             $scope.showReservations = false;
     		getAllResources();
-            console.log($scope.showReservations);
     	};
 
     	var getAllResources = function() {
 	   		$http.get('/resource/all').then(function(response) {
-		   		populateResourcesToDisplay(response.data, $scope.resourcesToDisplay);
+		   		populateResourcesToDisplay(response.data, $scope.allResources);
 		   		}, function(error){
 		   			console.log(error);
 		   		});
@@ -32,60 +31,73 @@ angular.module('resourceTracker')
         };
 
         $scope.getReservationsForSelectedResources = function(){
+            $scope.showReservations = false;
             var rIDArray = [];
-            var reservationsToDisplayMap = new Map();
             $scope.selectedResourcesIDs.forEach(function(resource){
                 rIDArray.push(resource.id);
             });            
             var reqBody = {resource_ids: rIDArray};
         	$http.post('/reservation/getReservationsByResources', reqBody).then(function(response) {
-                $scope.reservations = response.data.results;
-                createReservationMap(reservationsToDisplayMap);
+                var reservations = response.data.results;
+                createResourceToReservationMap(reservations);
         	}, function(error){
         		console.log(error);
         	});
         };
 
-        var createReservationMap = function(reservationsToDisplayMap){
-            $scope.reservations.forEach(function(reserv){
+        var createResourceToReservationMap = function(reservs){
+            $scope.resourcesToDisplayMap.clear();
+            reservs.forEach(function(reserv){
                 if(!reserv.is_confirmed){
-                    var reserv_id = reserv.reservation_id;
-                    if(reservationsToDisplayMap.has(reserv_id)){  
-                        var reserv_info = reservationsToDisplayMap.get(reserv_id);          
-                        var resourceArray = reserv_info.resources;
-                        resourceArray.push($scope.resourceMap.get(reserv.resource_id));
-                        reserv_info.resources = resourceArray;
-                        reservationsToDisplayMap.set(reserv_id, reserv_info);
+                    var resource_id = reserv.resource_id;
+                    var resource = $scope.resourceMap.get(resource_id);
+                    reserv = processReservationTimes(reserv);
+                    if($scope.resourcesToDisplayMap.has(resource_id)){  
+                        var resource_info = $scope.resourcesToDisplayMap.get(resource_id);
+                        var reservationList = resource_info.reservations;
+                        reservationList.push(reserv);
+                        resource_info.reservations = reservationList;
+                        $scope.resourcesToDisplayMap.set(resource_id, resource_info);
                     } else{
-                        var startTime = new Date(reserv.start_time);
-                        var endTime = new Date(reserv.end_time);
-                        var startTimeLabel = $filter('date')(startTime, "short");
-                        var endTimeLabel = $filter('date')(endTime, "short");
-                        var resource = [$scope.resourceMap.get(reserv.resource_id)];
-                        var reserv_info = {end_time: endTimeLabel,
-                               reservation_id: reserv_id,
-                               description: reserv.reservation_description,
-                               title: reserv.reservation_title,
-                               start_time: startTimeLabel,
-                               resources: resource}
-                        reservationsToDisplayMap.set(reserv_id, reserv_info);      
+                        var resource_info = {name: resource.name, description: resource.description,
+                                            resource_id: resource.resource_id, permission: resource.resource_permission,
+                                            state: resource.resource_state, tags: resource.tags, reservations: [reserv]};
+                        $scope.resourcesToDisplayMap.set(resource_id, resource_info);
                     }
                 }
             });
-            $scope.reservationsToDisplay = mapIteratorToArray(reservationsToDisplayMap);               
+            $scope.resourcesToDisplay = [];
+            $scope.resourcesToDisplay = mapIteratorToArray();
+            console.log($scope.resourcesToDisplay)
             $scope.showReservations = true;          
-            console.log($scope.reservationsToDisplay);
         };
 
-        var mapIteratorToArray = function(rMap){
-            console.log(rMap);
+        var mapIteratorToArray = function(){
             var rList = [];
-            for(let [key, value] of rMap){
+            for(let [key, value] of $scope.resourcesToDisplayMap){
                 rList.push(value);
             }
             return rList;
         }
 
     	$scope.initializePage();
+
+        var processReservationTimes = function(reserv){
+            var start_time = $filter('date')(reserv.start_time, "short");
+            var end_time = $filter('date')(reserv.end_time, "short");
+            reserv.start_time=start_time;
+            reserv.end_time=end_time;
+            return reserv;
+        }
+
+        $scope.approveReservation = function(reserv){
+            console.log("approve");
+            console.log(reserv);
+        }
+
+        $scope.denyReservation = function(reserv){
+            console.log("deny");
+            console.log(reserv);
+        }
 
 	});
