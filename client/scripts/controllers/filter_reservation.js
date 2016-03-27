@@ -207,11 +207,10 @@ angular.module('resourceTracker')
 
         var populateResourceArray = function(resourceData, resourceArray) {
             resourceData.forEach(function(resource) {
-                if (resource.resource_permission == 'reserve') {
+                if (resource.resource_permission > 0) {
                     var resourceData = {id: resource.resource_id, label: resource.name};
                     resourceArray.push(resourceData);
                     $scope.resourceReservationMap[resourceData.id] = resource.reservations;
-                    console.log(resource.reservations);
                 }
             });
         };

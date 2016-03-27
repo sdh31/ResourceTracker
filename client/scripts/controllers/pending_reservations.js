@@ -66,9 +66,7 @@ angular.module('resourceTracker')
                     }
                 }
             });
-            $scope.resourcesToDisplay = [];
             $scope.resourcesToDisplay = mapIteratorToArray();
-            console.log($scope.resourcesToDisplay)
             $scope.showReservations = true;          
         };
 
@@ -91,13 +89,29 @@ angular.module('resourceTracker')
         }
 
         $scope.approveReservation = function(reserv){
-            console.log("approve");
             console.log(reserv);
-        }
+            var reqBody = {resource_id: reserv.resource_id, reservation_id: reserv.reservation_id};
+            var result = confirm("Are you sure you want to approve")
+            $http.post('/reservation/confirm_request', reqBody).then(function(response) {
+                console.log(response);
+            }, function(error){
+                console.log(error);
+            });
+
+        };
 
         $scope.denyReservation = function(reserv){
-            console.log("deny");
             console.log(reserv);
+            var reqBody = {resource_id: reserv.resource_id, reservation_id: reserv.reservation_id};
+            var result = confirm("Are you sure you want to deny resource " + $scope.resourceMap.get(reserv.resource_id).name + " and delete reservation " + reserv.reservation_title + "?");
+            if(result){       
+                $http.post('/reservation/deny_request', reqBody).then(function(response) {
+                    confirm
+                    console.log(response);
+                }, function(error){
+                    console.log(error);
+                });     
+            };  
         }
 
 	});
