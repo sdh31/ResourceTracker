@@ -38,8 +38,8 @@ angular.module('resourceTracker')
             });            
             var reqBody = {resource_ids: rIDArray};
         	$http.post('/reservation/getReservationsByResources', reqBody).then(function(response) {
-                var reservations = response.data.results;
-                createResourceToReservationMap(reservations);
+                console.log(response.data.results);
+                createResourceToReservationMap(response.data.results);
         	}, function(error){
         		console.log(error);
         	});
@@ -60,12 +60,13 @@ angular.module('resourceTracker')
                         $scope.resourcesToDisplayMap.set(resource_id, resource_info);
                     } else{
                         var resource_info = {expanded: false, name: resource.name, description: resource.description,
-                                            resource_id: resource.resource_id, permission: resource.resource_permission,
-                                            state: resource.resource_state, tags: resource.tags, reservations: [reserv]};
+                                            resource_id: resource.resource_id, tags: resource.tags, reservations: [reserv],
+                                            };
                         $scope.resourcesToDisplayMap.set(resource_id, resource_info);
                     }
                 }
             });
+            console.log($scope.resourcesToDisplayMap);
             $scope.resourcesToDisplay = mapIteratorToArray();
             $scope.showReservations = true;          
         };

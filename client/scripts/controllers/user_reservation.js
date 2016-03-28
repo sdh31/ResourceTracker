@@ -67,9 +67,9 @@ angular.module('resourceTracker')
             })
         };
 
-        $scope.removeResources = function(){
+        var removeResources = function(){
+            console.log($scope.resourcesToRemove);
             $scope.resourcesToRemove.forEach(function(resource){
-                console.log(resource);
                 var reqBody = {resource_id: resource.id, reservation_id: $scope.reservationToModify.reservation_id};
                 $http.post('reservation/remove_resource', reqBody).then(function(response){
                     console.log(response);
@@ -78,10 +78,6 @@ angular.module('resourceTracker')
                 })
             });
         }
-
-        $scope.printResources = function(){
-            console.log($scope.resourcesToRemove);
-        };
 
         $scope.updateReservation = function() {
             if (!$scope.startReservationTime.valueOf()) {
@@ -93,7 +89,9 @@ angular.module('resourceTracker')
                 $scope.addError($scope.onReservationInvalidEndDate);
                 return;
             }
-            
+
+            removeResources();
+
 			modifyReservationsService.updateReservation($scope.reservationToModify.reservation_title,
             $scope.reservationToModify.reservation_description,
             $scope.startReservationTime.valueOf(), 
