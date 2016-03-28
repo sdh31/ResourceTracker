@@ -53,10 +53,4 @@ angular
                 $templateCache.remove(current.templateUrl);
             }
          });
-    })
-    .factory('$exceptionHandler', function() {
-        return function(exception, cause) {
-            exception.message += ' (caused by "' + cause + '")';
-            console.log(exception);
-        };
     });
