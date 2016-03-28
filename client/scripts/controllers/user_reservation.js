@@ -10,36 +10,28 @@ angular.module('resourceTracker')
 
         // this function initializes all global data on this page. 
         var initializeResourceReservations = function() {
-
             var currentTime = new Date();
-
             $scope.startReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
                                                     currentTime.getDate(), currentTime.getHours(), currentTime.getMinutes());
             $scope.endReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
                                                     currentTime.getDate(), currentTime.getHours(), currentTime.getMinutes());
-
             // reservation_id to reservation
             $scope.reservationMap = new Map();
-
             $scope.reservationIDToModify = {};
-
             $scope.reservationsToDisplay = [];
-
-            // all resources found in database, so admin can use them to modify/delete
             $scope.allReservations = [];
-
             // final reservation that needs modification
             $scope.reservationToModify = {};
-
             $scope.reservationSelected = false;
-
+            $scope.selectedReservationResources = [];
+            $scope.resourcesToDisplay = [];
+            $scope.resourcesToRemove = [];
             getAllResources();
         };
 
         var getAllResources = function() {
             return $http.get('/reservation').then(function(response) {
                 $scope.allReservations = response.data.results;
-                console.log($scope.allReservations);
                 populateReservationsToDisplay($scope.allReservations, $scope.reservationsToDisplay);
             }, function(error) {
                 console.log(error);
@@ -61,6 +53,34 @@ angular.module('resourceTracker')
             var endTime = new Date($scope.reservationToModify.end_time);
             $scope.startReservationTime = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(), startTime.getHours(), startTime.getMinutes());
             $scope.endReservationTime = new Date(endTime.getFullYear(), endTime.getMonth(), endTime.getDate(), endTime.getHours(), endTime.getMinutes());   
+            $scope.selectedReservationResources = $scope.reservationToModify.resources;
+
+            $scope.resourcesToDisplay = [];
+            $scope.resourcesToRemove = [];
+            populateResourcesToDisplay($scope.selectedReservationResources, $scope.resourcesToDisplay);
+        };
+
+        var populateResourcesToDisplay = function(resourceData, resourceArray){
+            resourceData.forEach(function(resource){
+                var data = {id: resource.resource_id, label: resource.name};
+                resourceArray.push(data);
+            })
+        };
+
+        $scope.removeResources = function(){
+            $scope.resourcesToRemove.forEach(function(resource){
+                console.log(resource);
+                var reqBody = {resource_id: resource.id, reservation_id: $scope.reservationToModify.reservation_id};
+                $http.post('reservation/remove_resource', reqBody).then(function(response){
+                    console.log(response);
+                }, function(error){
+                    console.log(error);
+                })
+            });
+        }
+
+        $scope.printResources = function(){
+            console.log($scope.resourcesToRemove);
         };
 
         $scope.updateReservation = function() {
