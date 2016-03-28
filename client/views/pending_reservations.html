@@ -35,12 +35,14 @@
                                 <tr>
                                     <th>Title</th>
                                     <th>Description</th>
+                                    <th>Created by</th>
                                     <th>Start time</th>
                                     <th>End time</th>                                
                                 </tr>
                                 <tr ng-repeat="reservation in resource.reservations">
                                     <td>{{reservation.reservation_title}}</td>
                                     <td>{{reservation.reservation_description}}</td>
+                                    <td>{{reservation.username}}</td>
                                     <td>{{reservation.start_time}}</td>
                                     <td>{{reservation.end_time}}</td>
                                     <td><button ng-click="approveReservation(reservation)">Approve</td>

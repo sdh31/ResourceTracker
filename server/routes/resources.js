@@ -114,8 +114,8 @@ router.put('/', function(req, res, next){
 });
 
 router.post('/', function(req, res, next){
-  
-    var update_resource_callback = function(result){
+
+    var confirmAllReservationsOnResourceCallback = function(result){
         if (result.error){
             res.status(400).json(result);
         } else {
@@ -123,12 +123,25 @@ router.post('/', function(req, res, next){
         }
     }
 
+    var update_resource_callback = function(result){
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            /// if the resource has been updated to free, confirm all reservations on that resource
+            if ("resource_state" in req.body && req.body.resource_state == 'free') {
+                reservation_service.confirmAllReservationsOnResource(req.body, confirmAllReservationsOnResourceCallback);
+            } else {
+                res.status(200).json(result);
+            }
+        }
+    }
+
     var get_overlapping_reservation_callback = function(result){
         if(result.error){
             res.status(400).json(result);
         } else if(result.results.length > 0 && req.body.resource_state != 'restricted' && result.results[0]['resource_state'] == 'restricted'){
-            result.err = "This resource is oversubscribed. Please resolve all conflicts before removing restriction"
-            res.status(400).json(result)
+            result.err = "This resource is oversubscribed. Please resolve all conflicts before removing restriction.";
+            res.status(400).json(result);
         }  
         else{
             res_service.update_resource_by_id(req.body, update_resource_callback);

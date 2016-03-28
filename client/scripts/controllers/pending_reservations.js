@@ -38,8 +38,8 @@ angular.module('resourceTracker')
             });            
             var reqBody = {resource_ids: rIDArray};
         	$http.post('/reservation/getReservationsByResources', reqBody).then(function(response) {
-                var reservations = response.data.results;
-                createResourceToReservationMap(reservations);
+                console.log(response.data.results);
+                createResourceToReservationMap(response.data.results);
         	}, function(error){
         		console.log(error);
         	});
@@ -60,8 +60,8 @@ angular.module('resourceTracker')
                         $scope.resourcesToDisplayMap.set(resource_id, resource_info);
                     } else{
                         var resource_info = {expanded: false, name: resource.name, description: resource.description,
-                                            resource_id: resource.resource_id, permission: resource.resource_permission,
-                                            state: resource.resource_state, tags: resource.tags, reservations: [reserv]};
+                                            resource_id: resource.resource_id, tags: resource.tags, reservations: [reserv],
+                                            };
                         $scope.resourcesToDisplayMap.set(resource_id, resource_info);
                     }
                 }
@@ -73,6 +73,7 @@ angular.module('resourceTracker')
         var mapIteratorToArray = function(){
             var rList = [];
             for(let [key, value] of $scope.resourcesToDisplayMap){
+                console.log(value);
                 rList.push(value);
             }
             return rList;
@@ -87,17 +88,42 @@ angular.module('resourceTracker')
         }
 
         $scope.approveReservation = function(reserv){
-            console.log(reserv);
-            console.log($scope.resourcesToDisplay);
-            var result = confirm("Are you sure you want to approve resource " + $scope.resourceMap.get(reserv.resource_id).name + " and delete reservation " + reserv.reservation_title + "?");
+            var conflicts = checkConflictingReservations(reserv);
+            var confirmMessage = "Are you sure you want to approve resource " + $scope.resourceMap.get(reserv.resource_id).name + 
+                                " for reservation " + reserv.reservation_title
+                                 + " and delete the following reservation(s): " + conflicts;
+            var result = confirm(confirmMessage);
             var reqBody = {resource_id: reserv.resource_id, reservation_id: reserv.reservation_id};
             if(result){
                 $http.post('/reservation/confirm_request', reqBody).then(function(response) {
-                    clearReservationAfterApproval(reserv);
+                    $scope.getReservationsForSelectedResources();
                 }, function(error){
                     console.log(error);
                 });
             }
+        };
+
+        var checkConflictingReservations = function(reserv){
+            var findResource = function(resource){
+                return reserv.resource_id == resource.resource_id;
+            };
+            var resourceToUpdate = $scope.resourcesToDisplay.find(findResource);
+            var reservations = resourceToUpdate.reservations;
+            var conflictingReservations = [];
+            reservations.forEach(function(reservation){
+                if((reserv.reservation_id != reservation.reservation_id) && checkTimesConflict(reserv, reservation)){
+                    conflictingReservations.push(reservation.reservation_title);
+                }
+            });
+            return conflictingReservations;
+        };
+
+        var checkTimesConflict = function(reserv1, reserv2){
+            var reserv1_start = reserv1.start_time.valueOf();
+            var reserv1_end = reserv1.end_time.valueOf();
+            var reserv2_start = reserv2.start_time.valueOf();
+            var reserv2_end = reserv2.end_time.valueOf();
+            return ((reserv1_start <= reserv2_end) && (reserv1_end >= reserv2_start))
         };
 
         $scope.denyReservation = function(reserv){
@@ -105,58 +131,12 @@ angular.module('resourceTracker')
             var result = confirm("Are you sure you want to deny resource " + $scope.resourceMap.get(reserv.resource_id).name + " and delete reservation " + reserv.reservation_title + "?");
             if(result){       
                 $http.post('/reservation/deny_request', reqBody).then(function(response) {
-                    clearReservationAfterDeny(reserv);
+                    $scope.getReservationsForSelectedResources();
                 }, function(error){
                     console.log(error);
                 });     
             };  
         };
-
-        var clearReservationAfterApproval = function(reserv){
-            var findResource = function(resource){
-                return reserv.resource_id == resource.resource_id;
-            };
-            var resourceToUpdate = $scope.resourcesToDisplay.find(findResource);
-            var findReservation = function(reservation){
-                return reserv.reservation_id == reservation.reservation_id;
-            };
-            var reservations = resourceToUpdate.reservations;
-            var reservationToRemove = reservations.find(findReservation);
-            var index = reservations.indexOf(reservationToRemove)
-            $scope.resourcesToDisplay.find(findResource).reservations.splice(index, 1);
-            if(reservations.length == 0){
-                removeResourceFromDisplay(resourceToUpdate);
-            }
-        };
-
-        var clearReservationAfterDeny = function(reserv){
-            var resourcesToRemove = [];
-            $scope.resourcesToDisplay.forEach(function(resource){
-                var reservations = resource.reservations;
-                var findReservation = function(reservation){
-                    return reserv.reservation_id == reservation.reservation_id;
-                };
-                var reservationToRemove = reservations.find(findReservation);
-                var index = reservations.indexOf(reservationToRemove);
-                if(index != -1){
-                    resource.reservations.splice(index, 1);
-                    if(reservations.length == 0){
-                        resourcesToRemove.push(resource);
-                    }
-                }
-            });
-            resourcesToRemove.forEach(function(resource){
-                removeResourceFromDisplay(resource);
-            });
-        };
-
-        var removeResourceFromDisplay = function(resource){
-            var index = $scope.resourcesToDisplay.indexOf(resource);
-            $scope.resourcesToDisplay.splice(index, 1);
-        };
-
-
-
 
         $scope.initializePage();
 

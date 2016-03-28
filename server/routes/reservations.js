@@ -233,7 +233,8 @@ router.delete('/', auth.is('user'), function(req, res, next){
     reservation_service.get_reservation_by_id(req.query, getReservationByIdCallback);
 });
 
-router.post('/remove_resource', function(req, res, next){
+// req.body should have resource_ids and reservation_id
+router.post('/remove_resources', function(req, res, next){
     var has_auth = false;
     var remove_resource_callback = function(result){
         if(result.error || result.results.affectedRows == 0){
@@ -246,7 +247,7 @@ router.post('/remove_resource', function(req, res, next){
     if (perm_service.check_reservation_permission(req.session)) {
         has_auth = true;
     } 
-    reservation_service.remove_resource_from_reservation(req.body, req.session.user, has_auth, remove_resource_callback);
+    reservation_service.remove_resources_from_reservation(req.body, req.session.user, has_auth, remove_resource_callback);
 
 });
 

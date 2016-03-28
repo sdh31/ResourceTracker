@@ -205,12 +205,12 @@ rahul_session = session_response.cookies
 
 desc = "### fail to remove resource from someone else's reservation ###"
 r.session = rahul_session
-res = r.remove_resource_from_reservation(reservation_id, resource_id)
+res = r.remove_resource_from_reservation(reservation_id, [resource_id])
 test_print(desc, res.status_code > 300)
 r.session = admin_session
 
 desc = "### remove resource from reservation as reservation owner"
-res = r.remove_resource_from_reservation(reservation_id2, resource_id)
+res = r.remove_resource_from_reservation(reservation_id2, [resource_id])
 test_print(desc, res.status_code < 300)
 
 desc =  '#### create a restricted resource ####'

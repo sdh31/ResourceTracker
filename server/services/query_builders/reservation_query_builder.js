@@ -253,7 +253,13 @@ module.exports.buildQueryForGetAllReservationsForUser = function(user) {
         .toString();
 };
 
-module.exports.buildQueryForRemoveResourceFromReservation = function(reservation, user, has_auth) {
+module.exports.buildQueryForRemoveResourcesFromReservation = function(reservation, user, has_auth) {
+
+    var remove_filter = squel.expr();
+	for (var i = 0; i < reservation.resource_ids.length; i++){
+        remove_filter.or("reservation_resource.resource_id = " + reservation.resource_ids[i]);
+    }
+
     var query = squel.delete()
         .target("reservation_resource")
         .from("reservation_resource")
@@ -262,7 +268,7 @@ module.exports.buildQueryForRemoveResourceFromReservation = function(reservation
         .join("user_group", null, "user_group.group_id = resource_group.resource_id")
         //.where("resource_group.resource_permission = ?", "")
         .where("reservation_resource.reservation_id = ?", reservation.reservation_id)
-        .where("reservation_resource.resource_id = ?", reservation.resource_id)
+        .where(remove_filter)
         if(!has_auth){
             query = query.where("user_reservation.user_id = ?", user.user_id)
         }
@@ -300,6 +306,15 @@ module.exports.buildQueryForConfirmResource = function(reservation, user){
         .toString()
     return query
 }
+
+module.exports.buildQueryForConfirmAllReservationsOnResource = function(resource){
+    return squel.update()
+        .table("reservation_resource")
+        .set("is_confirmed = 1")
+        .where("resource_id = " + resource.resource_id)
+        .toString();
+}
+
 var generate_conflict_expression = function(reservation){
     return squel.expr()
         .or_begin()

@@ -438,12 +438,12 @@ def get_api_token():
 
 	return send_request(method, params, url)
 
-def remove_resource_from_reservation(reservation_id, resource_id):
-	url = baseUrl + '/reservation/remove_resource'
+def remove_resource_from_reservation(reservation_id, resource_ids):
+	url = baseUrl + '/reservation/remove_resources'
 	method = "POST"
 	params = {
 		"reservation_id": reservation_id,
-		"resource_id": resource_id
+		"resource_ids": resource_ids
 	}
 
 	return send_request(method, params, url)
