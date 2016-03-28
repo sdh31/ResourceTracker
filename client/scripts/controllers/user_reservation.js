@@ -28,10 +28,10 @@ angular.module('resourceTracker')
             $scope.selectedReservationResources = [];
             $scope.resourcesToDisplay = [];
             $scope.resourcesToRemove = [];
-            getAllResources();
+            getAllReservations();
         };
 
-        var getAllResources = function() {
+        var getAllReservations = function() {
             return $http.get('/reservation').then(function(response) {
                 $scope.allReservations = response.data.results;
                 populateReservationsToDisplay($scope.allReservations, $scope.reservationsToDisplay);
@@ -146,24 +146,32 @@ angular.module('resourceTracker')
             if (!validateReservationInfo()) {
                 return;
             }
-
-            removeResources().then(function(){
-                modifyReservationsService.updateReservation($scope.reservationToModify.reservation_title,
-                $scope.reservationToModify.reservation_description,
-                $scope.startReservationTime.valueOf(), 
-                $scope.endReservationTime.valueOf(),
-                $scope.reservationToModify.reservation_id).then(function(successMessage) {
-                    $scope.addSuccess(successMessage);
-                    initializeResourceReservations();
-                }, function(alertMessage) {
-                    $scope.addError(alertMessage);
-                    initializeResourceReservations();
-                    })    
-                })
-			
+            if($scope.reservationToModify.resources.length == $scope.resourcesToRemove.length){
+                $scope.deleteReservation();
+            } else {
+                var result = confirm("Are you sure you want to update reservation " + $scope.reservationToModify.reservation_title);
+                if(!result) { return;}
+                removeResources().then(function(){
+                    modifyReservationsService.updateReservation($scope.reservationToModify.reservation_title,
+                    $scope.reservationToModify.reservation_description,
+                    $scope.startReservationTime.valueOf(), 
+                    $scope.endReservationTime.valueOf(),
+                    $scope.reservationToModify.reservation_id).then(function(successMessage) {
+                        $scope.addSuccess(successMessage);
+                        initializeResourceReservations();
+                    }, function(alertMessage) {
+                        $scope.addError(alertMessage);
+                        initializeResourceReservations();
+                    });    
+                });
+			}
 		};
 
         $scope.deleteReservation = function() {
+            var result = ($scope.reservationToModify.resources.length == $scope.resourcesToRemove.length) ?
+                confirm("By removing all resources, you will be deleting reservation " + $scope.reservationToModify.reservation_title + ". Are you sure this is what you want to do?")
+                : confirm("Are you sure you want to delete reservation " + $scope.reservationToModify.reservation_title)
+            if(!result){ return;}
 			modifyReservationsService.deleteReservation($scope.reservationToModify.reservation_id).then(function(successMessage) {
                 $scope.addSuccess(successMessage);
                 initializeResourceReservations();
