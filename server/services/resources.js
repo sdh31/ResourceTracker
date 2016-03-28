@@ -46,13 +46,19 @@ id:id of resource to delete
 };
 
 function addGroupPermissionToResource(body, callback) {
-    
+
     var addGroupPermissionToResourceQuery = resource_query_builder.buildQueryForAddGroupPermissionToResource(body);
     basic_db_utility.performSingleRowDBOperation(addGroupPermissionToResourceQuery, callback);
 };
 
+function updateGroupPermissionToResource(body, callback) {
+
+    var updateGroupPermissionToResourceQuery = resource_query_builder.buildQueryForUpdateGroupPermissionToResource(body);
+    basic_db_utility.performSingleRowDBOperation(updateGroupPermissionToResourceQuery, callback);
+};
+
 function removeGroupPermissionToResource(body, callback) {
-    
+
     var removeGroupPermissionToResourceQuery = resource_query_builder.buildQueryForRemoveGroupPermissionToResource(body);
     basic_db_utility.performSingleRowDBOperation(removeGroupPermissionToResourceQuery, callback);
 };
@@ -64,22 +70,29 @@ function getGroupPermissionToResource(body, callback) {
     
 };
 
-var notifyUserOnReservationDelete = function(resource, user, reservationInfo) {
-    var info = {
-        resource_name: resource.name,
-        user: user,
+var notifyUserOnReservationDelete = function(info) {
+    var emailInfo = {
+        resource_name: info.name,
+        user: {
+            first_name: info.first_name,
+            last_name: info.last_name,
+            email_address: info.email_address,
+            emails_enabled: info.emails_enabled,
+            username: info.username,
+            user_id: info.user_id
+        },
         reservation: {
-            start_time: reservationInfo.start_time,
-            end_time: reservationInfo.end_time,
-            reservation_title: reservationInfo.reservation_title,
-            reservation_description: reservationInfo.reservation_description
+            start_time: info.start_time,
+            end_time: info.end_time,
+            reservation_title: info.reservation_title,
+            reservation_description: info.reservation_description
         }
     };
     
     var currentTime = new Date();
 
-    if (currentTime.valueOf() <= info.reservation.start_time) {
-        agenda.now('notify on delete reservation', info);
+    if (currentTime.valueOf() <= emailInfo.reservation.start_time) {
+        agenda.now('notify on delete reservation', emailInfo);
     }
 };
 
@@ -91,6 +104,7 @@ module.exports = {
     delete_resource_by_id:delete_resource_by_id,
     addGroupPermissionToResource: addGroupPermissionToResource,
     removeGroupPermissionToResource: removeGroupPermissionToResource,
+    updateGroupPermissionToResource: updateGroupPermissionToResource,
     getGroupPermissionToResource: getGroupPermissionToResource,
     notifyUserOnReservationDelete: notifyUserOnReservationDelete
 };
