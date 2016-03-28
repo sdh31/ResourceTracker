@@ -67,12 +67,10 @@ angular.module('resourceTracker')
 
 
             $http.post('/tag/filter', filter).then(function(response) {
-                console.log(response.data);
                 var timelineInfo = {};
                 timelineInfo.startTime = $scope.startTime;
                 timelineInfo.endTime = $scope.endTime;
                 timelineInfo.resources = response.data.resources;
-
                 timelineService.drawTimeline(timelineInfo);
             }, function(error) {
                 console.log(error);

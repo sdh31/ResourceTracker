@@ -59,7 +59,6 @@ angular.module('resourceTracker')
                 } else {
                     resStatus = 'Pending';
                 }
-
                 var resourceTooltip = "<div>" + 
                                         "<b>Start Time: </b> " + new Date(reservation.start_time) + "<br>" + 
                                         "<b>End Time: </b> "   + new Date(reservation.end_time)   + "<br>" +  
