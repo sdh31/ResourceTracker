@@ -162,6 +162,8 @@ function organizeReservations(reservations) {
                 reservation_id: thisRow.reservation_id,
                 start_time: thisRow.start_time,
                 end_time: thisRow.end_time,
+                reservation_title: thisRow.reservation_title,
+                reservation_description: thisRow.reservation_description,
                 resources: [thisResource]
             };
             seenReservationIds.push(thisRow.reservation_id);

@@ -5,6 +5,10 @@ angular.module('resourceTracker')
 
 
       var timelineData = {};
+      var grayColor = "#f9f9f9";
+      var redColor = "#b22222";
+      var yellowColor = "#E0D873";
+
       this.drawTimeline = function(dataResponse) {
         timelineData = dataResponse;
         
@@ -20,42 +24,55 @@ angular.module('resourceTracker')
       var drawChart = function() {
         var container = document.getElementById('timeline');
         var chart = new google.visualization.Timeline(container);
-        var dataTable = new google.visualization.DataTable();
+        var dataTableRows = [];
 
-        dataTable.addColumn({ type: 'string', id: 'resource' });
-        dataTable.addColumn({ type: 'string', id: 'dummy bar label' });
-        dataTable.addColumn({ type: 'string', role: 'tooltip', 'p': {'html': true}});
-        dataTable.addColumn({ type: 'date', id: 'Start' });
-        dataTable.addColumn({ type: 'date', id: 'End' });
+        // schema definition
+        dataTableRows[0] = [{ type: 'string', id: 'resource' },
+        { type: 'string', id: 'dummy bar label' },
+        { role: 'style'}, // for colors
+        { type: 'string', role: 'tooltip', 'p': {'html': true}},
+        { type: 'date', id: 'Start' },
+        { type: 'date', id: 'End' }];
 
         var startTime = timelineData.startTime;
         var endTime = timelineData.endTime;
 
         var defaultDataDescription = "The reservation filter spans the time interval: " + startTime + " to " + endTime + ".";
-        var defaultData = ['Request Information', '', defaultDataDescription, startTime, endTime];
-
-        var dataTableRows = [];
+        var defaultData = ['Request Information', '',  "#f9f9f9", defaultDataDescription, startTime, endTime];
         dataTableRows.push(defaultData);
 
-        // index of empty rows in the table. needed to remove color from the row
-        var emptyRows = [];
-        var rowIndex = 0;
+
         timelineData.resources.forEach(function(resource) {
             var existsReservation = false;
-            rowIndex++;
             resource.reservations.forEach(function(reservation) {
                 existsReservation = true;
+                var resStatus = '';
+                if (reservation.is_confirmed == 1) {
+                    resStatus = 'Confirmed';
+                } else {
+                    resStatus = 'Pending';
+                }
 
                 var resourceTooltip = "<div>" + 
                                         "<b>Start Time: </b> " + new Date(reservation.start_time) + "<br>" + 
                                         "<b>End Time: </b> "   + new Date(reservation.end_time)   + "<br>" +  
-                                        "<b>Description: </b> " + resource.description            + "<br>" +
+                                        "<b>Resource Description: </b> " + resource.description            + "<br>" +
+                                        "<b>Reservation Title: </b> " + reservation.reservation_title + "<br>" + 
+                                        "<b>Reservation Description: </b> " + reservation.reservation_description + "<br>" + 
+                                        "<b>Reservation Status: </b> " + resStatus + "<br>" + 
                                         "<b>Reserved By: </b>"  + reservation.username            + "<br>" +  
                                      "</div>";
 
                 var data = [];
                 data.push(resource.name + " (" + resource.resource_permission + " access)");
                 data.push('');              // this is necessary... it is a column label, google charts is weird and requires it.
+
+                if (reservation.is_confirmed == 1) {
+                    data.push(redColor);
+                } else {
+                    data.push(yellowColor);
+                }
+
                 data.push(resourceTooltip);
                 
                 var resStartTime = new Date(reservation.start_time);
@@ -71,55 +88,37 @@ angular.module('resourceTracker')
                     data.push(resEndTime);
                 }
                 dataTableRows.push(data);
+
+
             });
             if (!existsReservation) {
                 var data = [];
                 data.push(resource.name + " (" + resource.resource_permission + " access)");
-                data.push('');
-                data.push('');
+                data.push(''); // title
+                data.push(grayColor);
+
+                data.push(''); // desc
                 data.push(startTime);
                 data.push(startTime);
                 dataTableRows.push(data);
-                emptyRows.push(rowIndex);
             }
         });
 
-
-
-    
-
-        dataTable.addRows(dataTableRows);
-        var colorsChosen = [];
-        var grayColor = "#f9f9f9";
-        var redColor = "#b22222"
-        // push default description color
-        colorsChosen.push(grayColor);
-        for (var index = 1; index < dataTable.getNumberOfRows(); index++) {
-            if (emptyRows.indexOf(index) != -1) {
-                colorsChosen.push(grayColor);
-            } else {
-                colorsChosen.push(redColor);
-            }
-        }
-
-
         var padding = 40;
-        var rowHeight = dataTable.getNumberOfRows() * 60;
+        var rowHeight = (dataTableRows.length - 1) * 60;
         var chartHeight = rowHeight + padding;
 
         var options = {
-            timeline: { colorByRowLabel: false },
-            avoidOverlappingGridLines: false,
             width: 1400,
             tooltip: { isHtml: true },
-            colors: colorsChosen,
             backgroundColor: grayColor,
             alternatingRowStyle: false,
             height: chartHeight
         }
 
-        chart.draw(dataTable, options);
+        chart.draw(new google.visualization.arrayToDataTable(dataTableRows), options);
       };
+
 
     });
 

@@ -91,7 +91,7 @@ router.delete('/', function(req,res,next){
                 res.status(200).json(result);
             } else {
                 for (var i = 0; i<result.results.length; i++) {
-                    resource_service.notifyUserOnReservationDelete(result.results[i]);
+                    resource_service.notifyUserOnReservationDelete(result.results[0], req.session.user, result.results[0]);
                 }
                 reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
             }
@@ -226,7 +226,7 @@ router.post('/removeUsers', function(req,res,next){
                 res.status(200).json(result);
             } else {
                 for (var i = 0; i<result.results.length; i++) {
-                    resource_service.notifyUserOnReservationDelete(result.results[i]);
+                    resource_service.notifyUserOnReservationDelete(result.results[0], req.session.user, result.results[0]);
                 }
                 reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
             }

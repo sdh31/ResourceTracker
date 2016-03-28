@@ -124,7 +124,6 @@ router.post('/', function(req, res, next){
     }
 
     var get_overlapping_reservation_callback = function(result){
-        console.log(result)
         if(result.error){
             res.status(400).json(result);
         } else if(result.results.length > 0 && req.body.resource_state != 'restricted' && result.results[0]['resource_state'] == 'restricted'){
@@ -153,11 +152,33 @@ router.delete('/', auth.is('user'), function(req, res, next){
             res.status(200).json(result);
         }
     }
+
+    var deleteReservationsCallback = function(result){
+       if (result.error){
+            res.status(400).json(result);
+        } else {
+            res_service.delete_resource_by_id(req.query, delete_resource_callback);
+        }
+    }
+
+    var getReservationsCallback = function(result){
+       if (result.error){
+            res.status(400).json(result);
+        } else {
+            for (var i = 0; i<result.results.length; i++) {
+                res_service.notifyUserOnReservationDelete(result.results[0], req.session.user, result.results[0]);
+            }
+
+            reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
+        }
+    }
+
     if(!perm_service.check_resource_permission(req.session)){
         res.status(403).json(perm_service.denied_error)
         return;
     }
-    res_service.delete_resource_by_id(req.query, delete_resource_callback);
+
+    reservation_service.getAllReservationsOnResourceByUsers(req.query.resource_id, [req.session.user], getReservationsCallback)
 });
 
 router.get('/all', auth.is('user'), function(req, res, next) {
