@@ -64,7 +64,7 @@ angular.module('resourceTracker')
         };
 
         $scope.updateReservation = function() {
-            if (!$scope.startReservationTime) {
+            if (!$scope.startReservationTime.valueOf()) {
                 $scope.addError($scope.onReservationInvalidStartDate);
                 return;
             }
@@ -88,7 +88,7 @@ angular.module('resourceTracker')
 		};
 
         $scope.deleteReservation = function() {
-			modifyReservationsService.deleteReservation($scope.reservationToModify.id).then(function(successMessage) {
+			modifyReservationsService.deleteReservation($scope.reservationToModify.reservation_id).then(function(successMessage) {
                 $scope.addSuccess(successMessage);
                 initializeResourceReservations();
 			}, function(alertMessage) {

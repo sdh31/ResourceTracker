@@ -44,15 +44,13 @@ angular.module('resourceTracker')
             var existsReservation = false;
             rowIndex++;
             resource.reservations.forEach(function(reservation) {
-                console.log(reservation);
                 existsReservation = true;
+
                 var resourceTooltip = "<div>" + 
-                                        "<b>Reservation Title: </b> " + reservation.reservation_title + "<br>" +
-                                        "<b>Reservation Description: </b> " + reservation.reservation_description + "<br>" +
                                         "<b>Start Time: </b> " + new Date(reservation.start_time) + "<br>" + 
                                         "<b>End Time: </b> "   + new Date(reservation.end_time)   + "<br>" +  
                                         "<b>Description: </b> " + resource.description            + "<br>" +
-                                        "<b>Reserved By: </b>"  + reservation.username            + "<br>" + 
+                                        "<b>Reserved By: </b>"  + reservation.username            + "<br>" +  
                                      "</div>";
 
                 var data = [];
