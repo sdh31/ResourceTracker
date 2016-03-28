@@ -11,10 +11,10 @@ angular.module('resourceTracker')
             onReservationDeleteFailure: "Unable to delete the reservation. There was an error doing so."
 		};
 
-        this.updateReservation = function(start_time, end_time, reservation_id, resource_id) {
+        this.updateReservation = function(title, description, start_time, end_time, reservation_id) {
             var deferred = $q.defer();
             var reservationData = {start_time: start_time, end_time: end_time,
-                reservation_id: reservation_id, resource_id: resource_id};
+                reservation_id: reservation_id, reservation_title: title, reservation_description: description};
             var onReservationUpdateSuccess = this.alertMessages.onReservationUpdateSuccess;
             var onReservationUpdateFailure = this.alertMessages.onReservationUpdateFailure;
             $http.post('/reservation', reservationData).then(function(response) {
