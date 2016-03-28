@@ -90,7 +90,6 @@ angular.module('resourceTracker')
                 return;
             }
 
-            removeResources();
 
 			modifyReservationsService.updateReservation($scope.reservationToModify.reservation_title,
             $scope.reservationToModify.reservation_description,

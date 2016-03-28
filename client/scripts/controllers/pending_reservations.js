@@ -66,7 +66,6 @@ angular.module('resourceTracker')
                     }
                 }
             });
-            console.log($scope.resourcesToDisplayMap);
             $scope.resourcesToDisplay = mapIteratorToArray();
             $scope.showReservations = true;          
         };
@@ -74,6 +73,7 @@ angular.module('resourceTracker')
         var mapIteratorToArray = function(){
             var rList = [];
             for(let [key, value] of $scope.resourcesToDisplayMap){
+                console.log(value);
                 rList.push(value);
             }
             return rList;
