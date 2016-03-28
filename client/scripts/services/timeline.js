@@ -9,6 +9,13 @@ angular.module('resourceTracker')
       var redColor = "#b22222";
       var yellowColor = "#E0D873";
 
+      var permissionLevelToNameMap = {
+            0: 'view',
+            1: 'reserve',
+            2: 'manage',
+            10: 'admin'
+      };
+
       this.drawTimeline = function(dataResponse) {
         timelineData = dataResponse;
         
@@ -38,7 +45,7 @@ angular.module('resourceTracker')
         var endTime = timelineData.endTime;
 
         var defaultDataDescription = "The reservation filter spans the time interval: " + startTime + " to " + endTime + ".";
-        var defaultData = ['Request Information', '',  "#f9f9f9", defaultDataDescription, startTime, endTime];
+        var defaultData = ['Request Information', '',  grayColor, defaultDataDescription, startTime, endTime];
         dataTableRows.push(defaultData);
 
 
@@ -64,7 +71,7 @@ angular.module('resourceTracker')
                                      "</div>";
 
                 var data = [];
-                data.push(resource.name + " (" + resource.resource_permission + " access)");
+                data.push(resource.name + " (" + permissionLevelToNameMap[resource.resource_permission] + " access)");
                 data.push('');              // this is necessary... it is a column label, google charts is weird and requires it.
 
                 if (reservation.is_confirmed == 1) {
@@ -93,7 +100,7 @@ angular.module('resourceTracker')
             });
             if (!existsReservation) {
                 var data = [];
-                data.push(resource.name + " (" + resource.resource_permission + " access)");
+                data.push(resource.name + " (" + permissionLevelToNameMap[resource.resource_permission] + " access)");
                 data.push(''); // title
                 data.push(grayColor);
 
