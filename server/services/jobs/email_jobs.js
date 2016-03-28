@@ -63,20 +63,10 @@ module.exports = function(agenda) {
 	agenda.define('notify on reservation starting', function(job) {
 
         var userInfo = {};
-        var resourcesInfoQueryCallback = function (result) {
-            // can change this to include the actual resources..
-		    email_utility.sendReservationStartingEmail(userInfo, result.results.length + ' resources');
-        };
 
         var reservationExistsCallback = function(result) {
             if (result.results[0].start_time == job.attrs.data.reservation.start_time) {
-                /*var resource_ids = [];
-                var resources = job.attrs.data.reservation.resources;
-                for (var i = 0; i<resources.length; i++) {
-                    resource_ids.push(resources[i].resource_id);
-                }
-                resource_service.get_resources_by_ids(resource_ids, resourcesInfoQueryCallback);*/
-                email_utility.sendReservationStartingEmail(userInfo, job.attrs.data.reservation.resources.length + ' resources');
+                email_utility.sendReservationStartingEmail(userInfo, result.results[0]);
             }
         };
 
