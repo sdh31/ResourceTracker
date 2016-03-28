@@ -41,19 +41,8 @@ deletes resource row given id of the resource
 id:id of resource to delete
 
 */
-    var checkReservationsOnResourceQuery = resource_query_builder.buildQueryForCheckReservationsOnDeleteResource(resource);
-    console.log(checkReservationsOnResourceQuery);
-    db_sql.connection.query(checkReservationsOnResourceQuery)
-        .on('result', function (row) {
-            notifyUserOnReservationDelete(row);
-        })
-        .on('error', function (err) {
-            console.log("error in check reservations for delete resource " + err);
-           // callback({error: true, err: err});
-        })
-        .on('end', function (){
-            deleteResource(resource.resource_id, callback);
-        });
+    var deleteResourceQuery = resource_query_builder.buildQueryForDeleteResource(resource.resource_id);
+    basic_db_utility.performSingleRowDBOperation(deleteResourceQuery, callback);
 };
 
 function addGroupPermissionToResource(body, callback) {
@@ -75,24 +64,15 @@ function getGroupPermissionToResource(body, callback) {
     
 };
 
-var deleteResource = function(resource_id, callback) {
-
-    var deleteResourceQuery = resource_query_builder.buildQueryForDeleteResource(resource_id);
-    basic_db_utility.performSingleRowDBOperation(deleteResourceQuery, callback);
-}
-
-var notifyUserOnReservationDelete = function(row) {
+var notifyUserOnReservationDelete = function(resource, user, reservationInfo) {
     var info = {
-        resource_name: row.name,
-        user: {
-            username: row.username,
-            first_name: row.first_name,
-            email_address: row.email_address,
-            last_name: row.last_name
-        },
+        resource_name: resource.name,
+        user: user,
         reservation: {
-            start_time: row.start_time,
-            end_time: row.end_time
+            start_time: reservationInfo.start_time,
+            end_time: reservationInfo.end_time,
+            reservation_title: reservationInfo.reservation_title,
+            reservation_description: reservationInfo.reservation_description
         }
     };
     

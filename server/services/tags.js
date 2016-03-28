@@ -131,7 +131,9 @@ function organizeResources(resources) {
             first_name: thisResource.first_name,
             last_name: thisResource.last_name,
             user_id: thisResource.user_id,
-            is_confirmed: thisResource.is_confirmed
+            is_confirmed: thisResource.is_confirmed,
+            reservation_title: thisResource.reservation_title,
+            reservation_description: thisResource.reservation_description
         };
 		var index = resourceExists(thisResource, resourcesToSend);
 		if (index != -1) {

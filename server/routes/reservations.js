@@ -57,10 +57,10 @@ router.put('/', function(req, res, next){
             // if this reservation has a restricted resource, schedule emails for notifying that reservation is starting when incomplete and for reminding when reservation is incomplete
             // otherwise just schedule the standard reservation starting email
             if (hasRestrictedResource) {
-               // agenda.schedule(new Date(reservation.start_time - (2*24*60*60*1000)), 'remind if reservation is incomplete', {user: req.session.user, reservation: reservation});
-               // agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting when still incomplete', {user: req.session.user, reservation: reservation});
+               agenda.schedule(new Date(reservation.start_time - (2*24*60*60*1000)), 'remind if reservation is incomplete', {user: req.session.user, reservation: reservation});
+               agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting when still incomplete', {user: req.session.user, reservation: reservation});
             } else {
-                //agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting', {user: req.session.user, reservation: reservation});
+                agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting', {user: req.session.user, reservation: reservation});
             }
             // set the insertId properly and send back a 200
             result.results.insertId = req.body.reservation_id;
@@ -216,7 +216,7 @@ router.delete('/', auth.is('user'), function(req, res, next){
             if (req.session.user.user_id == result.results[0].user_id) {
                 reservation_service.delete_reservation_by_id(req.query, request_callback);
             } else if (hasAuth) {
-                resource_service.notifyUserOnReservationDelete(result.results[0]);
+                resource_service.notifyUserOnReservationDelete(result.results[0], req.session.user, result.results[0]);
                 reservation_service.delete_reservation_by_id(req.query, request_callback);
             } else {
                 // this means that the user doesn't have reservation management AND the reservation isn't theirs
@@ -261,7 +261,7 @@ router.post('/deny_request', function(req, res, next){
             res.status(403).json(perm_service.denied_error)
         } else{
             // send email for resource denial notification on success
-            //agenda.now('notify on resource denial', {user: req.session.user, reservation: reservation, resource_name: resource_name});
+            agenda.now('notify on resource denial', {user: req.session.user, reservation: reservation, resource_name: resource_name});
             res.status(200).json(result)
         }
     }
@@ -313,9 +313,12 @@ router.post('/getReservationsByResources', function(req, res, next){
             // now check if the user has reserve permission on all of the resources
 
             var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, perm_service.get_permission_id(['reserve']));
-
-            if (resourcesWithPermission.length == req.body.resource_ids.length) {
-                reservation_service.get_reservations_by_resources(req.body, getReservationsByResourcesCallback);
+            var resource_ids = [];
+            for (var i = 0; i<resourcesWithPermission.length; i++) {
+                resource_ids.push(resourcesWithPermission[i]);
+            }
+            if (resourcesWithPermission.length > 0) {
+                reservation_service.get_reservations_by_resources({resource_ids: resource_ids}, getReservationsByResourcesCallback);
             } else {
                 result = perm_service.denied_error;
                 res.status(403).json(result);

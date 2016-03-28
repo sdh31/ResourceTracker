@@ -1,6 +1,6 @@
 import requester as r
 from requester import test_print
-from time import sleep
+import time
 
 r.initialize_and_clear_tables()
 
@@ -47,18 +47,23 @@ res = r.create_resource("free", "free", "free")
 is_success(desc, res)
 free_id = get_id(res)
 
+millis = int(round(time.time() * 1000)) + 86400000
+millis2 = int(round(time.time() * 1000)) + 2*86400000
+millis3 = int(round(time.time() * 1000)) + 3*86400000
+millis4 = int(round(time.time() * 1000)) + 4*86400000
+
 desc = '### create reservation on restricted1 ###'
-res = r.create_reservation([restricted_id1], 1, 5, 't', 'd')
+res = r.create_reservation([restricted_id1], millis, millis2, 't', 'd')
 is_success(desc, res)
 r1_id = get_id(res)
 
 desc = '### create reservation on restricted2 and one unrestricted ###'
-res = r.create_reservation([restricted_id1, free_id], 2, 7, 't', 'd')
+res = r.create_reservation([restricted_id1, free_id], millis+1, millis3, 't', 'd')
 is_success(desc, res)
 r2F_id = get_id(res)
 
 desc = '### create reservation on both restricted resources ###'
-res = r.create_reservation([restricted_id2, restricted_id1], 1, 10, 't', 'd')
+res = r.create_reservation([restricted_id2, restricted_id1], millis, millis4, 't', 'd')
 is_success(desc, res)
 r2r1_id = get_id(res)
 

@@ -19,6 +19,7 @@ var user_group_group = "group_id";
 module.exports.buildQueryForSystemPermissionChecks = function(user){
     return squel.select()
         .from(user_table)
+        .field("user.email_address")
         .field(user_permission)
         .field(resource_permission)
         .field(reservation_permission)
