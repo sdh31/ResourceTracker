@@ -145,6 +145,11 @@ function confirmResourceReservation(reservation, user, callback){
     basic_db_utility.performSingleRowDBOperation(confirmReservationQuery, callback);
 }
 
+function confirmAllReservationsOnResource(resource, callback) {
+    var confirmAllReservationsOnResourceQuery = reservation_query_builder.buildQueryForConfirmAllReservationsOnResource(resource);
+    basic_db_utility.performSingleRowDBOperation(confirmAllReservationsOnResourceQuery, callback);
+}
+
 function organizeReservations(reservations) {
     var finalReservations = [];
     var seenReservationIds = [];
@@ -210,5 +215,6 @@ module.exports = {
     confirmResourceReservation: confirmResourceReservation,
     deleteConflictingReservations:deleteConflictingReservations,
     get_unconfirmed_resources_for_reservation:get_unconfirmed_resources_for_reservation,
-    getOverlappingReservationsByResource: getOverlappingReservationsByResource
+    getOverlappingReservationsByResource: getOverlappingReservationsByResource,
+    confirmAllReservationsOnResource: confirmAllReservationsOnResource
 }

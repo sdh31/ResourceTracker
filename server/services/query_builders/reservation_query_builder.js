@@ -300,6 +300,15 @@ module.exports.buildQueryForConfirmResource = function(reservation, user){
         .toString()
     return query
 }
+
+module.exports.buildQueryForConfirmAllReservationsOnResource = function(resource){
+    return squel.update()
+        .table("reservation_resource")
+        .set("is_confirmed = 1")
+        .where("resource_id = " + resource.resource_id)
+        .toString();
+}
+
 var generate_conflict_expression = function(reservation){
     return squel.expr()
         .or_begin()
