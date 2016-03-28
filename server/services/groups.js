@@ -60,7 +60,7 @@ function get_all_groups_for_users(users, callback) {
 
 function checkReservePermission(groups) {
     for (var i = 0; i<groups.length; i++) {
-        if (groups[i].resource_permission == 'reserve') {
+        if (groups[i].resource_permission >= 1) {
             return true;
         }
     }

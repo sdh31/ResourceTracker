@@ -86,6 +86,7 @@ function get_all_system_permissions(user, callback){
     var user_permission = 0;
     var resource_permission = 0;
     var reservation_permission = 0;
+    var email_address = '';
     db_sql.connection.query(getResourcePermissionQuery)
         .on('result', function (row) {
         if(user_permission < row.user_management_permission){
@@ -97,6 +98,7 @@ function get_all_system_permissions(user, callback){
         if(reservation_permission < row.reservation_management_permission){
             reservation_permission = row.reservation_management_permission;
         }
+        email_address = row.email_address;
 
          })
     .on('error', function (err) {
@@ -106,7 +108,8 @@ function get_all_system_permissions(user, callback){
         results = {error:false, results: {
             user_management_permission: user_permission,
             resource_management_permission: resource_permission,
-            reservation_management_permission: reservation_permission
+            reservation_management_permission: reservation_permission,
+            email_address: email_address
         }}
         callback(results)
     });
@@ -132,5 +135,6 @@ module.exports = {
     check_resource_permission:check_resource_permission,
     check_reservation_permission:check_reservation_permission,
     denied_error:denied_error,
-    get_permission_id: get_permission_id
+    get_permission_id: get_permission_id,
+    resource_permissions: resource_permissions
 }

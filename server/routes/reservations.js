@@ -57,10 +57,10 @@ router.put('/', function(req, res, next){
             // if this reservation has a restricted resource, schedule emails for notifying that reservation is starting when incomplete and for reminding when reservation is incomplete
             // otherwise just schedule the standard reservation starting email
             if (hasRestrictedResource) {
-               // agenda.schedule(new Date(reservation.start_time - (2*24*60*60*1000)), 'remind if reservation is incomplete', {user: req.session.user, reservation: reservation});
-               // agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting when still incomplete', {user: req.session.user, reservation: reservation});
+               agenda.schedule(new Date(reservation.start_time - (2*24*60*60*1000)), 'remind if reservation is incomplete', {user: req.session.user, reservation: reservation});
+               agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting when still incomplete', {user: req.session.user, reservation: reservation});
             } else {
-                //agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting', {user: req.session.user, reservation: reservation});
+                agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting', {user: req.session.user, reservation: reservation});
             }
             // set the insertId properly and send back a 200
             result.results.insertId = req.body.reservation_id;
@@ -261,7 +261,7 @@ router.post('/deny_request', function(req, res, next){
             res.status(403).json(perm_service.denied_error)
         } else{
             // send email for resource denial notification on success
-            //agenda.now('notify on resource denial', {user: req.session.user, reservation: reservation, resource_name: resource_name});
+            agenda.now('notify on resource denial', {user: reservation.user, reservation: reservation, resource_name: resource_name});
             res.status(200).json(result)
         }
     }
@@ -313,9 +313,12 @@ router.post('/getReservationsByResources', function(req, res, next){
             // now check if the user has reserve permission on all of the resources
 
             var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, perm_service.get_permission_id(['reserve']));
-
-            if (resourcesWithPermission.length == req.body.resource_ids.length) {
-                reservation_service.get_reservations_by_resources(req.body, getReservationsByResourcesCallback);
+            var resource_ids = [];
+            for (var i = 0; i<resourcesWithPermission.length; i++) {
+                resource_ids.push(resourcesWithPermission[i]);
+            }
+            if (resourcesWithPermission.length > 0) {
+                reservation_service.get_reservations_by_resources({resource_ids: resource_ids}, getReservationsByResourcesCallback);
             } else {
                 result = perm_service.denied_error;
                 res.status(403).json(result);
@@ -353,12 +356,27 @@ router.post('/confirm_request', function(req, res, next){
     //Check if it is last reservation needed to be confirmed
     //if yes, delete conflicting reservations
     //if no, just change status of reservation
+
+    var reservationsToDelete = [];
     var delete_conflicting_reservation_callback = function(result){
         if(result.error){
             res.status(400).json(result);
         }
         else{
+            for (var i = 0; i<reservationsToDelete.length; i++) {
+                agenda.now('notify on competing reservation cancellation', {user: reservationsToDelete[i].user, reservation: reservationsToDelete[i]});
+            }
             res.status(200).json(result);
+        }
+    }
+
+    var getConflictingReservationsCallback = function(result){
+        if(result.error){
+            res.status(400).json(result);
+        }
+        else{
+            reservationsToDelete = reservation_service.organizeReservations(result.results);
+            reservation_service.deleteConflictingReservations(req.body, delete_conflicting_reservation_callback)
         }
     }
 
@@ -367,7 +385,8 @@ router.post('/confirm_request', function(req, res, next){
             res.status(400).json(result);
         }
         else if(result.results.length == 0){
-            reservation_service.deleteConflictingReservations(req.body, delete_conflicting_reservation_callback)
+            // get conflicting reservations to send notification emails for their deletion
+            reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
         }
         else{
             res.status(200).json(result)

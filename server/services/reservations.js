@@ -162,6 +162,16 @@ function organizeReservations(reservations) {
                 reservation_id: thisRow.reservation_id,
                 start_time: thisRow.start_time,
                 end_time: thisRow.end_time,
+                reservation_title: thisRow.reservation_title,
+                reservation_description: thisRow.reservation_description,
+                user: {
+                    first_name: thisRow.first_name,
+                    last_name: thisRow.last_name,
+                    email_address: thisRow.email_address,
+                    emails_enabled: thisRow.emails_enabled,
+                    username: thisRow.username,
+                    user_id: thisRow.user_id
+                },
                 resources: [thisResource]
             };
             seenReservationIds.push(thisRow.reservation_id);

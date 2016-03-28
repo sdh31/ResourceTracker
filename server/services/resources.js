@@ -41,29 +41,24 @@ deletes resource row given id of the resource
 id:id of resource to delete
 
 */
-    var checkReservationsOnResourceQuery = resource_query_builder.buildQueryForCheckReservationsOnDeleteResource(resource);
-    console.log(checkReservationsOnResourceQuery);
-    db_sql.connection.query(checkReservationsOnResourceQuery)
-        .on('result', function (row) {
-            notifyUserOnReservationDelete(row);
-        })
-        .on('error', function (err) {
-            console.log("error in check reservations for delete resource " + err);
-           // callback({error: true, err: err});
-        })
-        .on('end', function (){
-            deleteResource(resource.resource_id, callback);
-        });
+    var deleteResourceQuery = resource_query_builder.buildQueryForDeleteResource(resource.resource_id);
+    basic_db_utility.performSingleRowDBOperation(deleteResourceQuery, callback);
 };
 
 function addGroupPermissionToResource(body, callback) {
-    
+
     var addGroupPermissionToResourceQuery = resource_query_builder.buildQueryForAddGroupPermissionToResource(body);
     basic_db_utility.performSingleRowDBOperation(addGroupPermissionToResourceQuery, callback);
 };
 
+function updateGroupPermissionToResource(body, callback) {
+
+    var updateGroupPermissionToResourceQuery = resource_query_builder.buildQueryForUpdateGroupPermissionToResource(body);
+    basic_db_utility.performSingleRowDBOperation(updateGroupPermissionToResourceQuery, callback);
+};
+
 function removeGroupPermissionToResource(body, callback) {
-    
+
     var removeGroupPermissionToResourceQuery = resource_query_builder.buildQueryForRemoveGroupPermissionToResource(body);
     basic_db_utility.performSingleRowDBOperation(removeGroupPermissionToResourceQuery, callback);
 };
@@ -75,31 +70,29 @@ function getGroupPermissionToResource(body, callback) {
     
 };
 
-var deleteResource = function(resource_id, callback) {
-
-    var deleteResourceQuery = resource_query_builder.buildQueryForDeleteResource(resource_id);
-    basic_db_utility.performSingleRowDBOperation(deleteResourceQuery, callback);
-}
-
-var notifyUserOnReservationDelete = function(row) {
-    var info = {
-        resource_name: row.name,
+var notifyUserOnReservationDelete = function(info) {
+    var emailInfo = {
+        resource_name: info.name,
         user: {
-            username: row.username,
-            first_name: row.first_name,
-            email_address: row.email_address,
-            last_name: row.last_name
+            first_name: info.first_name,
+            last_name: info.last_name,
+            email_address: info.email_address,
+            emails_enabled: info.emails_enabled,
+            username: info.username,
+            user_id: info.user_id
         },
         reservation: {
-            start_time: row.start_time,
-            end_time: row.end_time
+            start_time: info.start_time,
+            end_time: info.end_time,
+            reservation_title: info.reservation_title,
+            reservation_description: info.reservation_description
         }
     };
     
     var currentTime = new Date();
 
-    if (currentTime.valueOf() <= info.reservation.start_time) {
-        agenda.now('notify on delete reservation', info);
+    if (currentTime.valueOf() <= emailInfo.reservation.start_time) {
+        agenda.now('notify on delete reservation', emailInfo);
     }
 };
 
@@ -111,6 +104,7 @@ module.exports = {
     delete_resource_by_id:delete_resource_by_id,
     addGroupPermissionToResource: addGroupPermissionToResource,
     removeGroupPermissionToResource: removeGroupPermissionToResource,
+    updateGroupPermissionToResource: updateGroupPermissionToResource,
     getGroupPermissionToResource: getGroupPermissionToResource,
     notifyUserOnReservationDelete: notifyUserOnReservationDelete
 };

@@ -120,6 +120,7 @@ function organizeResources(resources) {
 	var resourcesToSend = [];
     var seenResourceTagPairs = [];
     var seenReservations = [];
+    var maxResourcePermission = -1;
     
 	for (var i = 0; i<resources.length; i++) {
 		var thisResource = resources[i];
@@ -131,7 +132,9 @@ function organizeResources(resources) {
             first_name: thisResource.first_name,
             last_name: thisResource.last_name,
             user_id: thisResource.user_id,
-            is_confirmed: thisResource.is_confirmed
+            is_confirmed: thisResource.is_confirmed,
+            reservation_title: thisResource.reservation_title,
+            reservation_description: thisResource.reservation_description
         };
 		var index = resourceExists(thisResource, resourcesToSend);
 		if (index != -1) {
@@ -139,16 +142,16 @@ function organizeResources(resources) {
 			    resourcesToSend[index].tags.push(thisResource.tag_name);
                 seenResourceTagPairs.push({tag_name: thisResource.tag_name, resource_id: thisResource.resource_id});
             }
-            if (thisResource.reservation_id != null && seenReservations.indexOf(thisResource.reservation_id) == -1) {
+            if (thisResource.reservation_id != null && seenReservations.indexOf(thisResource.reservation_id) == -1 && thisReservation.is_confirmed != null) {
                 resourcesToSend[index].reservations.push(thisReservation);
                 seenReservations.push(thisResource.reservation_id);
             }
-            if (thisResource.resource_permission == 'reserve') {
-                resourcesToSend[index].resource_permission = 'reserve';
+            if (thisResource.resource_permission > maxResourcePermission) {
+                resourcesToSend[index].resource_permission = thisResource.resource_permission;
             }
 		} else {
 			var tag = (thisResource.tag_name == null) ? [] : [thisResource.tag_name];
-            var reservation = (thisResource.reservation_id == null) ? [] : [thisReservation];
+            var reservation = (thisResource.reservation_id == null || thisReservation.is_confirmed == null) ? [] : [thisReservation];
             seenResourceTagPairs.push({tag_name: thisResource.tag_name, resource_id: thisResource.resource_id});
             seenReservations.push(thisResource.reservation_id);
 			var resource = {

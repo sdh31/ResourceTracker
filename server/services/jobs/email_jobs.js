@@ -18,25 +18,7 @@ module.exports = function(agenda) {
     });
 
     agenda.define('notify on resource denial', function(job) {
-        var getReservationCallback = function(result) {
-            if (result.error) {
-                console.log('error in check if reservation is incomplete -- get reservation');
-            } else {
-                // this is a list because the function returns an array - only going to be 1 element
-                var reservation_list = reservation_service.organizeReservations(result.results);
-
-                /// this gets the resource_name that was denied, the resource_id comes from job.attrs.data.reservation.resource_id
-                var resources = reservation_list[0].resources;
-                var resource_name = '';
-                for (var i = 0; i<resources.length; i++) {
-                    if (job.attrs.data.reservation.resource_id == resources[i].resource_id) {
-                        resource_name = resources[i].name;
-                    }
-                }
-                email_utility.sendReservationCancelledOnResourceDenialEmail(job.attrs.data.user, reservation_list[0], resource_name);
-            }
-        };
-        reservation_service.get_reservation_by_id(job.attrs.data.reservation, getReservationCallback);
+        email_utility.sendReservationCancelledOnResourceDenialEmail(job.attrs.data.user, job.attrs.data.reservation, job.attrs.data.resource_name);
     });
 
     agenda.define('remind if reservation is incomplete', function(job) {

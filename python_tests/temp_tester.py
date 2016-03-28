@@ -1,5 +1,5 @@
 import requester as r
-from time import sleep
+import time
 from requester import test_print
 
 r.verify = False
@@ -14,7 +14,7 @@ admin_session = session_response.cookies
 r.session = admin_session
 
 dec = '#### update admin user to have new email ####'
-res = r.update_user(username="admin",email_address="jag.buddhavarapu@gmail.com")
+res = r.update_user(username="admin",email_address="teamscuullc@gmail.com")
 test_print(desc, res.status_code < 300)
 
 desc = '#### create API token ####'
@@ -32,7 +32,7 @@ test_print(desc, r.json.loads(res.content)['results']['username'] == 'admin')
 desc = '#### get all users in DB, make sure theres only 1 and that the username == admin ####'
 res = r.get_all_users()
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
-test_print(desc, r.json.loads(res.content)['results'][0]['email_address'] == 'jag.buddhavarapu@gmail.com')
+test_print(desc, r.json.loads(res.content)['results'][0]['email_address'] == 'teamscuullc@gmail.com')
 
 desc = '#### create restricted resource ###'
 res = r.create_resource("restricted", "restricted", "restricted")
@@ -114,7 +114,7 @@ test_print(desc, r.json.loads(res.content)['results'][0]['username'] == 'admin')
 test_print(desc, r.json.loads(res.content)['results'][0]['first_name'] == 'admin')
 
 desc =  '#### add view permission to the group for the resource with tags ####'
-res = r.add_group_permission_to_resource(resource_id, [group_id], [r.permissions['view']])
+res = r.add_group_permission_to_resource(resource_id, [group_id], ['view'])
 test_print(desc, res.status_code < 300)
 
 desc =  '#### get permissions for resource with tags and make sure we good ####'
@@ -123,7 +123,7 @@ test_print(desc, res.status_code < 300)
 test_print(desc, r.json.loads(res.content)['results'][1]['group_id'] == group_id)
 
 desc =  '#### add view permission to the group for the resource without tags ####'
-res = r.add_group_permission_to_resource(no_tags_id, [group_id], [r.permissions['view']])
+res = r.add_group_permission_to_resource(no_tags_id, [group_id], ['view'])
 test_print(desc, res.status_code < 300)
 
 desc =  '#### update resource with tags ####'
@@ -135,14 +135,19 @@ res = r.get_resource_by_id(resource_id)
 test_print(desc, res.status_code < 300)
 test_print(desc, r.json.loads(res.content)['results']['name'] == "serverEdited")
 
+millis = int(round(time.time() * 1000)) + 86400000
+millis2 = int(round(time.time() * 1000)) + 2*86400000
+millis3 = int(round(time.time() * 1000)) + 3*86400000
+millis4 = int(round(time.time() * 1000)) + 4*86400000
+
 desc =  '#### create reservation ####'
-res = r.create_reservation([no_tags_id, restricted_id, resource_id], 0, 2, 'title', 'description')
+res = r.create_reservation([restricted_id, resource_id], millis, millis2, 'title', 'description')
 test_print(desc, res.status_code < 300)
 reservation_id = r.json.loads(res.content)['results']['insertId']
 res = r.get_reservations([resource_id],0, 999999 )
 
 desc =  '#### create an aliasing reservation ####'
-res = r.create_reservation([resource_id], 2, 3, 'title', 'description')
+res = r.create_reservation([resource_id], millis, millis2, 'title', 'description')
 test_print(desc, res.status_code >= 400)
 
 desc =  '#### create a reservation with invalid start_time/end_time ####'
@@ -150,7 +155,7 @@ res = r.create_reservation([resource_id], 3, 3, 'title', 'description')
 test_print(desc, res.status_code >= 400)
 
 desc =  '#### create another valid reservation ####'
-res = r.create_reservation([resource_id, restricted_id], 3, 4, 'title', 'description')
+res = r.create_reservation([resource_id, restricted_id], millis3, millis4, 'title', 'description')
 test_print(desc, res.status_code < 300)
 reservation_id2 = r.json.loads(res.content)['results']['insertId']
 
@@ -159,11 +164,15 @@ res = r.get_reservations(resource_id, 0, 99999)
 test_print(desc, len(r.json.loads(res.content)['results']) == 2)
 
 desc = '### fail to extend reservation ###'
-res = r.update_reservations(resource_id, 200, 201, reservation_id, 'updated_reserv', 'u_desc')
+res = r.update_reservations(resource_id, millis+1, millis2+2, reservation_id, 'updated_reserv', 'u_desc')
 test_print(desc, res.status_code > 300)
 
 desc = "### successfully update reservation ###"
-res = r.update_reservations(restricted_id, 1, 2, reservation_id, 'updated_reserv', 'u_desc')
+res = r.update_reservations(restricted_id, millis+1, millis+2, reservation_id, 'updated_reserv', 'u_desc')
+test_print(desc, res.status_code < 300)
+
+desc =  '#### create reservation on resource without tags ####'
+res = r.create_reservation([no_tags_id], millis, millis2, 'title', 'description')
 test_print(desc, res.status_code < 300)
 
 desc = "### get all reservations for resource_id and no_tags_id"
@@ -171,8 +180,13 @@ res = r.get_reservations_by_resources([resource_id, no_tags_id])
 test_print (desc, len(r.json.loads(res.content)['results']) == 3)
 test_print(desc, res.status_code < 300)
 
-desc =  '#### delete resource without tags ####'
+desc =  '#### delete resource without tags, reservation should also be deleted ####'
 res = r.delete_resource(no_tags_id)
+test_print(desc, res.status_code < 300)
+
+desc = "### get all reservations for resource_id and no_tags_id and make sure the no_tags reservation is gone"
+res = r.get_reservations_by_resources([resource_id, no_tags_id])
+test_print (desc, len(r.json.loads(res.content)['results']) == 2)
 test_print(desc, res.status_code < 300)
 
 desc = "### deny request for resource ###"
@@ -205,9 +219,13 @@ test_print(desc, res.status_code < 300)
 restricted_resource_id = r.json.loads(res.content)['insertId']
 
 desc =  '#### create reservation on restricted resource ####'
-res = r.create_reservation([restricted_resource_id], 0, 2, 'title', 'description')
+res = r.create_reservation([restricted_resource_id], millis, millis2, 'title', 'description')
 test_print(desc, res.status_code < 300)
 restricted_reservation_id = r.json.loads(res.content)['results']['insertId']
+
+desc =  '#### delete reservation on restricted resource ####'
+res = r.delete_reservation(restricted_reservation_id)
+test_print(desc, res.status_code < 300)
 
 
 r.finish_test("temp main test")

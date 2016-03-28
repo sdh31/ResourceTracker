@@ -16,7 +16,9 @@ module.exports.buildQueryForGetConflictingReservations = function(reservation) {
     
     var query = squel.select()
         .from("reservation")
+        .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
         .join("reservation_resource", null, "reservation_resource.reservation_id = reservation.reservation_id")
+        .join("user", null, "user_reservation.user_id = user.user_id")
         .where(time_check)
         .where(resource_filter)
         //NOTE: If the reservation_id is provided, don't include that reservation in conflicts
@@ -33,14 +35,15 @@ module.exports.buildQueryForGetOverlappingReservationsByResource = function(rese
     This can be used to tell whether a resource is oversubscribed
     */
     var overlapping_query = squel.expr()
-        .or_begin()
+        .and("reservation.reservation_id != res2.reservation_id")
+        .and_begin()
             .or_begin()
-                .and("reservation.start_time > res2.start_time")
-                .and("reservation.start_time < res2.end_time")
+                .and("reservation.start_time >= res2.start_time")
+                .and("reservation.start_time <= res2.end_time")
             .end()
             .or_begin()
-                .and("reservation.start_time < res2.start_time")               
-                .and("reservation.end_time > res2.end_time")
+                .and("reservation.start_time <= res2.start_time")
+                .and("reservation.end_time >= res2.end_time")
             .end()
         .end()
 
@@ -169,18 +172,36 @@ module.exports.buildQueryForGetReservationById = function(reservation) {
         .toString();
 };
 
+module.exports.buildQueryForGetReservationsByIds = function(reservations) {
+
+    var reservation_filter = squel.expr();
+	for (var i = 0; i < reservations.length; i++){
+        reservation_filter.or("reservation.reservation_id = " + reservations[i].reservation_id);
+    }
+
+    return squel.select()
+        .from("reservation")
+        .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
+        .left_join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
+        .left_join("resource", null, "reservation_resource.resource_id = resource.resource_id")
+        .join("user", null, "user_reservation.user_id = user.user_id")
+        .where(reservation_filter)
+        .toString();
+};
+
 module.exports.buildQueryForGetAllReservationsOnResourceByUsers = function(resource_id, users) {
 
     var user_filter = squel.expr();
 	for (var i = 0; i < users.length; i++){
         user_filter.or("user_reservation.user_id = " + users[i].user_id);
     }
-    user_filter.and("reservation.resource_id = " + resource_id);
+    user_filter.and("reservation_resource.resource_id = " + resource_id);
 
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .left_join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
+        .left_join("resource", null, "reservation_resource.resource_id = resource.resource_id")
         .join("user", null, "user_reservation.user_id = user.user_id")
         .where(user_filter)
         .toString();
@@ -195,14 +216,15 @@ module.exports.buildQueryForGetAllReservationsOnResourcesByUsers = function(reso
 
     user_filter.and_begin();
     for (i = 0; i < resources.length; i++){
-        user_filter.or("reservation.resource_id = " + resources[i].resource_id);
+        user_filter.or("reservation_resource.resource_id = " + resources[i].resource_id);
     }
     user_filter.end();
 
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-        .join("resource", null, "reservation.resource_id = resource.resource_id")
+        .left_join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
+        .left_join("resource", null, "reservation_resource.resource_id = resource.resource_id")
         .join("user", null, "user_reservation.user_id = user.user_id")
         .where(user_filter)
         .toString();

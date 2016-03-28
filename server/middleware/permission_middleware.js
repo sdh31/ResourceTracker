@@ -34,6 +34,7 @@ module.exports.populate_permissions = function(req, res, next){
             next();
         }
         else{
+            req.session.user.email_address = result.results.email_address;
             req.session.user.user_management_permission = result.results.user_management_permission;
             req.session.user.resource_management_permission = result.results.resource_management_permission;
             req.session.user.reservation_management_permission = result.results.reservation_management_permission;
