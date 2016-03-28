@@ -91,7 +91,7 @@ router.delete('/', function(req,res,next){
                 res.status(200).json(result);
             } else {
                 for (var i = 0; i<result.results.length; i++) {
-                    resource_service.notifyUserOnReservationDelete(result.results[0], req.session.user, result.results[0]);
+                    resource_service.notifyUserOnReservationDelete(result.results[i]);
                 }
                 reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
             }
@@ -105,7 +105,7 @@ router.delete('/', function(req,res,next){
             var groupsThatHaveReservePermission = [];
 
             for (var i = 0; i<result.results.length; i++) {
-                if (result.results[i].resource_permission == 'reserve') {
+                if (result.results[i].resource_permission >= 1) {
                     if (result.results[i].group_id == req.query.group_id) {
                         continue;
                     }
@@ -226,7 +226,7 @@ router.post('/removeUsers', function(req,res,next){
                 res.status(200).json(result);
             } else {
                 for (var i = 0; i<result.results.length; i++) {
-                    resource_service.notifyUserOnReservationDelete(result.results[0], req.session.user, result.results[0]);
+                    resource_service.notifyUserOnReservationDelete(result.results[i]);
                 }
                 reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
             }
@@ -240,7 +240,7 @@ router.post('/removeUsers', function(req,res,next){
             var groupsThatHaveReservePermission = [];
 
             for (var i = 0; i<result.results.length; i++) {
-                if (result.results[i].resource_permission == 'reserve') {
+                if (result.results[i].resource_permission >= 1) {
                     groupsThatHaveReservePermission.push(result.results[i].group_id);
                 }
             }

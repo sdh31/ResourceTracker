@@ -114,7 +114,7 @@ test_print(desc, r.json.loads(res.content)['results'][0]['username'] == 'admin')
 test_print(desc, r.json.loads(res.content)['results'][0]['first_name'] == 'admin')
 
 desc =  '#### add view permission to the group for the resource with tags ####'
-res = r.add_group_permission_to_resource(resource_id, [group_id], [r.permissions['view']])
+res = r.add_group_permission_to_resource(resource_id, [group_id], ['view'])
 test_print(desc, res.status_code < 300)
 
 desc =  '#### get permissions for resource with tags and make sure we good ####'
@@ -123,7 +123,7 @@ test_print(desc, res.status_code < 300)
 test_print(desc, r.json.loads(res.content)['results'][1]['group_id'] == group_id)
 
 desc =  '#### add view permission to the group for the resource without tags ####'
-res = r.add_group_permission_to_resource(no_tags_id, [group_id], [r.permissions['view']])
+res = r.add_group_permission_to_resource(no_tags_id, [group_id], ['view'])
 test_print(desc, res.status_code < 300)
 
 desc =  '#### update resource with tags ####'

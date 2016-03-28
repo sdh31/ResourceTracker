@@ -69,7 +69,7 @@ desc = "### Add permission to one resource to non_admin user ###"
 res = r.get_groups()
 is_success(desc, res)
 group_id = r.json.loads(res.content)['results'][1]['group_id']
-res = r.add_group_permission_to_resource(resource1, [group_id], [r.permissions['view']])
+res = r.add_group_permission_to_resource(resource1, [group_id], ['view'])
 is_success(desc, res)
 
 """" ---login as non_admin user with permissions to resource1--- """

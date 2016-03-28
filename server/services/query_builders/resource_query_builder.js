@@ -84,6 +84,16 @@ module.exports.buildQueryForAddGroupPermissionToResource = function(body) {
         .toString();
 };
 
+// body has group_id, resource_id, resource_permission
+module.exports.buildQueryForUpdateGroupPermissionToResource = function(body) {
+
+    return squel.update()
+        .table("resource_group")
+        .set("resource_permission", body.resource_permission)
+        .where("resource_id = " + body.resource_id + " AND group_id = " + body.group_id)
+        .toString();
+};
+
 // body contains resource_id, group_ids
 module.exports.buildQueryForRemoveGroupPermissionToResource = function(body) {
 

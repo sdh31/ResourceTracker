@@ -65,7 +65,7 @@ module.exports.sendReservationDeletedEmail = function(user, reservation) {
 };
 
 module.exports.sendCompetingReservationCancelledEmail = function (user, reservation) {
-    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation of ' + reservation.resources, 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation of ' + reservation.resources + ', which had been scheduled for ' + new Date(reservation.start_time) + ' has been cancelled because a resource manager approved another reservation that competed with yours. Yours was necessarily deleted as a result.', '');
+    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation  ' + reservation.reservation_title, 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation ' + reservation.reservation_title + ', which had been scheduled for ' + new Date(reservation.start_time) + ' has been cancelled because a resource manager approved another reservation that competed with yours. Yours was necessarily deleted as a result.', '');
 
     sendEmail(mailOptions);
 };
