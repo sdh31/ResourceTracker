@@ -10,110 +10,140 @@ angular.module('resourceTracker')
 
         // this function initializes all global data on this page. 
         var initializeResourceReservations = function() {
-
             var currentTime = new Date();
-
-            $scope.newStartReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
+            $scope.startReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
                                                     currentTime.getDate(), currentTime.getHours(), currentTime.getMinutes());
-            $scope.newEndReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
+            $scope.endReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
                                                     currentTime.getDate(), currentTime.getHours(), currentTime.getMinutes());
-            // resource_id to array of reservations
-            $scope.resourceReservationMap = {};
-
-            // reservation_id to obj with startTime & endTime attributes
-            $scope.reservationMap = {};
-
-            // all resources found in database, so admin can use them to modify/delete
-            $scope.allResources = [];
-
-            // modify a reservation dropdown model for RESOURCE
-            $scope.resourceReservationToModify = {};
-
-            // all reservations found for selected resource
-            $scope.allReservationsForSelectedResource = [];
-
+            // reservation_id to reservation
+            $scope.reservationMap = new Map();
+            $scope.reservationIDToModify = {};
+            $scope.reservationsToDisplay = [];
+            $scope.allReservations = [];
             // final reservation that needs modification
             $scope.reservationToModify = {};
-
             $scope.reservationSelected = false;
-            $scope.userInfo = '';
-
-            getAllResources();
+            $scope.selectedReservationResources = [];
+            $scope.resourcesToDisplay = [];
+            $scope.resourcesToRemove = [];
+            getAllReservations();
         };
 
-        var getAllResources = function() {
-            return $http.get('/resource/all').then(function(response) {   
-                populateResourceArray(response.data, $scope.allResources);
-            }, function(error) {
+        var getAllReservations = function() {
+            return $http.get('/resource/all').then(function(response) {
+                var resourceList = response.data;
+                var reservationIDtoReservationMap = new Map();
+                resourceList.forEach(function(resource){
+                    var resourceReservations = resource.reservations;
+                    resourceReservations.forEach(function(reservation){
+                        var resourceToAdd = {description: resource.description, is_confirmed: reservation.is_confirmed,
+                            name: resource.name, resource_id: resource.resource_id, resource_state: resource.resource_state};
+                        if(reservationIDtoReservationMap.has(reservation.reservation_id)){
+                            var reserv = reservationIDtoReservationMap.get(reservation.reservation_id);
+                            var resources = reserv.resources;
+                            resources.push(resourceToAdd);
+                            reserv.resources = resources;
+                            reservationIDtoReservationMap.set(reservation.reservation_id, reserv); 
+                        } else {
+                            var reserv = {end_time: reservation.end_time, reservation_description: reservation.reservation_description,
+                                reservation_id: reservation.reservation_id, reservation_title: reservation.reservation_title, resources: [resourceToAdd],
+                                start_time: reservation.start_time, user: {user_id: reservation.user_id, username: reservation.username}};
+                            reservationIDtoReservationMap.set(reservation.reservation_id, reserv);
+                        }
+                    });
+                });
+                for(let [key, value] of reservationIDtoReservationMap){
+                    $scope.allReservations.push(value);
+                }
+                populateReservationsToDisplay($scope.allReservations, $scope.reservationsToDisplay);
+                console.log($scope.allReservations);
+            }, function(error){
                 console.log(error);
             });
-        };
+        }
 
-        var populateResourceArray = function(resourceData, resourceArray) {
-            resourceData.forEach(function(resource) {
-                var resourceData = {id: resource.resource_id, label: resource.name};
-                resourceArray.push(resourceData);
-                $scope.resourceReservationMap[resourceData.id] = resource.reservations;
+        var populateReservationsToDisplay = function(reservationData, reservationArray){
+            reservationData.forEach(function(reservation) {
+                var data = {id: reservation.reservation_id, label: reservation.reservation_title};
+                reservationArray.push(data);
+                $scope.reservationMap.set(reservation.reservation_id, reservation);
             });
-        };
-
-        $scope.onResourceReservationToggle = function() {
-            $scope.allReservationsForSelectedResource = [];
-            // go through map.....
-            var id = $scope.resourceReservationToModify.id;
-            $scope.resourceReservationMap[id].forEach(function(reservation) {
-                var startTime = new Date(reservation.start_time);
-                var endTime = new Date(reservation.end_time);
-                var res_id = reservation.reservation_id;
-                var startTimeLabel = $filter('date')(startTime, "medium");
-                var endTimeLabel = $filter('date')(endTime, "medium");
-
-                var res_label = 'Start Time: ' + startTimeLabel + ' End Time: '   + endTimeLabel;
-                var resObj = {id: res_id, label: res_label};
-                $scope.allReservationsForSelectedResource.push(resObj);
-                $scope.reservationMap[res_id] = {start_time: startTime, end_time: endTime, userInfo: reservation.username};
-            });
-        };
+        }
 
         $scope.onReservationSelect = function(item) {
-            var id = item.id;
+            $scope.reservationToModify = $scope.reservationMap.get(item.id);
             $scope.reservationSelected = true;
-            $scope.userInfo = $scope.reservationMap[id].userInfo;
-            $scope.newStartReservationTime = $scope.reservationMap[id].start_time;
-            $scope.newEndReservationTime = $scope.reservationMap[id].end_time;
+            var startTime = new Date($scope.reservationToModify.start_time);
+            var endTime = new Date($scope.reservationToModify.end_time);
+            $scope.startReservationTime = new Date(startTime.getFullYear(), startTime.getMonth(), startTime.getDate(), startTime.getHours(), startTime.getMinutes());
+            $scope.endReservationTime = new Date(endTime.getFullYear(), endTime.getMonth(), endTime.getDate(), endTime.getHours(), endTime.getMinutes());   
+            $scope.selectedReservationResources = $scope.reservationToModify.resources;
+
+            $scope.resourcesToDisplay = [];
+            $scope.resourcesToRemove = [];
+            populateResourcesToDisplay($scope.selectedReservationResources, $scope.resourcesToDisplay);
         };
 
+        var populateResourcesToDisplay = function(resourceData, resourceArray){
+            resourceData.forEach(function(resource){
+                var data = {id: resource.resource_id, label: resource.name};
+                resourceArray.push(data);
+            })
+        };
+
+        var removeResources = function(){
+            var resourceIDs = [];
+            $scope.resourcesToRemove.forEach(function(resource){
+                resourceIDs.push(resource.id);
+            });
+            var reqBody = {resource_ids: resourceIDs, reservation_id: $scope.reservationToModify.reservation_id};
+            var promise = $http.post('reservation/remove_resources', reqBody).then(function(response){
+                console.log(response);
+            }, function(error){
+                console.log(error);
+            })
+            return promise;
+        }
+
         $scope.updateReservation = function() {
-            if (!$scope.newStartReservationTime) {
+            var result = confirm("Are you sure you want to update reservation " + $scope.reservationToModify.reservation_title);
+            if(!result) { return;}
+            if (!$scope.startReservationTime.valueOf()) {
                 $scope.addError($scope.onReservationInvalidStartDate);
                 return;
             }
 
-            if (!$scope.newEndReservationTime) {
+            if (!$scope.endReservationTime.valueOf()) {
                 $scope.addError($scope.onReservationInvalidEndDate);
                 return;
             }
+            removeResources().then(function(){
+                modifyReservationsService.updateReservation($scope.reservationToModify.reservation_title,
+                $scope.reservationToModify.reservation_description,
+                $scope.startReservationTime.valueOf(), 
+                $scope.endReservationTime.valueOf(),
+                $scope.reservationToModify.reservation_id).then(function(successMessage) {
+                    $scope.addSuccess(successMessage);
+                    initializeResourceReservations();
+                }, function(alertMessage) {
+                    $scope.addError(alertMessage);
+                    initializeResourceReservations();
+                    })    
+                })
             
-			modifyReservationsService.updateReservation($scope.newStartReservationTime.valueOf(), $scope.newEndReservationTime.valueOf(),
-                $scope.reservationToModify.id, $scope.resourceReservationToModify.id).then(function(successMessage) {
-                $scope.addSuccess(successMessage);
-                initializeResourceReservations();
-			}, function(alertMessage) {
-				$scope.addError(alertMessage);
-                initializeResourceReservations();
-			})
-		};
+        };
 
         $scope.deleteReservation = function() {
-			modifyReservationsService.deleteReservation($scope.reservationToModify.id).then(function(successMessage) {
+            var result = confirm("Are you sure you want to delete reservation " + $scope.reservationToModify.reservation_title);
+            if(!result){ return;}
+            modifyReservationsService.deleteReservation($scope.reservationToModify.reservation_id).then(function(successMessage) {
                 $scope.addSuccess(successMessage);
                 initializeResourceReservations();
-			}, function(alertMessage) {
-				$scope.addError(alertMessage);
+            }, function(alertMessage) {
+                $scope.addError(alertMessage);
                 initializeResourceReservations();
-			})
+            })
         };
 
         initializeResourceReservations();
-
      });

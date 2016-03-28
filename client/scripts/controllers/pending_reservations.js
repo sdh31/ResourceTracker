@@ -17,9 +17,9 @@ angular.module('resourceTracker')
     	var getAllResources = function() {
 	   		$http.get('/resource/all').then(function(response) {
 		   		populateResourcesToDisplay(response.data, $scope.allResources);
-		   		}, function(error){
+		   	}, function(error){
 		   			console.log(error);
-		   		});
+		   	});
 	   	};
 
         var populateResourcesToDisplay = function(resourceData, resourceArray) {
@@ -73,7 +73,6 @@ angular.module('resourceTracker')
         var mapIteratorToArray = function(){
             var rList = [];
             for(let [key, value] of $scope.resourcesToDisplayMap){
-                console.log(value);
                 rList.push(value);
             }
             return rList;
