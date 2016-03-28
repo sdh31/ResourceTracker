@@ -5,8 +5,7 @@ angular.module('resourceTracker')
 
 		this.alertMessages = {
 			onReservationUpdateSuccess: "Reservation Updated!",
-            onReservationUpdateFailure: "Unable to update the reservation. The selected resource has already been reserved " +
-                                            "during this time.",
+            onReservationUpdateFailure: "Unable to update the reservation. You may only reduce your time range, not extend it.",
             onReservationDeleteSuccess: "Reservation Deleted!",
             onReservationDeleteFailure: "Unable to delete the reservation. There was an error doing so."
 		};
@@ -20,6 +19,7 @@ angular.module('resourceTracker')
             $http.post('/reservation', reservationData).then(function(response) {
                 deferred.resolve(onReservationUpdateSuccess);
             }, function(error) {
+                console.log(error);
                 deferred.reject(onReservationUpdateFailure);
             });
             return deferred.promise;
