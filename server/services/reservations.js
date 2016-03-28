@@ -103,9 +103,9 @@ function deleteReservationsById(reservations, callback) {
     basic_db_utility.performSingleRowDBOperation(deleteReservationsByIdQuery, callback);
 };
 
-function remove_resource_from_reservation(reservation, user, has_auth, callback){
-    var removeResourceFromReservation = reservation_query_builder.buildQueryForRemoveResourceFromReservation(reservation, user);
-    basic_db_utility.performSingleRowDBOperation(removeResourceFromReservation, callback);
+function remove_resources_from_reservation(reservation, user, has_auth, callback){
+    var removeResourcesFromReservation = reservation_query_builder.buildQueryForRemoveResourcesFromReservation(reservation, user);
+    basic_db_utility.performSingleRowDBOperation(removeResourcesFromReservation, callback);
 }
 
 function getAllReservationsForUser(user, callback) {
@@ -208,7 +208,7 @@ module.exports = {
     deleteReservationsById: deleteReservationsById,
     getAllReservationsForUser: getAllReservationsForUser,
     organizeReservations: organizeReservations,
-    remove_resource_from_reservation:remove_resource_from_reservation,
+    remove_resources_from_reservation:remove_resources_from_reservation,
     filterAllowedOverlappingReservations: filterAllowedOverlappingReservations,
     filterResourcesByPermission: filterResourcesByPermission,
     denyResourceReservation: denyResourceReservation,
