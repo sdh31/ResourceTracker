@@ -265,7 +265,7 @@ module.exports.buildQueryForRemoveResourcesFromReservation = function(reservatio
         .from("reservation_resource")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation_resource.reservation_id")
         .join("resource_group", null, "reservation_resource.resource_id = resource_group.resource_id")
-        .join("user_group", null, "user_group.group_id = resource_group.resource_id")
+        .join("user_group", null, "user_group.group_id = resource_group.group_id")
         //.where("resource_group.resource_permission = ?", "")
         .where("reservation_resource.reservation_id = ?", reservation.reservation_id)
         .where(remove_filter)

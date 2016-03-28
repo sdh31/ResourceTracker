@@ -69,14 +69,17 @@ angular.module('resourceTracker')
 
         var removeResources = function(){
             console.log($scope.resourcesToRemove);
+            var resourceIDs = [];
             $scope.resourcesToRemove.forEach(function(resource){
-                var reqBody = {resource_id: resource.id, reservation_id: $scope.reservationToModify.reservation_id};
-                $http.post('reservation/remove_resource', reqBody).then(function(response){
-                    console.log(response);
-                }, function(error){
-                    console.log(error);
-                })
+                resourceIDs.push(resource.id);
             });
+            var reqBody = {resource_ids: resourceIDs, reservation_id: $scope.reservationToModify.reservation_id};
+            var promise = $http.post('reservation/remove_resources', reqBody).then(function(response){
+                console.log(response);
+            }, function(error){
+                console.log(error);
+            })
+            return promise;
         }
 
         $scope.updateReservation = function() {
@@ -85,23 +88,24 @@ angular.module('resourceTracker')
                 return;
             }
 
-            if (!$scope.endReservationTime) {
+            if (!$scope.endReservationTime.valueOf()) {
                 $scope.addError($scope.onReservationInvalidEndDate);
                 return;
             }
-
-
-			modifyReservationsService.updateReservation($scope.reservationToModify.reservation_title,
-            $scope.reservationToModify.reservation_description,
-            $scope.startReservationTime.valueOf(), 
-            $scope.endReservationTime.valueOf(),
-            $scope.reservationToModify.reservation_id).then(function(successMessage) {
-                $scope.addSuccess(successMessage);
-                initializeResourceReservations();
-			}, function(alertMessage) {
-				$scope.addError(alertMessage);
-                initializeResourceReservations();
-			})
+            removeResources().then(function(){
+                modifyReservationsService.updateReservation($scope.reservationToModify.reservation_title,
+                $scope.reservationToModify.reservation_description,
+                $scope.startReservationTime.valueOf(), 
+                $scope.endReservationTime.valueOf(),
+                $scope.reservationToModify.reservation_id).then(function(successMessage) {
+                    $scope.addSuccess(successMessage);
+                    initializeResourceReservations();
+                }, function(alertMessage) {
+                    $scope.addError(alertMessage);
+                    initializeResourceReservations();
+                    })    
+                })
+			
 		};
 
         $scope.deleteReservation = function() {
