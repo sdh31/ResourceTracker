@@ -91,7 +91,6 @@ router.put('/', function(req, res, next){
         } else {
             // this means that we can add the link to user
             req.body.reservation_id = result.results.insertId;
-            //TODO: reservation_service.scheduleEmailForReservation(req.session.user, req.body);
             reservation_service.add_user_reservation_link(req.session.user, req.body, addUserReservationLinkCallback);
         }
     };
@@ -167,6 +166,8 @@ router.put('/', function(req, res, next){
 
 router.post('/', auth.is('user'), function(req, res, next){
     var has_auth = false;
+    var reservation = {};
+    var oldStartTime = -1;
 
     if(!("start_time" in req.body) || !("end_time" in req.body) || !("reservation_id" in req.body)){
         res.status(400).json({result:{err:"missing field"}});
@@ -178,17 +179,50 @@ router.post('/', auth.is('user'), function(req, res, next){
             res.status(400).json(result);
         } else if(result.results.affectedRows == 0){
             res.status(403).json(perm_service.denied_error)
-        }else {
-            //**Commented this out because the method was commented out in the service
-            //reservation_service.scheduleEmailForReservation(req.session.user, req.body);
+        } else {
+
+            // only schedule emails if the start time has changed
+            if (reservation.start_time != req.body.start_time) {
+
+                reservation.start_time = req.body.start_time;
+                reservation.end_time = req.body.end_time;
+                reservation.reservation_title = (req.body.reservation_title == null) ? reservation.reservation_title : req.body.reservation_title;
+                reservation.reservation_description = (req.body.reservation_description == null) ? reservation.reservation_description : req.body.reservation_description;
+                var hasUnconfirmedResource = false;
+                for (var i = 0; i < reservation.resources.length; i++) {
+                    if (reservation.resources[i].is_confirmed == 0) {
+                        hasUnconfirmedResource = true;
+                        break;
+                    }
+                }
+
+                if (hasUnconfirmedResource) {
+                    agenda.schedule(new Date(reservation.start_time - (2*24*60*60*1000)), 'remind if reservation is incomplete', {user: reservation.user, reservation: reservation});
+                   agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting when still incomplete', {user: reservation.user, reservation: reservation});
+                } else {
+                    agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting', {user: reservation.user, reservation: reservation});
+                }
+            }
+
             res.status(200).json(result);
         }
     };
 
-    if(perm_service.check_resource_permission(req.session)){
+    var getReservationByIdCallback = function(result) {
+        if(result.error){
+            res.status(403).json(result);
+        } else {
+            reservation = reservation_service.organizeReservations(result.results)[0];
+            reservation_service.update_reservation_by_id(req.body, req.session.user, has_auth, updateReservationCallback);
+        }
+    };
+
+    if (perm_service.check_reservation_permission(req.session)){
         has_auth = true;
-    }    
-    reservation_service.update_reservation_by_id(req.body, req.session.user, has_auth, updateReservationCallback)
+    }
+
+    // first get the old reservation info by id
+    reservation_service.get_reservation_by_id(req.body, getReservationByIdCallback);
 
 });
 
@@ -323,7 +357,7 @@ router.post('/getReservationsByResources', function(req, res, next){
             for (var i = 0; i<resourcesWithPermission.length; i++) {
                 resource_ids.push(resourcesWithPermission[i]);
             }
-            if (resourcesWithPermission.length > 0) {
+            if (resourcesWithPermission.length > 0 || perm_service.check_reservation_permission(req.session)) {
                 reservation_service.get_reservations_by_resources({resource_ids: resource_ids}, getReservationsByResourcesCallback);
             } else {
                 result = perm_service.denied_error;
@@ -364,6 +398,7 @@ router.post('/confirm_request', function(req, res, next){
     //if no, just change status of reservation
 
     var reservationsToDelete = [];
+    var reservation = {};
     var delete_conflicting_reservation_callback = function(result){
         if(result.error){
             res.status(400).json(result);
@@ -372,6 +407,7 @@ router.post('/confirm_request', function(req, res, next){
             for (var i = 0; i<reservationsToDelete.length; i++) {
                 agenda.now('notify on competing reservation cancellation', {user: reservationsToDelete[i].user, reservation: reservationsToDelete[i]});
             }
+            agenda.schedule(new Date(reservation.start_time), 'notify on reservation starting', {user: reservation.user, reservation: reservation});
             res.status(200).json(result);
         }
     }
@@ -423,6 +459,7 @@ router.post('/confirm_request', function(req, res, next){
             res.status(403).json(perm_service.denied_error)
         }
         else{
+            reservation = reservation_service.organizeReservations(result.results)[0];
             req.body.start_time = result.results[0].start_time;
             req.body.end_time = result.results[0].end_time;
 
@@ -434,7 +471,6 @@ router.post('/confirm_request', function(req, res, next){
         return;
     }
     check_for_management_permission(req, res, reservation_service.get_reservation_by_id, get_reservation_info_callback);
-
 
 });
 
@@ -450,7 +486,7 @@ var check_for_management_permission = function(req, res, to_call, callback){
 
             var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, perm_service.get_permission_id(['manage']));
 
-            if (resourcesWithPermission.length == 1) {
+            if (resourcesWithPermission.length == 1 || perm_service.check_reservation_permission(req.session)) {
                 to_call(req.body, callback)
             } else {
                 result = perm_service.denied_error;

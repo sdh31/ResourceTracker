@@ -24,7 +24,8 @@ angular.module('resourceTracker')
 
         var populateResourcesToDisplay = function(resourceData, resourceArray) {
             resourceData.forEach(function(resource) {
-                if(resource.resource_permission > 1){
+                console.log($scope.user.reservation_management_permission);
+                if(resource.resource_permission > 1 || $scope.user.reservation_management_permission == 1){
     	            var resourceData = {id: resource.resource_id, label: resource.name};
     	            resourceArray.push(resourceData);
     	            $scope.resourceMap.set(resourceData.id, resource);
