@@ -38,7 +38,7 @@ app.use(cookie_parser());
 
 app.use(session({
     secret: 'ssshhhhh',
-    store: new redis_store({ host: 'localhost', port: 6379, client: client,ttl :  260}),
+    store: new redis_store({ host: 'localhost', port: 6379, client: client,ttl :  2600}),
     saveUninitialized: false,
     resave: false,
 	key: 'sid'

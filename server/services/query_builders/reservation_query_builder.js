@@ -192,16 +192,20 @@ module.exports.buildQueryForGetReservationsByIds = function(reservations) {
 module.exports.buildQueryForGetAllReservationsOnResourceByUsers = function(resource_id, users) {
 
     var user_filter = squel.expr();
+    user_filter.or_begin();
 	for (var i = 0; i < users.length; i++){
         user_filter.or("user_reservation.user_id = " + users[i].user_id);
     }
+    user_filter.end();
+    user_filter.and_begin();
     user_filter.and("reservation_resource.resource_id = " + resource_id);
+    user_filter.end();
 
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-        .left_join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
-        .left_join("resource", null, "reservation_resource.resource_id = resource.resource_id")
+        .join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
+        .join("resource", null, "reservation_resource.resource_id = resource.resource_id")
         .join("user", null, "user_reservation.user_id = user.user_id")
         .where(user_filter)
         .toString();
@@ -210,10 +214,11 @@ module.exports.buildQueryForGetAllReservationsOnResourceByUsers = function(resou
 
 module.exports.buildQueryForGetAllReservationsOnResourcesByUsers = function(resources, users) {
     var user_filter = squel.expr();
+    user_filter.or_begin();
 	for (var i = 0; i < users.length; i++){
         user_filter.or("user_reservation.user_id = " + users[i].user_id);
     }
-
+    user_filter.end();
     user_filter.and_begin();
     for (i = 0; i < resources.length; i++){
         user_filter.or("reservation_resource.resource_id = " + resources[i].resource_id);
@@ -223,8 +228,8 @@ module.exports.buildQueryForGetAllReservationsOnResourcesByUsers = function(reso
     return squel.select()
         .from("reservation")
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-        .left_join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
-        .left_join("resource", null, "reservation_resource.resource_id = resource.resource_id")
+        .join("reservation_resource", null, "reservation.reservation_id = reservation_resource.reservation_id")
+        .join("resource", null, "reservation_resource.resource_id = resource.resource_id")
         .join("user", null, "user_reservation.user_id = user.user_id")
         .where(user_filter)
         .toString();
