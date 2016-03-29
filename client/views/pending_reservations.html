@@ -4,7 +4,7 @@
     <div class="panel-body">
         <div class="control-group" style="text-align:center;">
             <span ng-dropdown-multiselect="" options="allResources" selected-model="selectedResourcesIDs"
-                  extra-settings="{enableSearch: true}"
+                  extra-settings="{enableSearch: true, smartButtonMaxItems: 3 }"
                   translation-texts="{buttonDefaultText: 'Select one or more resource'}"></span> <br/><br/>
             <button type="button"
                     class="btn btn-primary btn-md"
@@ -60,6 +60,14 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="alert alert-danger" ng-show="hasError.value">
+            <strong>Warning:</strong> {{alertMessage.value}}
+            <a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
+        </div>
+        <div class="alert alert-success" ng-show="hasSuccess.value">
+            <strong>Success:</strong> {{successMessage.value}}
+            <a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
         </div>
     </div>
 </div>

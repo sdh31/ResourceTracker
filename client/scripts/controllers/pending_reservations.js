@@ -11,6 +11,9 @@ angular.module('resourceTracker')
             $scope.resourcesToDisplayMap = new Map();            
             $scope.resourcesToDisplay = [];
             $scope.showReservations = false;
+
+            $scope.onResourceApproved = "Resource Approved!";
+            $scope.onResourceDenied = "Resource Denied!";
     		getAllResources();
     	};
 
@@ -24,7 +27,6 @@ angular.module('resourceTracker')
 
         var populateResourcesToDisplay = function(resourceData, resourceArray) {
             resourceData.forEach(function(resource) {
-                console.log($scope.user.reservation_management_permission);
                 if(resource.resource_permission > 1 || $scope.user.reservation_management_permission == 1){
     	            var resourceData = {id: resource.resource_id, label: resource.name};
     	            resourceArray.push(resourceData);
@@ -41,7 +43,6 @@ angular.module('resourceTracker')
             });            
             var reqBody = {resource_ids: rIDArray};
         	$http.post('/reservation/getReservationsByResources', reqBody).then(function(response) {
-                console.log(response.data.results);
                 createResourceToReservationMap(response.data.results);
         	}, function(error){
         		console.log(error);
@@ -95,11 +96,12 @@ angular.module('resourceTracker')
                 " for reservation " + reserv.reservation_title + "?")
                 :("Are you sure you want to approve resource " + $scope.resourceMap.get(reserv.resource_id).name + 
                 " for reservation " + reserv.reservation_title
-                + " and delete the following reservation(s): " + conflicts);
+                + " and potentially delete the following reservation(s): " + conflicts);
             var result = confirm(confirmMessage);
             var reqBody = {resource_id: reserv.resource_id, reservation_id: reserv.reservation_id};
             if(result){
                 $http.post('/reservation/confirm_request', reqBody).then(function(response) {
+                    $scope.addSuccess($scope.onResourceApproved);
                     $scope.getReservationsForSelectedResources();
                 }, function(error){
                     console.log(error);
@@ -135,6 +137,7 @@ angular.module('resourceTracker')
             var result = confirm("Are you sure you want to deny resource " + $scope.resourceMap.get(reserv.resource_id).name + " and delete reservation " + reserv.reservation_title + "?");
             if(result){       
                 $http.post('/reservation/deny_request', reqBody).then(function(response) {
+                    $scope.addSuccess($scope.onResourceDenied);
                     $scope.getReservationsForSelectedResources();
                 }, function(error){
                     console.log(error);
