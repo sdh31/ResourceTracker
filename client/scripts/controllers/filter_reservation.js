@@ -43,6 +43,14 @@ angular.module('resourceTracker')
             });
         };
 
+        function timelineSelectHandler(e) {
+            console.log('select handler..  ');
+            console.log(e);
+            $scope.startTime = e[0];
+            $scope.endTime = e[1];
+            $scope.$apply()
+        };
+
         getAllTags();
 
         $scope.filterReservations = function() {
@@ -72,11 +80,12 @@ angular.module('resourceTracker')
                 timelineInfo.startTime = $scope.startTime;
                 timelineInfo.endTime = $scope.endTime;
                 timelineInfo.resources = response.data.resources;
-                timelineService.drawTimeline(timelineInfo);
+                timelineService.drawTimeline(timelineInfo, timelineSelectHandler);
             }, function(error) {
                 console.log(error);
             });
         };
+
 
         var populateTagArray = function(tagResponse) {
             tagResponse.data.tags.forEach(function(tag) {

@@ -9,6 +9,9 @@ angular.module('resourceTracker')
       var redColor = "#b22222";
       var yellowColor = "#E0D873";
       var reservationIdToConfirmedMap = {};
+      var handler;
+      var rowToStartAndEndDateMap = {};
+      var rowToStartAndEndDateMapIndex = 0;
 
       var permissionLevelToNameMap = {
             0: 'view',
@@ -17,9 +20,12 @@ angular.module('resourceTracker')
             10: 'admin'
       };
 
-      this.drawTimeline = function(dataResponse) {
+      this.drawTimeline = function(dataResponse, timelineSelectHandler) {
         timelineData = dataResponse;
         preprocessData();
+        handler = timelineSelectHandler;
+        rowToStartAndEndDateMap = {};
+        rowToStartAndEndDateMapIndex = 0;
         
         if ($rootScope.googleChartLoaded.value == false) {
             google.charts.load('current', {'packages':['timeline']});
@@ -65,6 +71,8 @@ angular.module('resourceTracker')
         var defaultDataDescription = "The reservation filter spans the time interval: " + startTime + " to " + endTime + ".";
         var defaultData = ['Request Information', '',  grayColor, defaultDataDescription, startTime, endTime];
         dataTableRows.push(defaultData);
+        rowToStartAndEndDateMap[rowToStartAndEndDateMapIndex] = [startTime, endTime];
+        rowToStartAndEndDateMapIndex++;
 
 
         timelineData.resources.forEach(function(resource) {
@@ -110,18 +118,27 @@ angular.module('resourceTracker')
                 
                 var resStartTime = new Date(reservation.start_time);
                 var resEndTime  = new Date(reservation.end_time);
+
+                var rowDateArray = [];
+
+
                 if (resStartTime < startTime) {
                     data.push(startTime);
                 } else {
                     data.push(resStartTime);
                 }
+                rowDateArray.push(resStartTime);
+
                 if (resEndTime > endTime) {
                     data.push(endTime);
                 } else {
                     data.push(resEndTime);
                 }
-                dataTableRows.push(data);
+                rowDateArray.push(resEndTime);
 
+                dataTableRows.push(data);
+                rowToStartAndEndDateMap[rowToStartAndEndDateMapIndex] = rowDateArray;
+                rowToStartAndEndDateMapIndex++;
 
             });
             if (!existsReservation) {
@@ -134,6 +151,8 @@ angular.module('resourceTracker')
                 data.push(startTime);
                 data.push(startTime);
                 dataTableRows.push(data);
+                rowToStartAndEndDateMap[rowToStartAndEndDateMapIndex] = [startTime, startTime];
+                rowToStartAndEndDateMapIndex++;
             }
         });
 
@@ -150,7 +169,16 @@ angular.module('resourceTracker')
             enableInteractivity: true,
         }
 
-        chart.draw(new google.visualization.arrayToDataTable(dataTableRows), options);
+        var table = new google.visualization.arrayToDataTable(dataTableRows);
+        google.visualization.events.addListener(chart, 'select', function() {
+            var selection = chart.getSelection();
+            var item = selection[0];
+            console.log(item);
+            var rowInfo = rowToStartAndEndDateMap[item.row];
+            handler(rowInfo);
+        });
+
+        chart.draw(table, options);
       };
 
 
