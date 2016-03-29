@@ -100,7 +100,7 @@ angular.module('resourceTracker')
                 data.push(resource.name + " (" + permissionLevelToNameMap[resource.resource_permission] + " access)");
                 data.push('');              // this is necessary... it is a column label, google charts is weird and requires it.
 
-                if (reservation.is_confirmed == 1) {
+                if (reservationIdToConfirmedMap[reservation.reservation_id] == 1) {
                     data.push(redColor);
                 } else {
                     data.push(yellowColor);
