@@ -74,20 +74,6 @@ function get_unconfirmed_resources_for_reservation(reservation, callback){
     basic_db_utility.performMultipleRowDBOperation(getUnconfirmedResourcesQuery, callback);
 }
 
-/*function scheduleEmailForReservation(user, reservation) {
-    //Doesn't have a callback so that the other data functions can run first.
-    //Also don't really want to throw an error if all of the INSERTS worked correctly
-    if (!user.emails_enabled) {
-        console.log("YOUR EMAILS AINT ENABLED BRUH");
-    } else {
-        var data = {
-            user: user,
-            reservation: reservation
-        };
-        agenda.schedule(new Date(reservation.start_time), 'send email', data);
-    }
-};*/
-
 function getAllReservationsOnResourceByUsers(resource_id, users, callback) {
     var getAllReservationsOnResourceByUsersQuery = reservation_query_builder.buildQueryForGetAllReservationsOnResourceByUsers(resource_id, users);
     basic_db_utility.performMultipleRowDBOperation(getAllReservationsOnResourceByUsersQuery, callback);
@@ -203,7 +189,6 @@ module.exports = {
     add_user_reservation_link:add_user_reservation_link,
     get_reservation_by_id: get_reservation_by_id,
     getAllReservationsOnResourcesByUsers: getAllReservationsOnResourcesByUsers,
-    //scheduleEmailForReservation: scheduleEmailForReservation,
     getAllReservationsOnResourceByUsers: getAllReservationsOnResourceByUsers,
     deleteReservationsById: deleteReservationsById,
     getAllReservationsForUser: getAllReservationsForUser,

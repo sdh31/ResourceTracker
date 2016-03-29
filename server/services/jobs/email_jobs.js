@@ -25,7 +25,7 @@ module.exports = function(agenda) {
         var getReservationCallback = function(result) {
             if (result.error) {
                 console.log('error in check if reservation is incomplete -- get reservation');
-            } else {
+            } else if (result.results.length > 0) {
                 // this is a list because the function expects an array - only going to be 1 element
                 var reservation_list = reservation_service.organizeReservations(result.results);
                 if ((job.attrs.data.reservation.start_time == reservation_list[0].start_time) && reservation_service.filterAllowedOverlappingReservations(reservation_list).length == 0) {
@@ -47,7 +47,7 @@ module.exports = function(agenda) {
         var getReservationCallback = function(result) {
             if (result.error) {
                 console.log('error in notify on reservation starting when still incomplete -- get reservation');
-            } else {
+            } else if (result.results.length > 0) {
                 // this is a list because the function expects an array - only going to be 1 element
                 var reservation_list = reservation_service.organizeReservations(result.results);
 
@@ -65,8 +65,8 @@ module.exports = function(agenda) {
         var userInfo = {};
 
         var reservationExistsCallback = function(result) {
-            if (result.results[0].start_time == job.attrs.data.reservation.start_time) {
-                email_utility.sendReservationStartingEmail(userInfo, result.results[0]);
+            if (result.results.length > 0 && result.results[0].start_time == job.attrs.data.reservation.start_time) {
+                email_utility.sendReservationStartingEmail(userInfo, reservation_service.organizeReservations(result.results)[0]);
             }
         };
 
