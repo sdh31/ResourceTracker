@@ -8,6 +8,7 @@ angular.module('resourceTracker')
       var grayColor = "#f9f9f9";
       var redColor = "#b22222";
       var yellowColor = "#E0D873";
+      var reservationIdToConfirmedMap = {};
 
       var permissionLevelToNameMap = {
             0: 'view',
@@ -18,6 +19,7 @@ angular.module('resourceTracker')
 
       this.drawTimeline = function(dataResponse) {
         timelineData = dataResponse;
+        preprocessData();
         
         if ($rootScope.googleChartLoaded.value == false) {
             google.charts.load('current', {'packages':['timeline']});
@@ -26,6 +28,22 @@ angular.module('resourceTracker')
         } else {
             drawChart();
         }
+      };
+
+
+      // for each reservation, determine if it is fully confirmed
+      var preprocessData = function() {
+        reservationIdToConfirmedMap = {};
+
+        timelineData.resources.forEach(function(resource) {
+            resource.reservations.forEach(function(reservation) {
+                if (reservationIdToConfirmedMap[reservation.reservation_id] === undefined) {
+                    reservationIdToConfirmedMap[reservation.reservation_id] = 1;
+                }
+                reservationIdToConfirmedMap[reservation.reservation_id] = 
+                    reservationIdToConfirmedMap[reservation.reservation_id] & reservation.is_confirmed;
+            }
+        });
       };
 
       var drawChart = function() {
@@ -53,20 +71,28 @@ angular.module('resourceTracker')
             var existsReservation = false;
             resource.reservations.forEach(function(reservation) {
                 existsReservation = true;
-                var resStatus = '';
-                if (reservation.is_confirmed == 1) {
-                    resStatus = 'Confirmed';
+                var reservationStatus = '';
+                if (reservationIdToConfirmedMap[reservation.reservation_id] == 1) {
+                    reservationStatus = 'Confirmed';
                 } else {
-                    resStatus = 'Pending';
+                    reservationStatus = 'Pending';
+                }
+
+                var resourceStatus = '';
+                if (reservation.is_confirmed == 1) {
+                    resourceStatus = 'Confirmed';
+                } else {
+                    resourceStatus = 'Pending';
                 }
 
                 var resourceTooltip = "<div>" + 
                                         "<b>Start Time: </b> " + new Date(reservation.start_time) + "<br>" + 
                                         "<b>End Time: </b> "   + new Date(reservation.end_time)   + "<br>" +  
                                         "<b>Resource Description: </b> " + resource.description            + "<br>" +
+                                        "<b>Resource Status: </b> " + resourceStatus + "<br>" + 
                                         "<b>Reservation Title: </b> " + reservation.reservation_title + "<br>" + 
                                         "<b>Reservation Description: </b> " + reservation.reservation_description + "<br>" + 
-                                        "<b>Reservation Status: </b> " + resStatus + "<br>" + 
+                                        "<b>Reservation Status: </b> " + reservationStatus + "<br>" + 
                                         "<b>Reserved By: </b>"  + reservation.username            + "<br>" +  
                                      "</div>";
 
@@ -120,7 +146,8 @@ angular.module('resourceTracker')
             tooltip: { isHtml: true },
             backgroundColor: grayColor,
             alternatingRowStyle: false,
-            height: chartHeight
+            height: chartHeight,
+            enableInteractivity: true,
         }
 
         chart.draw(new google.visualization.arrayToDataTable(dataTableRows), options);
