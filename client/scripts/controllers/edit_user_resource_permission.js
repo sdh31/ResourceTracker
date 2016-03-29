@@ -43,7 +43,7 @@ angular.module('resourceTracker')
 	   	};
 
         $scope.confirmation = function() {
-             if(nameToPermissionLevelMap[$scope.tempGroupPermission] >= 1 || nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] < 1 || (nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] >= 1 && confirm('users in ' + $scope.selectedGroup.group_name + " may have reservations on " + $scope.selectedResource.name + ", are you sure you want to take away reserve permission?"))){
+             if(nameToPermissionLevelMap[$scope.tempGroupPermission] >= 1 || nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] < 1 || (nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] >= 1 && confirm($scope.selectedUser.username + " may have reservations on " + $scope.selectedResource.name + ", are you sure you want to take away reserve permission?"))){
                 doUpdate();
             }
         };

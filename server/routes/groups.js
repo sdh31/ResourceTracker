@@ -90,8 +90,12 @@ router.delete('/', function(req,res,next){
             if (result.results.length == 0) {
                 res.status(200).json(result);
             } else {
+                var alreadyDeletedReservationIds = [];
                 for (var i = 0; i<result.results.length; i++) {
-                    resource_service.notifyUserOnReservationDelete(result.results[i]);
+                    if (alreadyDeletedReservationIds.indexOf(result.results[i].reservation_id) == -1) {
+                        resource_service.notifyUserOnReservationDelete(result.results[i]);
+                        alreadyDeletedReservationIds.push(result.results[i].reservation_id);
+                    }
                 }
                 reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
             }
@@ -225,8 +229,12 @@ router.post('/removeUsers', function(req,res,next){
             if (result.results.length == 0) {
                 res.status(200).json(result);
             } else {
+                var alreadyDeletedReservationIds = [];
                 for (var i = 0; i<result.results.length; i++) {
-                    resource_service.notifyUserOnReservationDelete(result.results[i]);
+                    if (alreadyDeletedReservationIds.indexOf(result.results[i].reservation_id) == -1) {
+                        resource_service.notifyUserOnReservationDelete(result.results[i]);
+                        alreadyDeletedReservationIds.push(result.results[i].reservation_id);
+                    }
                 }
                 reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
             }
