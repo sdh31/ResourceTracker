@@ -7,5 +7,6 @@ server/node_modules/
 *.html~
 *.sql~
 *.py~
+*.css~
 *.pyc
 

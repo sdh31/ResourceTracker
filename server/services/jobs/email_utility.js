@@ -33,33 +33,33 @@ var createMailOptions = function(from, to, subject, text, html) {
     return mailOptions;
 };
 
-module.exports.sendReservationStartingEmail = function(user, resource_blurb) {
+module.exports.sendReservationStartingEmail = function(user, reservation) {
 
-    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation of ' + resource_blurb, 'Hey '+ user.first_name + ',\n\nBe aware that your reservation is starting now!', '');
+    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation ' + reservation.reservation_title, 'Hey '+ user.first_name + ',\n\nBe aware that your reservation is starting now!', '');
 
     sendEmail(mailOptions);
 };
 
 module.exports.sendReservationNotYetApprovedEmail = function(user, reservation) {
-    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation for ' + new Date(reservation.start_time), 'Hey '+ user.first_name + " " + user.last_name + ',\n\nThis is a warning that your reservation that is scheduled for ' + new Date(reservation.start_time) + ' still needs one or more approvals ', '');
+    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation ' + reservation.reservation_title, 'Hey '+ user.first_name + " " + user.last_name + ',\n\nThis is a warning that your reservation called ' + reservation.reservation_title + ' that is scheduled for ' + new Date(reservation.start_time) + ' still needs one or more approvals ', '');
 
     sendEmail(mailOptions);
 };
 
 module.exports.sendReservationCancelledDueToResourcesNotApprovedInTimeEmail = function(user, reservation) {
-    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation for ' + new Date(reservation.start_time), 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation which had been scheduled for ' + new Date(reservation.start_time) + ' has been cancelled because all of the restricted resources had not been approved in time. Please try again! ' , '');
+    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation ' + reservation.reservation_title, 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation called ' + reservation.reservation_title + ' which had been scheduled for ' + new Date(reservation.start_time) + ' has been cancelled because all of the restricted resources had not been approved in time. Please try again! ' , '');
 
     sendEmail(mailOptions);
 };
 
 module.exports.sendReservationCancelledOnResourceDenialEmail = function(user, reservation, resource_name) {
-    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation for ' + new Date(reservation.start_time), 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation which had been scheduled for ' + new Date(reservation.start_time) + ' has been cancelled because a resource manager denied your request for ' + resource_name + '.', '');
+    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation ' + reservation.reservation_title, 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation which had been scheduled for ' + new Date(reservation.start_time) + ' has been cancelled because a resource manager denied your request for ' + resource_name + '.', '');
 
     sendEmail(mailOptions);
 };
 
 module.exports.sendReservationDeletedEmail = function(user, reservation) {
-    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation for ' + new Date(reservation.start_time), 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation called ' + reservation.reservation_title +' which had been scheduled for ' + new Date(reservation.start_time) + ' has been deleted', '');
+    var mailOptions = createMailOptions('Hypotheticorp LLC <asdf@gmail.com>', user.email_address, 'Your reservation ' + reservation.reservation_title, 'Hey '+ user.first_name + " " + user.last_name + ',\n\nSadly, your reservation called ' + reservation.reservation_title +' which had been scheduled for ' + new Date(reservation.start_time) + ' has been deleted', '');
 
     sendEmail(mailOptions);
 };

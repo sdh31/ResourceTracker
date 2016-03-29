@@ -7,6 +7,8 @@ angular.module('resourceTracker')
         $scope.clearSuccess();
         $scope.onReservationInvalidStartDate = "Please select a valid start date.";
         $scope.onReservationInvalidEndDate = "Please select a valid end date.";
+        $scope.oldReservationTitle = "";
+        $('[data-toggle="tooltip"]').tooltip({title: "You cannot extend the time of your reservation. This button allows you to create a new reservation on the same resources as your original reservation. Keep in mind that you'll still need approval on any restricted resources.", placement: "right"});
 
         // this function initializes all global data on this page. 
         var initializeResourceReservations = function() {
@@ -48,6 +50,7 @@ angular.module('resourceTracker')
 
         $scope.onReservationSelect = function(item) {
             $scope.reservationToModify = $scope.reservationMap.get(item.id);
+            $scope.oldReservationTitle = $scope.reservationToModify.reservation_title;
             $scope.reservationSelected = true;
             var startTime = new Date($scope.reservationToModify.start_time);
             var endTime = new Date($scope.reservationToModify.end_time);
@@ -69,10 +72,7 @@ angular.module('resourceTracker')
 
         var removeResources = function(){
             console.log($scope.resourcesToRemove);
-            var resourceIDs = [];
-            $scope.resourcesToRemove.forEach(function(resource){
-                resourceIDs.push(resource.id);
-            });
+            var resourceIDs = populateResourceIds($scope.resourcesToRemove);
             var reqBody = {resource_ids: resourceIDs, reservation_id: $scope.reservationToModify.reservation_id};
             var promise = $http.post('reservation/remove_resources', reqBody).then(function(response){
                 console.log(response);
@@ -80,18 +80,73 @@ angular.module('resourceTracker')
                 console.log(error);
             })
             return promise;
-        }
+        };
 
-        $scope.updateReservation = function() {
+        var populateResourceIds = function(resources) {
+            var resourceIDs = [];
+            resources.forEach(function(resource){
+                resourceIDs.push(resource.id);
+            });
+            return resourceIDs;
+        };
+
+        $scope.createNewReservation = function() {
+
+            if (!validateReservationInfo()) {
+                return;
+            }
+
+            var reservationData = {
+                resource_ids: populateResourceIds($scope.resourcesToDisplay),
+                reservation_title: $scope.reservationToModify.reservation_title,
+                reservation_description: $scope.reservationToModify.reservation_description,
+                start_time: $scope.startReservationTime.valueOf(),
+                end_time: $scope.endReservationTime.valueOf()
+            };
+
+            $http.put('/reservation', reservationData).then(function(response) {
+                console.log(response);
+                $scope.addSuccess("Successfully created new reservation!");
+                initializeResourceReservations();
+            }, function(error) {
+                console.log(error);
+                $scope.addError("Unable to create new reservation, probably a conflict!");
+                initializeResourceReservations();
+            });
+        };
+
+        var validateReservationInfo = function() {
             if (!$scope.startReservationTime.valueOf()) {
                 $scope.addError($scope.onReservationInvalidStartDate);
-                return;
+                return false;
             }
 
             if (!$scope.endReservationTime.valueOf()) {
                 $scope.addError($scope.onReservationInvalidEndDate);
+                return false;
+            }
+
+            if ($scope.startReservationTime.valueOf() >= $scope.endReservationTime.valueOf()) {
+                return false;
+            }
+
+            if ($scope.reservationToModify.reservation_title == '') {
+                return false;
+            }
+
+            if ($scope.startReservationTime.valueOf() <= new Date().valueOf()) {
+                return false;
+            }
+
+            return true;
+        };
+
+        $scope.updateReservation = function() {
+
+            if (!validateReservationInfo()) {
                 return;
             }
+
             removeResources().then(function(){
                 modifyReservationsService.updateReservation($scope.reservationToModify.reservation_title,
                 $scope.reservationToModify.reservation_description,

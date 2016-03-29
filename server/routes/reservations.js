@@ -247,6 +247,11 @@ router.post('/remove_resources', function(req, res, next){
     if (perm_service.check_reservation_permission(req.session)) {
         has_auth = true;
     } 
+
+    if (!("resource_ids" in req.body) || req.body.resource_ids == null || req.body.resource_ids.length == 0) {
+       res.status(400).json({results: {err: "no resource_ids specified"}});
+       return;
+    }
     reservation_service.remove_resources_from_reservation(req.body, req.session.user, has_auth, remove_resource_callback);
 
 });
