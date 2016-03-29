@@ -119,7 +119,7 @@
                             <a href="" data-toggle="tab">My Reservations</a></li>
 
                         <li ng-class="isTabSelected('/pending_reservations')"
-                            ng-show="user.reservation_management_permission"
+                            ng-show="user.loggedIn"
                             ng-click="goToPendingReservationsPage()">
                             <a href="" data-toggle="tab">Pending Reservations</a></li>
                     </ul>
