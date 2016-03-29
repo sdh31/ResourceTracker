@@ -120,7 +120,6 @@ function organizeResources(resources) {
 	var resourcesToSend = [];
     var seenResourceTagPairs = [];
     var seenReservationResourcePairs = [];
-    var maxResourcePermission = -1;
     
 	for (var i = 0; i<resources.length; i++) {
 		var thisResource = resources[i];
@@ -146,7 +145,7 @@ function organizeResources(resources) {
                 resourcesToSend[index].reservations.push(thisReservation);
                 seenReservationResourcePairs.push({reservation_id: thisResource.reservation_id, resource_id: thisResource.resource_id});
             }
-            if (thisResource.resource_permission > maxResourcePermission) {
+            if (thisResource.resource_permission > resourcesToSend[index].resource_permission) {
                 resourcesToSend[index].resource_permission = thisResource.resource_permission;
             }
 		} else {
