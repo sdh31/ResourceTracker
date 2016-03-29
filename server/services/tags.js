@@ -119,7 +119,7 @@ function remove_tag_from_object(tag_info, callback){
 function organizeResources(resources) {
 	var resourcesToSend = [];
     var seenResourceTagPairs = [];
-    var seenReservations = [];
+    var seenReservationResourcePairs = [];
     var maxResourcePermission = -1;
     
 	for (var i = 0; i<resources.length; i++) {
@@ -142,9 +142,9 @@ function organizeResources(resources) {
 			    resourcesToSend[index].tags.push(thisResource.tag_name);
                 seenResourceTagPairs.push({tag_name: thisResource.tag_name, resource_id: thisResource.resource_id});
             }
-            if (thisResource.reservation_id != null && seenReservations.indexOf(thisResource.reservation_id) == -1 && thisReservation.is_confirmed != null) {
+            if (thisResource.reservation_id != null && !containsReservationResourcePair(thisResource, seenReservationResourcePairs) && thisReservation.is_confirmed != null) {
                 resourcesToSend[index].reservations.push(thisReservation);
-                seenReservations.push(thisResource.reservation_id);
+                seenReservationResourcePairs.push({reservation_id: thisResource.reservation_id, resource_id: thisResource.resource_id});
             }
             if (thisResource.resource_permission > maxResourcePermission) {
                 resourcesToSend[index].resource_permission = thisResource.resource_permission;
@@ -153,7 +153,7 @@ function organizeResources(resources) {
 			var tag = (thisResource.tag_name == null) ? [] : [thisResource.tag_name];
             var reservation = (thisResource.reservation_id == null || thisReservation.is_confirmed == null) ? [] : [thisReservation];
             seenResourceTagPairs.push({tag_name: thisResource.tag_name, resource_id: thisResource.resource_id});
-            seenReservations.push(thisResource.reservation_id);
+            seenReservationResourcePairs.push({reservation_id: thisResource.reservation_id, resource_id: thisResource.resource_id});
 			var resource = {
 				name: thisResource.name,
 				description: thisResource.description,
@@ -181,6 +181,15 @@ var resourceExists = function(thisResource, resources) {
 var containsResourceTagPair = function(thisResource, seenResourceTagPairs) {
     for (var i = 0; i<seenResourceTagPairs.length; i++) {
 		if ((thisResource.resource_id == seenResourceTagPairs[i].resource_id) && (thisResource.tag_name == seenResourceTagPairs[i].tag_name)) {
+			return true;
+		}
+	}
+	return false;
+};
+
+var containsReservationResourcePair = function (thisResource, seenReservationResourcePairs) {
+    for (var i = 0; i<seenReservationResourcePairs.length; i++) {
+		if ((thisResource.resource_id == seenReservationResourcePairs[i].resource_id) && (thisResource.reservation_id == seenReservationResourcePairs[i].reservation_id)) {
 			return true;
 		}
 	}
