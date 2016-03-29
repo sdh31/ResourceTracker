@@ -11,7 +11,7 @@
                     ng-click="getReservationsForSelectedResources()">Get Resources!</button>
         </div>
         <div ng-if="showReservations">
-            <table class="table">
+            <table class="table table-striped">
                 <thead>
                     <tr>
                         <th style="width: 100px;">Resource</th>
@@ -30,24 +30,31 @@
                         <br/><br/>
                     </tr>
                     <tr ng-if="resource.expanded" >
-                        <td COLSPAN=3 style="padding-left:30px; border-top: none;">
-                            <table cellpadding="3" cellspacing="3">
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Description</th>
-                                    <th>Created by</th>
-                                    <th>Start time</th>
-                                    <th>End time</th>                                
-                                </tr>
-                                <tr ng-repeat="reservation in resource.reservations">
-                                    <td>{{reservation.reservation_title}}</td>
-                                    <td>{{reservation.reservation_description}}</td>
-                                    <td>{{reservation.username}}</td>
-                                    <td>{{reservation.start_time}}</td>
-                                    <td>{{reservation.end_time}}</td>
-                                    <td><button ng-click="approveReservation(reservation)">Approve</td>
-                                    <td><button ng-click="denyReservation(reservation)">Deny</td>
-                                </tr>
+                        <td COLSPAN=3 style="padding-left:30px;">
+                            <table class="table table-hover" cellpadding="3" cellspacing="3">
+                                <thead>
+                                    <tr>
+                                        <th style="min-width: 50px;">Title</th>
+                                        <th style="min-width: 100px;">Description</th>
+                                        <th style="min-width: 50px;">Created by</th>
+                                        <th style="min-width: 150px;">Start time</th>
+                                        <th style="min-width: 150px;">End time</th>
+                                        <th></th>                                
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="reservation in resource.reservations">
+                                        <td>{{reservation.reservation_title}}</td>
+                                        <td>{{reservation.reservation_description}}</td>
+                                        <td>{{reservation.username}}</td>
+                                        <td>{{reservation.start_time}}</td>
+                                        <td>{{reservation.end_time}}</td>
+                                        <td>
+                                            <button ng-click="approveReservation(reservation)">Approve</button>
+                                            <button ng-click="denyReservation(reservation)">Deny
+                                        </td>
+                                    </tr>
+                                </tbody>
                             </table>
                         </td>
                     </tr>
