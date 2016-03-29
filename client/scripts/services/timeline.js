@@ -42,7 +42,7 @@ angular.module('resourceTracker')
                 }
                 reservationIdToConfirmedMap[reservation.reservation_id] = 
                     reservationIdToConfirmedMap[reservation.reservation_id] & reservation.is_confirmed;
-            }
+            });
         });
       };
 
