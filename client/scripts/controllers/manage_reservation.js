@@ -33,22 +33,25 @@ angular.module('resourceTracker')
             return $http.get('/resource/all').then(function(response) {
                 var resourceList = response.data;
                 var reservationIDtoReservationMap = new Map();
+                var currentTime = new Date();
                 resourceList.forEach(function(resource){
                     var resourceReservations = resource.reservations;
                     resourceReservations.forEach(function(reservation){
-                        var resourceToAdd = {description: resource.description, is_confirmed: reservation.is_confirmed,
-                            name: resource.name, resource_id: resource.resource_id, resource_state: resource.resource_state};
-                        if(reservationIDtoReservationMap.has(reservation.reservation_id)){
-                            var reserv = reservationIDtoReservationMap.get(reservation.reservation_id);
-                            var resources = reserv.resources;
-                            resources.push(resourceToAdd);
-                            reserv.resources = resources;
-                            reservationIDtoReservationMap.set(reservation.reservation_id, reserv); 
-                        } else {
-                            var reserv = {end_time: reservation.end_time, reservation_description: reservation.reservation_description,
-                                reservation_id: reservation.reservation_id, reservation_title: reservation.reservation_title, resources: [resourceToAdd],
-                                start_time: reservation.start_time, user: {user_id: reservation.user_id, username: reservation.username}};
-                            reservationIDtoReservationMap.set(reservation.reservation_id, reserv);
+                        if(reservation.end_time > currentTime.valueOf()){
+                            var resourceToAdd = {description: resource.description, is_confirmed: reservation.is_confirmed,
+                                name: resource.name, resource_id: resource.resource_id, resource_state: resource.resource_state};
+                            if(reservationIDtoReservationMap.has(reservation.reservation_id)){
+                                var reserv = reservationIDtoReservationMap.get(reservation.reservation_id);
+                                var resources = reserv.resources;
+                                resources.push(resourceToAdd);
+                                reserv.resources = resources;
+                                reservationIDtoReservationMap.set(reservation.reservation_id, reserv); 
+                            } else {
+                                var reserv = {end_time: reservation.end_time, reservation_description: reservation.reservation_description,
+                                    reservation_id: reservation.reservation_id, reservation_title: reservation.reservation_title, resources: [resourceToAdd],
+                                    start_time: reservation.start_time, user: {user_id: reservation.user_id, username: reservation.username}};
+                                reservationIDtoReservationMap.set(reservation.reservation_id, reserv);
+                            }
                         }
                     });
                 });
@@ -56,7 +59,6 @@ angular.module('resourceTracker')
                     $scope.allReservations.push(value);
                 }
                 populateReservationsToDisplay($scope.allReservations, $scope.reservationsToDisplay);
-                console.log($scope.allReservations);
             }, function(error){
                 console.log(error);
             });

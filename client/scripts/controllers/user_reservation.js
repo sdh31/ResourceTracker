@@ -41,10 +41,13 @@ angular.module('resourceTracker')
         };
 
         var populateReservationsToDisplay = function(reservationData, reservationArray){
+            var currentTime = new Date();
             reservationData.forEach(function(reservation) {
-                var data = {id: reservation.reservation_id, label: reservation.reservation_title};
-                reservationArray.push(data);
-                $scope.reservationMap.set(reservation.reservation_id, reservation);
+                if(reservation.end_time > currentTime.valueOf()){
+                    var data = {id: reservation.reservation_id, label: reservation.reservation_title};
+                    reservationArray.push(data);
+                    $scope.reservationMap.set(reservation.reservation_id, reservation);
+                }
             });
         }
 
