@@ -24,9 +24,11 @@ angular.module('resourceTracker')
 
         var populateResourcesToDisplay = function(resourceData, resourceArray) {
             resourceData.forEach(function(resource) {
-	            var resourceData = {id: resource.resource_id, label: resource.name};
-	            resourceArray.push(resourceData);
-	            $scope.resourceMap.set(resourceData.id, resource);
+                if(resource.resource_permission > 1){
+    	            var resourceData = {id: resource.resource_id, label: resource.name};
+    	            resourceArray.push(resourceData);
+    	            $scope.resourceMap.set(resourceData.id, resource);
+                }
             });
         };
 
