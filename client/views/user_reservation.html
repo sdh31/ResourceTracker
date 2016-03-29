@@ -24,7 +24,10 @@
 		<div class="control-group" style="margin-top: 15px;">
 			<button type="button" class="btn btn-primary btn-md" ng-disabled="!reservationSelected" ng-click="updateReservation()">Update Reservation</button>
 			<button type="button" class="btn btn-danger btn-md" ng-disabled="!reservationSelected" ng-click="deleteReservation()">Delete Reservation</button>
+            <button type="button" class="btn btn-secondary btn-md" ng-disabled="!reservationSelected || oldReservationTitle == reservationToModify.reservation_title" ng-click="createNewReservation()" style="margin-top: 2px;">Create New Reservation</button>
+            <md-icon data-toggle="tooltip" class="material-icons" style="width: 24px; height: 24px; vertical-align: middle">help outline</md-icon>
 		</div><br>
+
 		<div class="alert alert-danger" ng-show="hasError.value">
 			<strong>Warning:</strong> {{alertMessage.value}}
 			<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>

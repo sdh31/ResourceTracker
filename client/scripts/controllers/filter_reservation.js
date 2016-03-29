@@ -14,6 +14,7 @@ angular.module('resourceTracker')
         $scope.onReservationNoResource = "Please select at least one resource to reserve.";
         $scope.onReservationInvalidStartDate = "Please select a valid start date.";
         $scope.onReservationInvalidEndDate = "Please select a valid end date.";
+        $scope.noTitleSpecified = "You must specify a reservation title!";
 
     	var currentTime = new Date();
     	$scope.startTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
@@ -199,6 +200,9 @@ angular.module('resourceTracker')
                 return false;
             } if(reservationData.resource_ids.length == 0){
                 $scope.addError($scope.onReservationNoResource);
+                return false;
+            } if(reservationData.reservation_title == "") {
+                $scope.addError($scope.noTitleSpecified);
                 return false;
             }
             return true;
