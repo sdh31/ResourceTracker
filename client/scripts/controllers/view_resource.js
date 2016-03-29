@@ -116,7 +116,7 @@ angular.module('resourceTracker')
 			$http.post('/resource', $scope.editingResource).then(function(response) {
 				addTagsToResource();
             }, function(error) {
-                if (error.data.err == "This resource is oversubscribed. Please resolve all conflicts before removing restriction") {
+                if (error.data.err == "This resource is oversubscribed. Please resolve all conflicts before removing restriction.") {
                     $scope.addError(error.data.err);
                 } else {
                     $scope.addError(resourceService.alertMessages.resourceUpdatingFailed);
