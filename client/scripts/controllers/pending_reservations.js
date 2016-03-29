@@ -90,9 +90,11 @@ angular.module('resourceTracker')
 
         $scope.approveReservation = function(reserv){
             var conflicts = checkConflictingReservations(reserv);
-            var confirmMessage = "Are you sure you want to approve resource " + $scope.resourceMap.get(reserv.resource_id).name + 
-                                " for reservation " + reserv.reservation_title
-                                 + " and delete the following reservation(s): " + conflicts;
+            var confirmMessage = (conflicts.length==0) ? ("Are you sure you want to approve resource " + $scope.resourceMap.get(reserv.resource_id).name + 
+                " for reservation " + reserv.reservation_title + "?")
+                :("Are you sure you want to approve resource " + $scope.resourceMap.get(reserv.resource_id).name + 
+                " for reservation " + reserv.reservation_title
+                + " and delete the following reservation(s): " + conflicts);
             var result = confirm(confirmMessage);
             var reqBody = {resource_id: reserv.resource_id, reservation_id: reserv.reservation_id};
             if(result){
