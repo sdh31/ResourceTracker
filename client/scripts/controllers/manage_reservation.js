@@ -7,6 +7,8 @@ angular.module('resourceTracker')
         $scope.clearSuccess();
         $scope.onReservationInvalidStartDate = "Please select a valid start date.";
         $scope.onReservationInvalidEndDate = "Please select a valid end date.";
+        $('[data-toggle="tooltip2"]').tooltip({title: "Select resources you wish to remove from this reservation.", placement: "right"});
+
 
         // this function initializes all global data on this page. 
         var initializeResourceReservations = function() {
@@ -24,6 +26,7 @@ angular.module('resourceTracker')
             $scope.reservationToModify = {};
             $scope.reservationSelected = false;
             $scope.selectedReservationResources = [];
+            $scope.updateValid = false;
             $scope.resourcesToDisplay = [];
             $scope.resourcesToRemove = [];
             getAllReservations();
@@ -37,21 +40,19 @@ angular.module('resourceTracker')
                 resourceList.forEach(function(resource){
                     var resourceReservations = resource.reservations;
                     resourceReservations.forEach(function(reservation){
-                        if(reservation.end_time > currentTime.valueOf()){
-                            var resourceToAdd = {description: resource.description, is_confirmed: reservation.is_confirmed,
-                                name: resource.name, resource_id: resource.resource_id, resource_state: resource.resource_state};
-                            if(reservationIDtoReservationMap.has(reservation.reservation_id)){
-                                var reserv = reservationIDtoReservationMap.get(reservation.reservation_id);
-                                var resources = reserv.resources;
-                                resources.push(resourceToAdd);
-                                reserv.resources = resources;
-                                reservationIDtoReservationMap.set(reservation.reservation_id, reserv); 
-                            } else {
-                                var reserv = {end_time: reservation.end_time, reservation_description: reservation.reservation_description,
-                                    reservation_id: reservation.reservation_id, reservation_title: reservation.reservation_title, resources: [resourceToAdd],
-                                    start_time: reservation.start_time, user: {user_id: reservation.user_id, username: reservation.username}};
-                                reservationIDtoReservationMap.set(reservation.reservation_id, reserv);
-                            }
+                        var resourceToAdd = {description: resource.description, is_confirmed: reservation.is_confirmed,
+                            name: resource.name, resource_id: resource.resource_id, resource_state: resource.resource_state};
+                        if(reservationIDtoReservationMap.has(reservation.reservation_id)){
+                            var reserv = reservationIDtoReservationMap.get(reservation.reservation_id);
+                            var resources = reserv.resources;
+                            resources.push(resourceToAdd);
+                            reserv.resources = resources;
+                            reservationIDtoReservationMap.set(reservation.reservation_id, reserv); 
+                        } else {
+                            var reserv = {end_time: reservation.end_time, reservation_description: reservation.reservation_description,
+                                reservation_id: reservation.reservation_id, reservation_title: reservation.reservation_title, resources: [resourceToAdd],
+                                start_time: reservation.start_time, user: {user_id: reservation.user_id, username: reservation.username}};
+                            reservationIDtoReservationMap.set(reservation.reservation_id, reserv);
                         }
                     });
                 });
@@ -65,11 +66,23 @@ angular.module('resourceTracker')
         }
 
         var populateReservationsToDisplay = function(reservationData, reservationArray){
+            var currentTime = new Date();
             reservationData.forEach(function(reservation) {
-                var data = {id: reservation.reservation_id, label: reservation.reservation_title};
-                reservationArray.push(data);
-                $scope.reservationMap.set(reservation.reservation_id, reservation);
+                if(reservation.end_time > currentTime.valueOf()){
+                    var status = (determineIfReservationConfirmed(reservation)) ? " (confirmed)" : " (pending)"
+                    var data = {id: reservation.reservation_id, label: reservation.reservation_title + status};
+                    reservationArray.push(data);
+                    $scope.reservationMap.set(reservation.reservation_id, reservation);
+                }
             });
+        }
+
+        var determineIfReservationConfirmed = function(reserv){
+            var sum = 0;
+            reserv.resources.forEach(function(resource){
+                sum += resource.is_confirmed;
+            });
+            return (sum == reserv.resources.length);
         }
 
         $scope.onReservationSelect = function(item) {
@@ -88,7 +101,8 @@ angular.module('resourceTracker')
 
         var populateResourcesToDisplay = function(resourceData, resourceArray){
             resourceData.forEach(function(resource){
-                var data = {id: resource.resource_id, label: resource.name};
+                var status = (resource.is_confirmed==0) ? " (pending)" : " (approved)";
+                var data = {id: resource.resource_id, label: resource.name + status};
                 resourceArray.push(data);
             })
         };
