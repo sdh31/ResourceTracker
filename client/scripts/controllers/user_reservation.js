@@ -38,7 +38,6 @@ angular.module('resourceTracker')
             return $http.get('/reservation').then(function(response) {
                 $scope.allReservations = response.data.results;
                 populateReservationsToDisplay($scope.allReservations, $scope.reservationsToDisplay);
-                console.log($scope.reservationsToDisplay);
             }, function(error) {
                 console.log(error);
             });
@@ -87,10 +86,6 @@ angular.module('resourceTracker')
                 resourceArray.push(data);
             })
         };
-
-        $scope.print = function(){
-            console.log($scope.updateValid);
-        }
 
         var removeResources = function(){
             console.log($scope.resourcesToRemove);
