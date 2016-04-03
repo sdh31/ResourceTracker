@@ -173,4 +173,3 @@ res = r.get_reservations_by_resources([resource_id1, resource_id2, resource_id3,
 test_print(desc, len(r.json.loads(res.content)['results']) == 0)
 
 r.finish_test("remove permissions test")
-

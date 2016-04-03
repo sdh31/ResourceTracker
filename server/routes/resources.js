@@ -309,15 +309,15 @@ router.delete('/', function(req, res, next){
 });
 
 router.get('/all', function(req, res, next) {
-	var getAllResourcesCallback = function(result){
-		if (result.error) {
-		  res.status(400).json(result);
-		} else if (result.empty) {
-			res.send(JSON.stringify(result.resources));
-		} else {
-			res.send(JSON.stringify(result.resources));
-		}
-  	};
+    var getAllResourcesCallback = function(result){
+        if (result.error) {
+          res.status(400).json(result);
+        } else if (result.empty) {
+            res.send(JSON.stringify(result.resources));
+        } else {
+            res.send(JSON.stringify(result.resources));
+        }
+    };
 
     var getAllGroupsForUserCallback = function(result){
         if (result.error) {
@@ -339,11 +339,11 @@ router.get('/all', function(req, res, next) {
 router.get('/children', function(req, res, next) {
 
     var getAllDirectChildrenCallback = function(result){
-		if (result.error) {
+        if (result.error) {
             res.status(400).json(result);
-		} else {
+        } else {
             res.status(200).json(result);
-		}
+        }
     };
 
     var checkPermissionForResourceCallback = function(result){
@@ -373,11 +373,11 @@ router.get('/children', function(req, res, next) {
 router.get('/subtree', function(req, res, next) {
 
     var getSubtreeCallback = function(result){
-		if (result.error) {
+        if (result.error) {
             res.status(400).json(result);
-		} else {
+        } else {
             res.status(200).json(result);
-		}
+        }
     };
 
     var checkPermissionForResourceCallback = function(result){
