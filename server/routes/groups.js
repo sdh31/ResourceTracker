@@ -106,13 +106,11 @@ router.delete('/', function(req,res,next){
         if (result.error) {
             res.status(400).json(result);
         } else {
+            allGroupsForUsers = result.allGroupsForUsers;
             var groupsThatHaveReservePermission = [];
 
             for (var i = 0; i<result.results.length; i++) {
-                if (result.results[i].resource_permission >= 1) {
-                    if (result.results[i].group_id == req.query.group_id) {
-                        continue;
-                    }
+                if (result.results[i].resource_permission >= 1 && !(result.results[i].group_id == req.query.group_id)) {
                     groupsThatHaveReservePermission.push(result.results[i].group_id);
                 }
             }
@@ -136,27 +134,12 @@ router.delete('/', function(req,res,next){
         }
     };
 
-    var getAllGroupsForUsersCallback = function(result) {
-        if (result.error){
-            res.status(400).json(result);
-        } else {
-            allGroupsForUsers = result.results;
-
-            var group_ids = [];
-            for (var i = 0; i<result.results.length; i++) {
-                group_ids.push(result.results[i].group_id);
-            }
-            
-            perm_service.check_permission_for_resources(allResources, group_ids, checkPermissionForResourceCallback);
-        }
-    };
-
     var getUsersInGroupsCallback = function(result){
         if (result.error){
             res.status(400).json(result);
         } else {
             allUsers = result.results;
-            group_service.get_all_groups_for_users(result.results, getAllGroupsForUsersCallback);
+            perm_service.check_permission_for_resources(allResources, allUsers, [], checkPermissionForResourceCallback);
         }
     };
 
@@ -245,45 +228,14 @@ router.post('/removeUsers', function(req,res,next){
         if (result.error) {
             res.status(400).json(result);
         } else {
-            var groupsThatHaveReservePermission = [];
-
-            for (var i = 0; i<result.results.length; i++) {
-                if (result.results[i].resource_permission >= 1) {
-                    groupsThatHaveReservePermission.push(result.results[i].group_id);
-                }
-            }
-
-            for (i = 0; i<allGroupsForUsers.length; i++) {
-                if (groupsThatHaveReservePermission.indexOf(allGroupsForUsers[i].group_id) != -1) {
-                    for (var j = 0; j < allUsers.length; j++) {
-                        if (allUsers[j].user_id == allGroupsForUsers[i].user_id) {
-                            allUsers.splice(j, 1);
-                            break;
-                        }
-                    }
-                }
-            }
+            allGroupsForUsers = result.allGroupsForUsers;
+            allUsers = reservation_service.removeUsersThatHaveReservePermission(allUsers, allGroupsForUsers, result.results);
 
             if (allUsers.length == 0) {
                 res.status(200).json(result);
             } else {
                 reservation_service.getAllReservationsOnResourcesByUsers(allResources, allUsers, getReservationsCallback);
             }
-        }
-    };
-
-    var getAllGroupsForUsersCallback = function(result) {
-        if (result.error){
-            res.status(400).json(result);
-        } else {
-            allGroupsForUsers = result.results;
-
-            var group_ids = [];
-            for (var i = 0; i<result.results.length; i++) {
-                group_ids.push(result.results[i].group_id);
-            }
-            
-            perm_service.check_permission_for_resources(allResources, group_ids, checkPermissionForResourceCallback);
         }
     };
 
@@ -300,7 +252,7 @@ router.post('/removeUsers', function(req,res,next){
                     allUsers.push({user_id: req.body.user_ids[i]});
                 }
 
-                group_service.get_all_groups_for_users(allUsers, getAllGroupsForUsersCallback);
+                perm_service.check_permission_for_resources(allResources, allUsers, [], checkPermissionForResourceCallback);
             }
         }
     };

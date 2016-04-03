@@ -49,7 +49,7 @@ test_print(desc, res.status_code < 300)
 
 desc = '#### Check all tags created ####'
 res = r.get_all_tags()
-test_print(desc, len(r.json.loads(res.content)["tags"]) == 2)
+test_print(desc, len(r.json.loads(res.content)["results"]) == 2)
 
 desc =  '#### get permissions for resource with tags and make that the admin user has permission ####'
 res = r.get_group_permission_to_resource(resource_id)

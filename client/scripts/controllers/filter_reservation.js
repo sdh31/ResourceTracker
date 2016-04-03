@@ -88,7 +88,7 @@ angular.module('resourceTracker')
 
 
         var populateTagArray = function(tagResponse) {
-            tagResponse.data.tags.forEach(function(tag) {
+            tagResponse.data.results.forEach(function(tag) {
                 var tag = {id: tag.tag_id, label: tag.tag_name};
                 $scope.tagMap[tag.id] = tag.label;
                 $scope.allTags.push(tag);

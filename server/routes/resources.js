@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 var res_service = require('../services/resources');
 var tag_service = require('../services/tags');
-var auth = require('../services/authorization');
 var perm_service = require('../services/permissions');
 var user_service = require('../services/users');
 var group_service = require('../services/groups');
@@ -156,7 +155,7 @@ router.post('/', function(req, res, next){
 
 });
 
-router.delete('/', auth.is('user'), function(req, res, next){
+router.delete('/', function(req, res, next){
   
     var delete_resource_callback = function(result){
        if (result.error){
@@ -194,7 +193,7 @@ router.delete('/', auth.is('user'), function(req, res, next){
     reservation_service.getAllReservationsOnResourceByUsers(req.query.resource_id, [req.session.user], getReservationsCallback)
 });
 
-router.get('/all', auth.is('user'), function(req, res, next) {
+router.get('/all', function(req, res, next) {
 	var getAllResourcesCallback = function(result){
 		if (result.error) {
 		  res.status(400).json(result);
@@ -236,7 +235,7 @@ router.post('/addPermission', function(req, res, next) {
         res.status(403).json(perm_service.denied_error)
         return;
     }
-     if (req.body.group_ids.length != req.body.resource_permissions.length) {
+    if (req.body.group_ids.length != req.body.resource_permissions.length) {
         res.status(400).json({error: true, err: "need same amount of permissions as resources"})
         return;
     }
@@ -248,85 +247,6 @@ router.post('/addPermission', function(req, res, next) {
 
 router.post('/updatePermission', function(req, res, next) {
 
-    var deleteReservationsCallback = function(result) {
-        if (result.error) {
-            res.status(400).json(result);
-        } else {
-            res.status(200).json(result);
-        }
-    };
-
-    var getReservationsCallback = function(result) {
-
-        if (result.error) {
-            res.status(400).json(result);
-        } else {
-            if (result.results.length == 0) {
-                res.status(200).json(result);
-            } else {
-                for (var i = 0; i<result.results.length; i++) {
-                    res_service.notifyUserOnReservationDelete(result.results[i]);
-                }
-                reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
-            }
-        }
-    };
-
-    var checkPermissionForResourceCallback = function (result) {
-        if (result.error) {
-            res.status(400).json(result);
-        } else {
-            var groupsThatHaveReservePermission = [];
-
-            for (var i = 0; i<result.results.length; i++) {
-                if (result.results[i].resource_permission >= 1) {
-                    groupsThatHaveReservePermission.push(result.results[i].group_id);
-                }
-            }
-
-            for (i = 0; i<allGroupsForUsers.length; i++) {
-                if (groupsThatHaveReservePermission.indexOf(allGroupsForUsers[i].group_id) != -1) {
-                    for (var j = 0; j < allUsers.length; j++) {
-                        if (allUsers[j].user_id == allGroupsForUsers[i].user_id) {
-                            allUsers.splice(j, 1);
-                            break;
-                        }
-                    }
-                }
-            }
-
-            if (allUsers.length == 0) {
-                res.status(200).json(result);
-            } else {
-                reservation_service.getAllReservationsOnResourceByUsers(req.body.resource_id, allUsers, getReservationsCallback);
-            }
-        }
-    };
-
-    var getAllGroupsForUsersCallback = function(result) {
-        if (result.error){
-            res.status(400).json(result);
-        } else {
-            allGroupsForUsers = result.results;
-
-            var group_ids = [];
-            for (var i = 0; i<result.results.length; i++) {
-                group_ids.push(result.results[i].group_id);
-            }
-
-            perm_service.check_permission_for_resource(req.body.resource_id, group_ids, checkPermissionForResourceCallback);
-        }
-    };
-
-    var getUsersInGroupCallback = function(result){
-        if (result.error){
-            res.status(400).json(result);
-        } else {
-            allUsers = result.results;
-            group_service.get_all_groups_for_users(result.results, getAllGroupsForUsersCallback);
-        }
-    };
-
     var updateGroupPermissionCallback = function(result){
         if (result.error){
             res.status(400).json(result);
@@ -334,7 +254,8 @@ router.post('/updatePermission', function(req, res, next) {
             if (req.body.resource_permission >= 1) {
                 res.status(200).json(result);
             } else {
-                group_service.get_users_in_group(req.body, getUsersInGroupCallback);
+                req.body.group_ids = [req.body.group_id];
+                deleteReservationsIfNecessary(req, res)
             }
         }
     };
@@ -351,6 +272,43 @@ router.post('/updatePermission', function(req, res, next) {
 
 // req.body should have resource_id, group_ids
 router.post('/removePermission', function(req, res, next) {
+
+    var removeGroupPermissionCallback = function(result){
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            deleteReservationsIfNecessary(req, res);
+        }
+    };
+
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
+    res_service.removeGroupPermissionToResource(req.body, removeGroupPermissionCallback);
+
+});
+
+// req.query should have resource_id
+router.get('/getPermission', function(req, res, next) {
+
+    var getGroupPermissionCallback = function(result){
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            res.status(200).json(result);
+        }
+    };
+    
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
+
+    res_service.getGroupPermissionToResource(req.query, getGroupPermissionCallback);
+});
+
+function deleteReservationsIfNecessary(req, res) {
 
     var allUsers = [];
     var allGroupsForUsers = [];
@@ -383,25 +341,8 @@ router.post('/removePermission', function(req, res, next) {
         if (result.error) {
             res.status(400).json(result);
         } else {
-            var groupsThatHaveReservePermission = [];
-
-            for (var i = 0; i<result.results.length; i++) {
-                if (result.results[i].resource_permission >= 1) {
-                    groupsThatHaveReservePermission.push(result.results[i].group_id);
-                }
-            }
-
-            for (i = 0; i<allGroupsForUsers.length; i++) {
-                if (groupsThatHaveReservePermission.indexOf(allGroupsForUsers[i].group_id) != -1) {
-                    for (var j = 0; j < allUsers.length; j++) {
-                        if (allUsers[j].user_id == allGroupsForUsers[i].user_id) {
-                            allUsers.splice(j, 1);
-                            break;
-                        }
-                    }
-                }
-            }
-
+            allGroupsForUsers = result.allGroupsForUsers;
+            allUsers = reservation_service.removeUsersThatHaveReservePermission(allUsers, allGroupsForUsers, result.results);
             if (allUsers.length == 0) {
                 res.status(200).json(result);
             } else {
@@ -410,63 +351,16 @@ router.post('/removePermission', function(req, res, next) {
         }
     };
 
-    var getAllGroupsForUsersCallback = function(result) {
-        if (result.error){
-            res.status(400).json(result);
-        } else {
-            allGroupsForUsers = result.results;
-
-            var group_ids = [];
-            for (var i = 0; i<result.results.length; i++) {
-                group_ids.push(result.results[i].group_id);
-            }
-
-            perm_service.check_permission_for_resource(req.body.resource_id, group_ids, checkPermissionForResourceCallback);
-        }
-    };
-
     var getUsersInGroupsCallback = function(result){
         if (result.error){
             res.status(400).json(result);
         } else {
             allUsers = result.results;
-            group_service.get_all_groups_for_users(result.results, getAllGroupsForUsersCallback);
+            perm_service.check_permission_for_resources([req.body], allUsers, [], checkPermissionForResourceCallback);
         }
     };
 
-    var removeGroupPermissionCallback = function(result){
-        if (result.error){
-            res.status(400).json(result);
-        } else {
-            group_service.get_users_in_groups(req.body.group_ids, getUsersInGroupsCallback);
-        }
-    };
-
-    if(!perm_service.check_resource_permission(req.session)){
-        res.status(403).json(perm_service.denied_error)
-        return;
-    }
-    res_service.removeGroupPermissionToResource(req.body, removeGroupPermissionCallback);
-
-});
-
-// req.query should have resource_id
-router.get('/getPermission', function(req, res, next) {
-    
-    var getGroupPermissionCallback = function(result){
-        if (result.error){
-            res.status(400).json(result);
-        } else {
-            res.status(200).json(result);
-        }
-    };
-    
-    if(!perm_service.check_resource_permission(req.session)){
-        res.status(403).json(perm_service.denied_error)
-        return;
-    }
-
-    res_service.getGroupPermissionToResource(req.query, getGroupPermissionCallback);
-});
+    group_service.get_users_in_groups(req.body.group_ids, getUsersInGroupsCallback);
+};
 
 module.exports = router;

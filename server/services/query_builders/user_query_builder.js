@@ -12,32 +12,6 @@ module.exports.buildQueryForCreateUser = function(user, hash) {
             .toString();
 };
 
-module.exports.buildQueryForGetUser = function(username) {
-   return squel.select()
-                .field("resource.name")
-                .field("resource.resource_id")
-                .field("resource.description")
-                //.field("resource.resource_state")
-                .field("resource.created_by")
-                .field("tag.tag_name")
-                .field("reservation.reservation_id")
-                .field("reservation.start_time")
-                .field("reservation.end_time")
-                .field("user.username")
-                .field("user.first_name")
-                .field("user.last_name")
-                .field("user.user_id")
-                .field("user.password")
-                .from("user")
-                .left_join("user_reservation", null, "user.user_id = user_reservation.user_id")
-                .left_join("reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
-                .left_join("resource", null, "reservation.resource_id = resource.resource_id")
-                .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")
-                .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")
-                .where("username = '" + username + "'")
-                .toString();
-};
-
 module.exports.buildQueryForGetUserPermissions = function(user){
      return squel.select()
                 .field("user.username")

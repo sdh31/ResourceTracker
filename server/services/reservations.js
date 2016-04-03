@@ -179,6 +179,29 @@ function organizeReservations(reservations) {
     return finalReservations;
 };
 
+function removeUsersThatHaveReservePermission(allUsers, allGroupsForUsers, resourcePermissions) {
+
+    var groupsThatHaveReservePermission = [];
+
+    for (var i = 0; i<resourcePermissions.length; i++) {
+        if (resourcePermissions[i].resource_permission >= 1) {
+            groupsThatHaveReservePermission.push(resourcePermissions[i].group_id);
+        }
+    }
+
+    for (i = 0; i<allGroupsForUsers.length; i++) {
+        if (groupsThatHaveReservePermission.indexOf(allGroupsForUsers[i].group_id) != -1) {
+            for (var j = 0; j < allUsers.length; j++) {
+                if (allUsers[j].user_id == allGroupsForUsers[i].user_id) {
+                    allUsers.splice(j, 1);
+                    break;
+                }
+            }
+        }
+    }
+    return allUsers;
+}
+
 module.exports = {
     get_conflicting_reservations:get_conflicting_reservations,
     get_reservations_by_resources: get_reservations_by_resources,
@@ -201,5 +224,6 @@ module.exports = {
     deleteConflictingReservations:deleteConflictingReservations,
     get_unconfirmed_resources_for_reservation:get_unconfirmed_resources_for_reservation,
     getOverlappingReservationsByResource: getOverlappingReservationsByResource,
-    confirmAllReservationsOnResource: confirmAllReservationsOnResource
+    confirmAllReservationsOnResource: confirmAllReservationsOnResource,
+    removeUsersThatHaveReservePermission: removeUsersThatHaveReservePermission
 }
