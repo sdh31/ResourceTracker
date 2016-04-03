@@ -43,71 +43,37 @@ function filter_by_tag (includedTags, excludedTags, start_time, end_time, group_
     
 	var includedQuery = tag_query_builder.buildQueryForIncludedTags(includedTags, start_time, end_time, group_ids);
 	var excludedQuery = tag_query_builder.buildQueryForExcludedTags(excludedTags);
-	console.log(excludedQuery);
-	console.log(includedQuery);
-	var resourcesFound = [];
-	var idsSeen = [];
-    var excludedResourceIds = [];
-    
-    var error = false;
-    var err = '';
-	var includeCallback = function() {
-		db_sql.connection.query(includedQuery)
-            .on('result', function (row) {
-			    if (excludedResourceIds.indexOf(row.resource_id) == -1) {
-                	resourcesFound.push(row);
-			    }
-            })
-            .on('error', function (err) {
-                error = true;
-                err = err;
-            })
-            .on('end', function () {
-                callback({error: error, err: err, resources: organizeResources(resourcesFound)});
-            });
+
+    var excludedResources = [];
+    var includeCallback = function(result) {
+        if (result.error) {
+            callback(result);
+        } else {
+            result.resources = organizeResources(removeExcludedResources(excludedResources, result.results));
+            callback(result);
+        }
+    }
+
+	var excludeCallback = function(result) {
+        if (result.error) {
+            callback(result);
+        } else {
+            excludedResources = result.results;
+            basic_db_utility.performMultipleRowDBOperation(includedQuery, includeCallback);
+        }
 	}
 
-    db_sql.connection.query(excludedQuery)
-        .on('result', function (row) {
-            excludedResourceIds.push(row.resource_id);
-        })
-        .on('error', function (err) {
-            // empty excluded query is totally ok
-            if (err.code != 'ER_EMPTY_QUERY') {
-                error = true;
-                err = err;
-            }
-        })
-        .on('end', function () {
-            if (error) {
-                callback({error: error, err: err});
-            } else {
-                includeCallback();
-            }
-        });
+    if (excludedQuery == "") {
+        excludeCallback({error: false, results: []});
+    } else {
+        basic_db_utility.performMultipleRowDBOperation(excludedQuery, excludeCallback);
+    }
 }
 
 function get_all_tags(callback) {
 
 	var getAllTagsQuery = tag_query_builder.buildQueryForGetAllTags();
-	var tags = [];
-	var seenTagIds = [];
-    var error = false;
-    var err = '';
-	db_sql.connection.query(getAllTagsQuery)
-		.on('result', function (row) {
-			if (seenTagIds.indexOf(row.tag_id) == -1) {
-				seenTagIds.push(row.tag_id);
-				tags.push(row);
-			}
-		})
-		.on('error', function (err) {
-			error = true;
-            err = err;
-		})
-		.on('end', function () {
-			callback({error: error, err: err, tags: tags})
-		});
+	basic_db_utility.performMultipleRowDBOperationOnlyUniqueValues(getAllTagsQuery, 'tag_id', callback)
 };
 
 function remove_tag_from_object(tag_info, callback){
@@ -193,6 +159,17 @@ var containsReservationResourcePair = function (thisResource, seenReservationRes
 		}
 	}
 	return false;
+};
+
+var removeExcludedResources = function(excludedResources, includedResources) {
+    
+    var resourcesToReturn = [];
+    for (var i = 0; i<includedResources.length; i++) {
+        if (resourceExists(includedResources[i], excludedResources) == -1) {
+            resourcesToReturn.push(includedResources[i]);
+        }
+    }
+    return resourcesToReturn;
 };
 
 module.exports = {

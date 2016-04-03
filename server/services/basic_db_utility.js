@@ -38,6 +38,29 @@ module.exports.performMultipleRowDBOperation = function(query, callback) {
         });
 };
 
+module.exports.performMultipleRowDBOperationOnlyUniqueValues = function(query, fieldToIgnoreBy, callback) {
+    console.log(query);
+    var results = [];
+    var error = false;
+    var err = '';
+    var alreadySeen = [];
+    db_sql.connection.query(query)
+	    .on('result', function (row) {
+            if (alreadySeen.indexOf(row[fieldToIgnoreBy]) == -1) {
+                alreadySeen.push(row[fieldToIgnoreBy]);
+                results.push(row);
+            }
+        })
+        .on('error', function (err) {
+            console.log(err);
+            error = true;
+            err = err;
+        })
+        .on('end', function () {
+            callback({error: error, results: results, err: err});
+        });
+};
+
 module.exports.performMultipleRowDBOperationIgnoreDuplicates = function(query, callback) {
     console.log(query);
     var results = [];

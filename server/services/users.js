@@ -117,53 +117,6 @@ function get_user_permissions(user, callback) {
     );
 };
 
-// THIS METHOD IS NEVER USED 
-function get_user(username, callback){
-    // gets the user information given a username
-    if (username == null) {
-        callback(callback({error: true, err: err, empty: false}));
-        return;
-    }
-
-    var getUserQuery = user_query_builder.buildQueryForGetUser(username);
-    console.log(getUserQuery);
-
-    var rowCount = 0;
-    var resources = [];
-    var userInfo = {};
-    
-    db_sql.connection.query(getUserQuery)
-        .on('result', function (row) {
-            if (rowCount == 0) {
-                userInfo = {    
-                    user_id: row.user_id,
-                    username: row.username,
-                    first_name: row.first_name,
-                    last_name: row.last_name,
-                    email_address: row.email_address,
-                    password: row.password,
-                    permission_level: row.permission_level,
-                    resources: []
-                };
-            }
-            resources.push(row);
-            rowCount++;
-        })
-        .on('error', function (err) {
-            callback({error: true, err: err, empty: false});
-         })
-
-        .on('end', function () {
-            if (rowCount == 0) {
-                callback({error: true, empty: true});
-            } else {
-                userInfo.resources = tag_service.organizeResources(resources);
-                callback(userInfo);
-            }
-         }
-    );
-};
-
 function delete_user(username, callback) {
 
     if (username == null) {
@@ -243,7 +196,6 @@ function compare_passwords(password, user, callback) {
 
 module.exports = {
     create_user: create_user,
-    get_user: get_user,
     get_user_permissions: get_user_permissions,
     delete_user: delete_user,
     delete_private_group: delete_private_group,

@@ -94,7 +94,7 @@ def create_user (username, password):
 	params = {
 		'username':username,
 		'password':password,
-		'email_address': 'a@a.com',
+		'email_address': 'a@example.com',
         'first_name': 'rahul',
         'last_name': 'abcd',
 		'is_shibboleth': 0
@@ -228,6 +228,18 @@ def add_group_permission_to_resource(resource_id, group_ids, resource_permission
         'resource_id': resource_id,
 		'group_ids': group_ids,
 		'resource_permissions': resource_permissions
+    }
+
+	return send_request(method, params, url)
+
+def update_group_permission_to_resource(resource_id, group_id, resource_permission):
+	url = baseUrl + '/resource/updatePermission'
+	method = "POST"
+
+	params = {
+        'resource_id': resource_id,
+		'group_id': group_id,
+		'resource_permission': resource_permission
     }
 
 	return send_request(method, params, url)

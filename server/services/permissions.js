@@ -2,6 +2,7 @@ var db_sql = require('./db_wrapper');
 var squel = require('squel');
 var permission_queries = require('./query_builders/permission_query_builder');
 var basic_db_utility = require('./basic_db_utility');
+var group_service = require('./groups');
 var jwt = require('jsonwebtoken');
 
 //This will need to be moved out of source control
@@ -120,9 +121,39 @@ function check_permission_for_resource(resource_id, group_ids, callback) {
     basic_db_utility.performMultipleRowDBOperation(checkPermissionForResourceQuery, callback);
 };
 
-function check_permission_for_resources(resources, group_ids, callback) {
-    var checkPermissionForResourcesQuery = permission_queries.buildQueryForCheckPermissionForResources(resources, group_ids);
-    basic_db_utility.performMultipleRowDBOperation(checkPermissionForResourcesQuery, callback);
+function check_permission_for_resources(resources, users, group_ids, callback) {
+
+    var allGroupsForUsers = [];
+
+    var finalCallback = function(result) {
+        if (result.error) {
+            callback(result);
+        } else {
+            result.allGroupsForUsers = allGroupsForUsers;
+            callback(result);
+        }
+    };
+
+    var getAllGroupsForUsersCallback = function(result) {
+        if (result.error) {
+            callback(result);
+        } else {
+            allGroupsForUsers = result.results;
+            group_ids = [];
+            for (var i = 0; i<result.results.length; i++) {
+                group_ids.push(result.results[i].group_id);
+            }
+            var checkPermissionForResourcesQuery = permission_queries.buildQueryForCheckPermissionForResources(resources, group_ids);
+            basic_db_utility.performMultipleRowDBOperation(checkPermissionForResourcesQuery, finalCallback);
+        }
+    }
+
+    if (group_ids.length == 0) {
+        group_service.get_all_groups_for_users(users, getAllGroupsForUsersCallback);
+    } else {
+        var checkPermissionForResourcesQuery = permission_queries.buildQueryForCheckPermissionForResources(resources, group_ids);
+        basic_db_utility.performMultipleRowDBOperation(checkPermissionForResourcesQuery, callback);
+    }
 };
 
 module.exports = {

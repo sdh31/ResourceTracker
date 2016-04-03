@@ -1,10 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var user_service = require('../services/users');
-var auth = require('../services/authorization');
 var perm_service = require('../services/permissions');
 
-router.get('/', auth.is('user'), function(req, res, next){
+router.get('/', function(req, res, next){
     //read user
     var getUserCallback = function(result){
         if (result.error) {
@@ -34,7 +33,7 @@ router.get('/', auth.is('user'), function(req, res, next){
     }
 });
 
-router.put('/', auth.is('admin'), function(req, res, next){
+router.put('/', function(req, res, next){
     //create user
     if(!perm_service.check_user_permission(req.session) && req.body.username != 'admin'){
         res.status(403).json(perm_service.denied_error)
@@ -59,7 +58,7 @@ router.put('/', auth.is('admin'), function(req, res, next){
 
 );
 
-router.post('/', auth.is('user'), function(req, res, next){
+router.post('/', function(req, res, next){
     //update user
     
     var updateUserCallback = function(result) {
@@ -85,7 +84,7 @@ router.post('/', auth.is('user'), function(req, res, next){
     }
 );
 
-router.delete('/', auth.is('user'), function(req, res, next){
+router.delete('/', function(req, res, next){
     
     if(!perm_service.check_user_permission(req.session)){
         res.status(403).json(perm_service.denied_error)
@@ -163,7 +162,7 @@ router.post('/signin', function(req, res, next){
     user_service.get_user_permissions({username: username}, getUserCallback);
 });
 
-router.post('/signout', auth.is('user'), function(req, res, next){
+router.post('/signout', function(req, res, next){
     if(!req.session.auth){
         res.status(403).json({err: "You are not signed in!"});
         return;

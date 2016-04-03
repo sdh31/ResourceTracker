@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var app = express();
-
-var auth = require('../services/authorization');
 var perm_service = require('../services/permissions');
 
 var basePath =  '/home/bitnami/ResourceTracker/client';
