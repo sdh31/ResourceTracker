@@ -74,6 +74,43 @@ module.exports.buildQueryForGetAllAncestors = function(body) {
         .toString();
 };
 
+module.exports.buildQueryForInsertIntoFolderTree = function(descendant_id, ancestor_ids, path_lengths) {
+    var rows_to_add = [];
+    for(var i = 0; i < ancestor_ids.length; i++){
+        var row = {"descendant_id": descendant_id, "ancestor_id": ancestor_ids[i], "path_length": path_lengths[i]};
+        rows_to_add.push(row);
+    }
+
+    return squel.insert()
+        .into('folder_tree')
+        .setFieldsRows(rows_to_add)
+        .toString();
+};
+
+module.exports.buildQueryForGetAllDirectChildren = function(user, resource) {
+    return squel.select()
+        .from("resource")
+        .join("folder_tree", null, "resource.resource_id = folder_tree.descendant_id")
+        .join("resource_group", null, "resource_group.resource_id = resource.resource_id")
+        .join("permission_group", null, "resource_group.group_id = permission_group.group_id")
+        .join("user_group", null, "user_group.group_id = permission_group.group_id")
+        .join("user", null, "user_group.user_id = user.user_id")
+        .where("folder_tree.ancestor_id = " + resource.resource_id + " AND folder_tree.path_length = 1")
+        .toString();
+};
+
+module.exports.buildQueryForGetSubtree = function(user, resource) {
+    return squel.select()
+        .from("resource")
+        .join("folder_tree", null, "resource.resource_id = folder_tree.descendant_id")
+        .join("resource_group", null, "resource_group.resource_id = resource.resource_id")
+        .join("permission_group", null, "resource_group.group_id = permission_group.group_id")
+        .join("user_group", null, "user_group.group_id = permission_group.group_id")
+        .join("user", null, "user_group.user_id = user.user_id")
+        .where("folder_tree.ancestor_id = " + resource.resource_id + " AND user.user_id = " + user.user_id)
+        .toString();
+};
+
 module.exports.buildQueryForCheckReservationsOnDeleteResource = function(resource) {
     return squel.select()
             .from("reservation")

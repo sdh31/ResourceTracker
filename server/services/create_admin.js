@@ -1,4 +1,5 @@
 var user_services = require('./users');
+var resource_service = require('./resources');
 
 exports.createAdmin = function(err) {
 
@@ -15,11 +16,19 @@ exports.createAdmin = function(err) {
         emails_enabled: 1
 	};
 	
-	var createAdminUserCallback = function (result) {
+	var addGroupPermissionToResourceCallback = function (result) {
+		if (result.error) {
+			console.log('oh no');
+		} else {
+			console.log('admin successfully created');
+		}
+	};
+
+    var createAdminUserCallback = function (result) {
 		if (result.error) {
 			console.log('admin already created');
 		} else {
-			console.log('admin successfully created')
+			resource_service.addGroupPermissionToResource({resource_id: 1, group_ids: [1], resource_permissions: ['view']}, addGroupPermissionToResourceCallback);
 		}
 	};
 

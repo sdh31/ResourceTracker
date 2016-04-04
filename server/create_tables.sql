@@ -11,3 +11,5 @@ CREATE TABLE IF NOT EXISTS permission_group (group_id INT NOT NULL AUTO_INCREMEN
 CREATE TABLE IF NOT EXISTS user_group (user_id INT , group_id INT, PRIMARY KEY (user_id, group_id), FOREIGN KEY (user_id) REFERENCES user(user_id) ON DELETE CASCADE, FOREIGN KEY (group_id) REFERENCES permission_group(group_id) ON DELETE CASCADE);
 CREATE TABLE IF NOT EXISTS resource_group (resource_id INT, group_id INT, resource_permission INT, PRIMARY KEY (resource_id, group_id), FOREIGN KEY (resource_id) REFERENCES resource(resource_id) ON DELETE CASCADE, FOREIGN KEY (group_id) REFERENCES permission_group(group_id) ON DELETE CASCADE);
 ALTER TABLE resource ADD FOREIGN KEY (parent_id) REFERENCES resource(resource_id);
+INSERT INTO resource(resource_id, name, description, parent_id, sharing_level, is_folder) VALUES (1, 'root', 'root folder', NULL, 0, 1);
+INSERT INTO folder_tree(ancestor_id, descendant_id, path_length) VALUES (1,1,0);
