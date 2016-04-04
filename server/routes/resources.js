@@ -9,7 +9,6 @@ var reservation_service = require('../services/reservations');
 // returns the resource specified by resource_id
 // req.query should have a field "resource_id"
 router.get('/', function(req, res, next){
-  
     var getResourceCallback = function (result) {
         if (result.error){
             res.status(400).json(result);

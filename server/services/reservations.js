@@ -48,20 +48,35 @@ function update_reservation_by_id(reservation, user, has_auth, callback){
 }
 
 function filterAllowedOverlappingReservations(reservations) {
-
+    //Gets rid of the allowed ones
     var confirmedReservations = [];
-
+    var sharing_check = {};
+    var is_overbooked;
     for (var i = 0; i<reservations.length; i++) {
         var thisReservation = reservations[i];
         var allConfirmed = true;
+        is_overbooked = false;
         for (var j = 0; j<thisReservation.resources.length; j++) {
+            if(!sharing_check[j]){
+                //Initialize sharing_check value to 1 -- we have found a reservation on that resource
+
+                sharing_check[j] = 1
+            }
             if (!thisReservation.resources[j].is_confirmed) {
                 allConfirmed = false;
                 break;
             }
+            else{
+                sharing_check[j] ++;
+            }
+            console.log(sharing_check[j])
+            console.log(thisReservation.resources[j].sharing_level)
+            //update number of shared reservations on each resource -- if too many, don't filter
+            if(sharing_check[j] > thisReservation.resources[j].sharing_level){
+                is_overbooked = (true || is_overbooked);
+            }
         }
-
-        if (allConfirmed) {
+        if (allConfirmed && is_overbooked) {
             confirmedReservations.push(thisReservation);
         }
     }
@@ -101,13 +116,11 @@ function getAllReservationsForUser(user, callback) {
 
 function filterResourcesByPermission(resources, minPermission) {
     var resourcesWithPermission = [];
-    console.log(minPermission)
     for (var i = 0; i<resources.length; i++) {
         if ((resources[i].resource_permission >= minPermission) && resourcesWithPermission.indexOf(resources[i].resource_id) == -1) {
             resourcesWithPermission.push(resources[i].resource_id);
         }
     }
-
     return resourcesWithPermission;
 };
 
@@ -146,6 +159,9 @@ function organizeReservations(reservations) {
             name: thisRow.name,
             description: thisRow.description,
             resource_state: thisRow.resource_state,
+            sharing_level: thisRow.sharing_level,
+            is_folder: thisRow.is_folder,
+            parent_id: thisRow.parent_id,
             is_confirmed: thisRow.is_confirmed
         };
         if (seenReservationIds.indexOf(thisRow.reservation_id) == -1) {

@@ -19,6 +19,7 @@ module.exports.buildQueryForGetConflictingReservations = function(reservation) {
         .join("user_reservation", null, "user_reservation.reservation_id = reservation.reservation_id")
         .join("reservation_resource", null, "reservation_resource.reservation_id = reservation.reservation_id")
         .join("user", null, "user_reservation.user_id = user.user_id")
+        .join("resource", null, "reservation_resource.resource_id = resource.resource_id")
         .where(time_check)
         .where(resource_filter)
         //NOTE: If the reservation_id is provided, don't include that reservation in conflicts

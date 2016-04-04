@@ -95,7 +95,6 @@ router.put('/', function(req, res, next){
     };
 
     var getConflictingReservationsCallback = function(result){
-
         if(result.error){
             res.status(403).json(result);
 
@@ -392,7 +391,6 @@ router.post('/confirm_request', function(req, res, next){
         }
         else{
             reservationsToDelete = reservation_service.organizeReservations(result.results);
-
             if (reservationsToDelete.length > 0) {
                 reservation_service.deleteReservationsById(reservationsToDelete, delete_conflicting_reservation_callback)
             } else {
