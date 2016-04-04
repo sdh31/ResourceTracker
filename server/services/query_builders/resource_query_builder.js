@@ -27,6 +27,9 @@ module.exports.buildQueryForCreateResource = function(resource) {
 		.set("name", resource.name)
 		.set("description", resource.description)
 		.set("resource_state", resource.resource_state)
+        .set("sharing_level", resource.sharing_level)
+        .set("is_folder", resource.is_folder)
+        .set("parent_id", resource.parent_id)
 		.toString();
 };
 
@@ -48,7 +51,27 @@ module.exports.buildQueryForUpdateResource = function(resource) {
         query.set("resource_state", resource.resource_state);
     }
 
+    if (("sharing_level" in resource)){
+        query.set("sharing_level", resource.sharing_level);
+    }
+
+    if (("is_folder" in resource)){
+        query.set("is_folder", resource.is_folder);
+    }
+
+    if (("parent_id" in resource)){
+        query.set("parent_id", resource.parent_id);
+    }
+
     return query.toString();
+};
+
+module.exports.buildQueryForGetAllAncestors = function(body) {
+    return squel.select()
+        .from("resource")
+        .join("folder_tree", null, "resource.resource_id = folder_tree.ancestor_id")
+        .where("folder_tree.descendant_id = " + body.resource_id)
+        .toString();
 };
 
 module.exports.buildQueryForCheckReservationsOnDeleteResource = function(resource) {
