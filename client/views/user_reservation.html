@@ -9,20 +9,21 @@
 		 	 translation-texts="{buttonDefaultText: 'Select a Reservation'}"
 		 	 events="{onItemSelect: onReservationSelect}"></span>
         <br><h5>Reservation Title:</h5>
-        <input type="text" placeholder="Title" ng-model="reservationToModify.reservation_title" ng-disabled="!reservationSelected">
+        <input type="text" placeholder="Title" ng-model="reservationToModifyInfo.title" ng-change="updateValid = true" ng-disabled="!reservationSelected" onC>
         <br><h5>Reservation Description:</h5>
-        <input type="text" placeholder="Description" ng-model="reservationToModify.reservation_description" ng-disabled="!reservationSelected">
+        <input type="text" placeholder="Description" ng-model="reservationToModifyInfo.description" ng-change="updateValid = true"  ng-disabled="!reservationSelected">
         <br>
-        <h5>Resources To Remove:</h5>
+        <h5>Resources:</h5>
         <span ng-dropdown-multiselect="" options="resourcesToDisplay" selected-model="resourcesToRemove"
         	 extra-settings="{enableSearch: true, smartButtonMaxItems: 3 }" translation-texts="{buttonDefaultTexts: 'Resources to Remove from Reservation'}" ng-disabled="!reservationSelected"></span>
+        	 <md-icon data-toggle="tooltip2" class="material-icons" style="width: 24px; height: 24px; vertical-align: middle">help outline</md-icon>
         <br>
 		<h5>Start Time:</h5> 
-		<input type="datetime-local" id="exampleInput" name="input" ng-model="startReservationTime" placeholder="yyyy-MM-ddTHH:mm"required />
+		<input type="datetime-local" id="exampleInput" name="input" ng-change="updateValid = true"  ng-model="startReservationTime" placeholder="yyyy-MM-ddTHH:mm"required />
 		<h5>End Time:</h5> 
-		<input type="datetime-local" id="exampleInput" name="input" ng-model="endReservationTime" placeholder="yyyy-MM-ddTHH:mm"required /> <br>
+		<input type="datetime-local" id="exampleInput" name="input" ng-change="updateValid = true"  ng-model="endReservationTime" placeholder="yyyy-MM-ddTHH:mm"required /> <br>
 		<div class="control-group" style="margin-top: 15px;">
-			<button type="button" class="btn btn-primary btn-md" ng-disabled="!reservationSelected" ng-click="updateReservation()">Update Reservation</button>
+			<button type="button" class="btn btn-primary btn-md" ng-disabled="!(reservationSelected && updateValid)" ng-click="print()">Update Reservation</button>
 			<button type="button" class="btn btn-danger btn-md" ng-disabled="!reservationSelected" ng-click="deleteReservation()">Delete Reservation</button>
             <button type="button" class="btn btn-secondary btn-md" ng-disabled="!reservationSelected || oldReservationTitle == reservationToModify.reservation_title" ng-click="createNewReservation()" style="margin-top: 2px;">Create New Reservation</button>
             <md-icon data-toggle="tooltip" class="material-icons" style="width: 24px; height: 24px; vertical-align: middle">help outline</md-icon>
