@@ -70,6 +70,28 @@ function getGroupPermissionToResource(body, callback) {
     
 };
 
+function getAllAncestors(body, callback) {
+
+    var getAllAncestorsQuery = resource_query_builder.buildQueryForGetAllAncestors(body);
+    basic_db_utility.performMultipleRowDBOperation(getAllAncestorsQuery, callback);
+}
+
+function insertIntoFolderTree(descendant_id, ancestor_ids, path_lengths, callback) {
+
+    var insertIntoFolderTreeQuery = resource_query_builder.buildQueryForInsertIntoFolderTree(descendant_id, ancestor_ids, path_lengths);
+    basic_db_utility.performSingleRowDBOperation(insertIntoFolderTreeQuery, callback);
+}
+
+function getAllDirectChildren(user, resource, callback) {
+    var getAllDirectChildrenQuery = resource_query_builder.buildQueryForGetAllDirectChildren(user, resource);
+    basic_db_utility.performMultipleRowDBOperation(getAllDirectChildrenQuery, callback);
+}
+
+function getSubtree(user, resource, callback) {
+    var getSubtreeQuery = resource_query_builder.buildQueryForGetSubtree(user, resource);
+    basic_db_utility.performMultipleRowDBOperation(getSubtreeQuery, callback);
+}
+
 var notifyUserOnReservationDelete = function(info) {
     var emailInfo = {
         resource_name: info.name,
@@ -106,5 +128,9 @@ module.exports = {
     removeGroupPermissionToResource: removeGroupPermissionToResource,
     updateGroupPermissionToResource: updateGroupPermissionToResource,
     getGroupPermissionToResource: getGroupPermissionToResource,
-    notifyUserOnReservationDelete: notifyUserOnReservationDelete
+    notifyUserOnReservationDelete: notifyUserOnReservationDelete,
+    getAllAncestors: getAllAncestors,
+    insertIntoFolderTree: insertIntoFolderTree,
+    getAllDirectChildren: getAllDirectChildren,
+    getSubtree: getSubtree
 };

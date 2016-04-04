@@ -6,14 +6,9 @@ r.verify = False
 
 r.initialize_and_clear_tables()
 
-desc = '#### initialize session ####'
-session_response = r.login_to_session('admin', 'Treeadmin')
-test_print(desc, session_response.status_code < 300)
+admin_session = r.session
 
-admin_session = session_response.cookies
-r.session = admin_session
-
-dec = '#### update admin user to have new email ####'
+desc = '#### update admin user to have new email ####'
 res = r.update_user(username="admin",email_address="teamscuullc@gmail.com")
 test_print(desc, res.status_code < 300)
 
@@ -35,12 +30,12 @@ test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 test_print(desc, r.json.loads(res.content)['results'][0]['email_address'] == 'teamscuullc@gmail.com')
 
 desc = '#### create restricted resource ###'
-res = r.create_resource("restricted", "restricted", "restricted")
+res = r.create_resource("restricted", "restricted", "restricted", 1000, 0, 1)
 test_print(desc, res.status_code < 300)
 restricted_id = r.json.loads(res.content)['insertId']
 
 desc = '#### create resource with tags ####'
-res = r.create_resource("server1", "this is a server", 'free')
+res = r.create_resource("server1", "this is a server", 'free', 1000, 0, 1)
 test_print(desc, res.status_code < 300)
 resource_id = r.json.loads(res.content)['insertId']
 
@@ -57,7 +52,7 @@ test_print(desc, res.status_code < 300)
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 
 desc =  '#### create resource without tags ####'
-res = r.create_resource("notags", "notags", 'free')
+res = r.create_resource("notags", "notags", 'free', 1000, 0, 1)
 test_print(desc, res.status_code < 300)
 no_tags_id = r.json.loads(res.content)['insertId']
 
@@ -66,10 +61,10 @@ res = r.get_group_permission_to_resource(resource_id)
 test_print(desc, res.status_code < 300)
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 
-desc =  '#### get all resources and make sure there are 3 ####'
+desc =  '#### get all resources and make sure there are 4 (including root) ####'
 res = r.get_all_resources()
 test_print(desc, res.status_code < 300)
-test_print(desc, len(r.json.loads(res.content)) == 3)
+test_print(desc, len(r.json.loads(res.content)) == 4)
 
 desc =  '#### create another user ####' 
 res = r.create_user('rahul', 'rahul123')
@@ -214,7 +209,7 @@ res = r.remove_resource_from_reservation(reservation_id2, [resource_id])
 test_print(desc, res.status_code < 300)
 
 desc =  '#### create a restricted resource ####'
-res = r.create_resource("restrictedRes", "restrictedDesc", 'restricted')
+res = r.create_resource("restrictedRes", "restrictedDesc", 'restricted', 1000, 0, 1)
 test_print(desc, res.status_code < 300)
 restricted_resource_id = r.json.loads(res.content)['insertId']
 

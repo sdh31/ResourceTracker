@@ -126,7 +126,10 @@ function organizeResources(resources) {
 				tags: tag,
 				resource_id: thisResource.resource_id,
                 reservations: reservation,
-                resource_permission: thisResource.resource_permission
+                resource_permission: thisResource.resource_permission,
+                is_folder: thisResource.is_folder,
+                parent_id: thisResource.parent_id,
+                sharing_level: thisResource.sharing_level
 			};
 			resourcesToSend.push(resource);
 		}

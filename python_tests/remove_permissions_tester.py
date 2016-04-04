@@ -6,12 +6,7 @@ r.verify = False
 
 r.initialize_and_clear_tables()
 
-desc = '#### initialize admin session ####'
-session_response = r.login_to_session('admin', 'Treeadmin')
-test_print(desc, session_response.status_code < 300)
-
-admin_session = session_response.cookies
-r.session = admin_session
+admin_session = r.session
 
 desc =  '#### create 2 more users ####' 
 res = r.create_user('rahul', 'rahul123')
@@ -47,19 +42,19 @@ res = r.add_users_to_group([ashwin_user_id], group_id2)
 test_print(desc, res.status_code < 300)
 
 desc = '#### create 4 resources ####'
-res = r.create_resource("res1", "res1", 'free')
+res = r.create_resource("res1", "res1", 'free', 1000, 0, 1)
 test_print(desc, res.status_code < 300)
 resource_id1 = r.json.loads(res.content)['insertId']
 
-res = r.create_resource("res2", "res2", 'free')
+res = r.create_resource("res2", "res2", 'free', 1000, 0, 1)
 test_print(desc, res.status_code < 300)
 resource_id2 = r.json.loads(res.content)['insertId']
 
-res = r.create_resource("res3", "res3", 'free')
+res = r.create_resource("res3", "res3", 'free', 1000, 0, 1)
 test_print(desc, res.status_code < 300)
 resource_id3 = r.json.loads(res.content)['insertId']
 
-res = r.create_resource("res4", "res4", 'free')
+res = r.create_resource("res4", "res4", 'free', 1000, 0, 1)
 test_print(desc, res.status_code < 300)
 resource_id4 = r.json.loads(res.content)['insertId']
 

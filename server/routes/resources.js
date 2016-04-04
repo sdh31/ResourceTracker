@@ -47,17 +47,53 @@ router.get('/', function(req, res, next){
     group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
 
-// create resource - req.body should have name, description, and resource_state (either 'free' or 'restricted')
+// create resource - req.body should have name, description, resource_state (either 'free' or 'restricted'), is_folder, sharing_level, and parent_id
 router.put('/', function(req, res, next){
 
     var resource_id = -1;
 
-    var addAdminGroupPermissionCallback = function(result) {
+    var insertIntoFolderTreeCallback = function(result) {
         if (result.error){
             res.status(400).json(result);
         } else {
             result.results.insertId = resource_id;
             res.status(200).json(result.results);
+        }
+    };
+
+    var getAllAncestorsCallback = function(result) {
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            var resources = result.results;
+            var ancestor_ids = [];
+            var path_lengths = [];
+            for (var i = 0; i<resources.length; i++) {
+                if (resources[i].is_folder == 0) {
+                    result.error = true;
+                    result.err = "Can't create resource with a parent that isn't a folder";
+                    res.status(400).json(result);
+                    return;
+                }
+                ancestor_ids.push(resources[i].resource_id);
+                path_lengths.push(resources[i].path_length + 1);
+            }
+            ancestor_ids.push(resource_id);
+            path_lengths.push(0);
+            res_service.insertIntoFolderTree(resource_id, ancestor_ids, path_lengths, insertIntoFolderTreeCallback);
+        }
+    };
+
+    var addAdminGroupPermissionCallback = function(result) {
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            if (req.body.parent_id == null) {
+                result.results.insertId = resource_id;
+                res.status(200).json(result.results);
+            }
+            req.body.resource_id = req.body.parent_id;
+            res_service.getAllAncestors(req.body, getAllAncestorsCallback);
         }
     };
 
@@ -76,8 +112,7 @@ router.put('/', function(req, res, next){
             res.status(400).json(result);
         } else {
             if (req.session.user.username == 'admin') {
-                result.results.insertId = resource_id;
-                res.status(200).json(result.results);
+                addAdminGroupPermissionCallback({error: false});
             } else {
                 user_service.get_admin_group(getAdminGroupCallback);
             }
@@ -89,7 +124,7 @@ router.put('/', function(req, res, next){
             res.status(400).json(result);
         } else {
             var group_ids = [result.results.group_id];
-            // TODO: not sure if this should be 'view' or 'reserve'; helps with testing for it to be 'reserve' for now
+            // you are given max permission on any resource that you create
             var resource_permissions = perm_service.get_permission_id(['admin']);
             res_service.addGroupPermissionToResource({resource_id: resource_id, group_ids: group_ids, resource_permissions: resource_permissions}, addGroupPermissionCallback);
         }
@@ -220,6 +255,74 @@ router.get('/all', function(req, res, next) {
     group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
 
+// req.query should have resource_id - this gets all of the direct children
+router.get('/children', function(req, res, next) {
+
+    var getAllDirectChildrenCallback = function(result){
+		if (result.error) {
+            res.status(400).json(result);
+		} else {
+            res.status(200).json(result);
+		}
+    };
+
+    var checkPermissionForResourceCallback = function(result){
+        if (result.error) {
+            res.status(400).json(result);
+        } else if (result.results == {}) {
+            result['err'] = "The resources you specified don't exist";
+            res.status(400).json(result);
+        } else {
+            // now check if the user has reserve permission on all of the resources
+
+            var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, perm_service.get_permission_id(['view']));
+
+            if (resourcesWithPermission.length == 1) {
+                res_service.getAllDirectChildren(req.session.user, req.query, getAllDirectChildrenCallback);
+            } else {
+                result = perm_service.denied_error;
+                res.status(403).json(result);
+            }
+        }
+    };
+
+    perm_service.check_permission_for_resources([{resource_id: req.query.resource_id}], [req.session.user], [], checkPermissionForResourceCallback);
+});
+
+// req.query should have resource_id - this gets the entire subtree
+router.get('/subtree', function(req, res, next) {
+
+    var getSubtreeCallback = function(result){
+		if (result.error) {
+            res.status(400).json(result);
+		} else {
+            res.status(200).json(result);
+		}
+    };
+
+    var checkPermissionForResourceCallback = function(result){
+        if (result.error) {
+            res.status(400).json(result);
+        } else if (result.results == {}) {
+            result['err'] = "The resources you specified don't exist";
+            res.status(400).json(result);
+        } else {
+            // now check if the user has view permission on all of the resources
+
+            var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, perm_service.get_permission_id(['view']));
+
+            if (resourcesWithPermission.length == 1) {
+                res_service.getSubtree(req.session.user, req.query, getSubtreeCallback);
+            } else {
+                result = perm_service.denied_error;
+                res.status(403).json(result);
+            }
+        }
+    };
+
+    perm_service.check_permission_for_resources([{resource_id: req.query.resource_id}], [req.session.user], [], checkPermissionForResourceCallback);
+});
+
 // req.body should have resource_id, group_ids, resource_permissions and group_ids.length == resource_permissions.length
 router.post('/addPermission', function(req, res, next) {
 
@@ -242,7 +345,37 @@ router.post('/addPermission', function(req, res, next) {
 
     // convert string permissions to their INT equivalents
     req.body.resource_permissions = perm_service.get_permission_id(req.body.resource_permissions);
-    res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);
+
+    var checkPermissionForResourceCallback = function(result){
+        if (result.error) {
+            res.status(400).json(result);
+        } else if (result.results == {}) {
+            result['err'] = "The resources you specified don't exist";
+            res.status(400).json(result);
+        } else {
+            // now check if the user has view permission on all of the resources
+
+            var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, perm_service.get_permission_id(['view']));
+
+            // the OR is used in the stupid case where the admin user needs to be given view access on the root resource by the python testers
+            if (resourcesWithPermission.length == 1 || (req.session.user.username == 'admin' && req.body.resource_id == 1)) {
+                for (var i = 0; i<req.body.resource_permissions.length; i++) {
+                    if (req.body.resource_permissions[i] > 0 && result.results[0].is_folder == 1) {
+                        result['err'] = "Cant give more than view for a folder!";
+                        res.status(400).json(result);
+                        return;
+                    }
+                }
+
+                res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);
+            } else {
+                result = perm_service.denied_error;
+                res.status(403).json(result);
+            }
+        }
+    };
+
+    perm_service.check_permission_for_resources([{resource_id: req.body.resource_id}], [req.session.user], [], checkPermissionForResourceCallback);
 });
 
 router.post('/updatePermission', function(req, res, next) {
@@ -267,7 +400,33 @@ router.post('/updatePermission', function(req, res, next) {
 
     // convert string permission to the INT value
     req.body.resource_permission = perm_service.resource_permissions[req.body.resource_permission];
-    res_service.updateGroupPermissionToResource(req.body, updateGroupPermissionCallback);
+
+    var checkPermissionForResourceCallback = function(result){
+        if (result.error) {
+            res.status(400).json(result);
+        } else if (result.results == {}) {
+            result['err'] = "The resources you specified don't exist";
+            res.status(400).json(result);
+        } else {
+            // now check if the user has view permission on all of the resources
+
+            var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, perm_service.get_permission_id(['view']));
+
+            if (resourcesWithPermission.length == 1) {
+                if (req.body.resource_permission > 0 && result.results[0].is_folder == 1) {
+                    result['err'] = "Cant give more than view for a folder!";
+                    res.status(400).json(result);
+                    return;
+                }
+                res_service.updateGroupPermissionToResource(req.body, updateGroupPermissionCallback);
+            } else {
+                result = perm_service.denied_error;
+                res.status(403).json(result);
+            }
+        }
+    };
+
+    perm_service.check_permission_for_resources([{resource_id: req.body.resource_id}], [req.session.user], [], checkPermissionForResourceCallback);
 });
 
 // req.body should have resource_id, group_ids
@@ -285,7 +444,28 @@ router.post('/removePermission', function(req, res, next) {
         res.status(403).json(perm_service.denied_error)
         return;
     }
-    res_service.removeGroupPermissionToResource(req.body, removeGroupPermissionCallback);
+
+    var checkPermissionForResourceCallback = function(result){
+        if (result.error) {
+            res.status(400).json(result);
+        } else if (result.results == {}) {
+            result['err'] = "The resources you specified don't exist";
+            res.status(400).json(result);
+        } else {
+            // now check if the user has view permission on all of the resources
+
+            var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, perm_service.get_permission_id(['view']));
+
+            if (resourcesWithPermission.length == 1) {
+                res_service.removeGroupPermissionToResource(req.body, removeGroupPermissionCallback);
+            } else {
+                result = perm_service.denied_error;
+                res.status(403).json(result);
+            }
+        }
+    };
+
+    perm_service.check_permission_for_resources([{resource_id: req.body.resource_id}], [req.session.user], [], checkPermissionForResourceCallback);
 
 });
 
