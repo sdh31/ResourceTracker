@@ -23,27 +23,27 @@ module.exports.buildQueryForGetResourcesByIds = function (resource_ids) {
 
 module.exports.buildQueryForCreateResource = function(resource) {
     return squel.insert()
-		.into('resource')
-		.set("name", resource.name)
-		.set("description", resource.description)
-		.set("resource_state", resource.resource_state)
+        .into('resource')
+        .set("name", resource.name)
+        .set("description", resource.description)
+        .set("resource_state", resource.resource_state)
         .set("sharing_level", resource.sharing_level)
         .set("is_folder", resource.is_folder)
         .set("parent_id", resource.parent_id)
-		.toString();
+        .toString();
 };
 
 module.exports.buildQueryForUpdateResource = function(resource) {
 
     var query = squel.update()
-		.table('resource')
-		.where("resource_id=" + resource.resource_id);
+        .table('resource')
+        .where("resource_id=" + resource.resource_id);
 
     if (("name" in resource)){
-	  query.set("name", resource.name);
+      query.set("name", resource.name);
     }
 
-	if (("description" in resource)){
+    if (("description" in resource)){
         query.set("description", resource.description);
     }
 
@@ -210,4 +210,3 @@ module.exports.buildQueryForUpdateParentId = function(body) {
         .set("parent_id=" + body.parent_id)
         .toString();
 };
-
