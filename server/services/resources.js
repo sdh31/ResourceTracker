@@ -8,7 +8,7 @@ function get_resource_by_id(resource, callback){
     /*
     return resource specified by resource_id in resource.resource_id
     */
-	var getResourceByIdQuery = resource_query_builder.buildQueryForGetResourceById(resource);
+    var getResourceByIdQuery = resource_query_builder.buildQueryForGetResourceById(resource);
     basic_db_utility.performSingleRowDBOperation(getResourceByIdQuery, callback);
 };
 
@@ -22,7 +22,7 @@ function create_resource(resource, callback){
     Create a resource, given all parameters 
     resource: dictionary of all parameters, as stored in the json body of a request    
     */
-	var createResourceQuery = resource_query_builder.buildQueryForCreateResource(resource);
+    var createResourceQuery = resource_query_builder.buildQueryForCreateResource(resource);
     basic_db_utility.performSingleRowDBOperation(createResourceQuery, callback);
 }
 
@@ -31,7 +31,7 @@ function update_resource_by_id(resource, callback){
 Update specified fields of specified resource
 resource: dictionary of fields TO UPDATE, and the id of specified resource
 */
-	var updateResourceQuery = resource_query_builder.buildQueryForUpdateResource(resource);
+    var updateResourceQuery = resource_query_builder.buildQueryForUpdateResource(resource);
     basic_db_utility.performSingleRowDBOperation(updateResourceQuery, callback);
 }
 
@@ -146,9 +146,9 @@ var notifyUserOnReservationDelete = function(info) {
 };
 
 module.exports = {
-	get_resource_by_id: get_resource_by_id,
+    get_resource_by_id: get_resource_by_id,
     get_resources_by_ids: get_resources_by_ids,
-	create_resource: create_resource,
+    create_resource: create_resource,
     update_resource_by_id: update_resource_by_id,
     delete_resource_by_id:delete_resource_by_id,
     addGroupPermissionToResource: addGroupPermissionToResource,
