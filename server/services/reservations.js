@@ -47,6 +47,36 @@ function update_reservation_by_id(reservation, user, has_auth, callback){
     basic_db_utility.performSingleRowDBOperation(updateReservationByIdQuery, callback);
 }
 
+function filter_unconfirmed_overbooked_resources(reservations){
+    var sharing_check = {};
+    var unconfirmed_reservations = [];
+    for (var i = 0; i<reservations.length; i++){
+         var thisReservation = reservations[i];
+        for (var j = 0; j<thisReservation.resources.length; j++) {
+            if(!sharing_check[j]){
+                //Initialize sharing_check value to 1 -- we have found a reservation on that resource
+                sharing_check[j] = 1;
+            }
+            if(thisReservation.resources[j].is_confirmed){
+                sharing_check[j] ++;
+            }
+        }
+    }
+    for (var i = 0; i<reservations.length; i++) {
+        var thisReservation = reservations[i];
+        var theseResources = thisReservation.resources;
+        for (var j = 0; j<thisReservation.resources.length; j++) {
+            if((sharing_check[j] >= theseResources[j].sharing_level)){
+                if(!theseResources[j].is_confirmed){
+                    unconfirmed_reservations.push(thisReservation)
+                    break;
+                }
+            }
+        }
+    }
+    return unconfirmed_reservations
+}
+
 function filterAllowedOverlappingReservations(reservations) {
     //Gets rid of the allowed ones
     var confirmedReservations = [];
@@ -59,7 +89,6 @@ function filterAllowedOverlappingReservations(reservations) {
         for (var j = 0; j<thisReservation.resources.length; j++) {
             if(!sharing_check[j]){
                 //Initialize sharing_check value to 1 -- we have found a reservation on that resource
-
                 sharing_check[j] = 1
             }
             if (!thisReservation.resources[j].is_confirmed) {
@@ -69,8 +98,6 @@ function filterAllowedOverlappingReservations(reservations) {
             else{
                 sharing_check[j] ++;
             }
-            console.log(sharing_check[j])
-            console.log(thisReservation.resources[j].sharing_level)
             //update number of shared reservations on each resource -- if too many, don't filter
             if(sharing_check[j] > thisReservation.resources[j].sharing_level){
                 is_overbooked = (true || is_overbooked);
@@ -241,5 +268,6 @@ module.exports = {
     get_unconfirmed_resources_for_reservation:get_unconfirmed_resources_for_reservation,
     getOverlappingReservationsByResource: getOverlappingReservationsByResource,
     confirmAllReservationsOnResource: confirmAllReservationsOnResource,
-    removeUsersThatHaveReservePermission: removeUsersThatHaveReservePermission
+    removeUsersThatHaveReservePermission: removeUsersThatHaveReservePermission,
+    filter_unconfirmed_overbooked_resources:filter_unconfirmed_overbooked_resources
 }

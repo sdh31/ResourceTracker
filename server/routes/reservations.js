@@ -115,7 +115,6 @@ router.put('/', function(req, res, next){
 
     var checkPermissionForResourceCallback = function(result){
         if (result.error) {
-            console.log("here")
             res.status(400).json(result);
         } else if (result.results == {}) {
             result['err'] = "The resources you specified don't exist";
@@ -129,7 +128,6 @@ router.put('/', function(req, res, next){
                 reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
             } else {
                 result = perm_service.denied_error;
-                console.log(req.body.resource_ids)
                 res.status(403).json(result);
             }
         }
@@ -390,7 +388,7 @@ router.post('/confirm_request', function(req, res, next){
             res.status(400).json(result);
         }
         else{
-            reservationsToDelete = reservation_service.organizeReservations(result.results);
+            reservationsToDelete = reservation_service.filter_unconfirmed_overbooked_resources(reservation_service.organizeReservations(result.results));
             if (reservationsToDelete.length > 0) {
                 reservation_service.deleteReservationsById(reservationsToDelete, delete_conflicting_reservation_callback)
             } else {

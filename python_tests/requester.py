@@ -224,7 +224,7 @@ def create_resource(name, description, resource_state, sharing_level, is_folder,
 
 	return send_request(method, params, url)
 
-def update_resource(id, name = None, description = None, resource_state = None):
+def update_resource(id, name = None, description = None, resource_state = None, sharing_level = None):
 	url = baseUrl + '/resource'
 	method = "POST"
     
@@ -237,7 +237,8 @@ def update_resource(id, name = None, description = None, resource_state = None):
 		params['description'] = description
 	if resource_state:
 		params['resource_state'] = resource_state
-
+	if sharing_level:
+		params['']
 	return send_request(method, params, url)
 
 def delete_resource(id):
