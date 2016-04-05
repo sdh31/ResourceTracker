@@ -29,12 +29,12 @@ non_admin_session = res.cookies
 r.session = admin_session
 
 desc = '### create restricted resource ###'
-res = r.create_resource("restricted", "restricted", "restricted", 1000, 0, 1)
+res = r.create_resource("restricted", "restricted", "restricted", 1, 0, 1)
 is_success(desc, res)
 restricted_id1 = get_id(res)
 
 desc = '### create another restricted resource ###'
-res = r.create_resource("restricted2", "restricted2", "restricted", 1000, 0, 1)
+res = r.create_resource("restricted2", "restricted2", "restricted", 1, 0, 1)
 is_success(desc, res)
 restricted_id2 = get_id(res)
 

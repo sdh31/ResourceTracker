@@ -30,12 +30,12 @@ test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 test_print(desc, r.json.loads(res.content)['results'][0]['email_address'] == 'teamscuullc@gmail.com')
 
 desc = '#### create restricted resource ###'
-res = r.create_resource("restricted", "restricted", "restricted", 1000, 0, 1)
+res = r.create_resource("restricted", "restricted", "restricted", 1, 0, 1)
 test_print(desc, res.status_code < 300)
 restricted_id = r.json.loads(res.content)['insertId']
 
 desc = '#### create resource with tags ####'
-res = r.create_resource("server1", "this is a server", 'free', 1000, 0, 1)
+res = r.create_resource("server1", "this is a server", 'free', 1, 0, 1)
 test_print(desc, res.status_code < 300)
 resource_id = r.json.loads(res.content)['insertId']
 
@@ -52,7 +52,7 @@ test_print(desc, res.status_code < 300)
 test_print(desc, len(r.json.loads(res.content)['results']) == 1)
 
 desc =  '#### create resource without tags ####'
-res = r.create_resource("notags", "notags", 'free', 1000, 0, 1)
+res = r.create_resource("notags", "notags", 'free', 1, 0, 1)
 test_print(desc, res.status_code < 300)
 no_tags_id = r.json.loads(res.content)['insertId']
 
@@ -209,7 +209,7 @@ res = r.remove_resource_from_reservation(reservation_id2, [resource_id])
 test_print(desc, res.status_code < 300)
 
 desc =  '#### create a restricted resource ####'
-res = r.create_resource("restrictedRes", "restrictedDesc", 'restricted', 1000, 0, 1)
+res = r.create_resource("restrictedRes", "restrictedDesc", 'restricted', 1, 0, 1)
 test_print(desc, res.status_code < 300)
 restricted_resource_id = r.json.loads(res.content)['insertId']
 

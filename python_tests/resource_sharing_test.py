@@ -19,19 +19,13 @@ def get_time(iter):
 	millis = int(round(time.time() * 1000)) + iter*86400000
 	return millis
 
-desc = '#### initialize session ####'
-res = r.login_to_session('admin', 'Treeadmin')
-is_success(desc, res)
-admin_session = res.cookies
-r.session = admin_session
-
 desc = '### create restricted resource ###'
-res = r.create_resource("restricted", "restricted", "restricted", 3, 1, 0)
+res = r.create_resource("restricted", "restricted", "restricted", 3, 0, 1)
 is_success(desc, res)
 resource_id1 = get_id(res)
 
 desc = '### Create Free Resource ###'
-res = r.create_resource("free", "free", "free", 2, 1, 0)
+res = r.create_resource("free", "free", "free", 2, 0, 1)
 is_success(desc, res)
 free_id = get_id(res)
 
