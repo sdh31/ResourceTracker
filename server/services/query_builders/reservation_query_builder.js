@@ -30,7 +30,7 @@ module.exports.buildQueryForGetConflictingReservations = function(reservation) {
         .toString();
 };
 
-module.exports.buildQueryForGetOverlappingReservationsByResource = function(reservation){
+module.exports.buildQueryForGetOverlappingReservationsByResource = function(reservation, only_confirmed){
     /*
     Query to find all reservations that overlap another reservaton given a resource. 
     This can be used to tell whether a resource is oversubscribed
@@ -50,14 +50,23 @@ module.exports.buildQueryForGetOverlappingReservationsByResource = function(rese
 
     var query = squel.select()
         .from("reservation")
-        .field("reservation.reservation_id")
+        .field("reservation.reservation_id id1")
+        .field("res2.reservation_id id2")
+        .field("reservation.reservation_title title1")
+        .field("res2.reservation_title title2")
         .field("resource.resource_state")
+        .field("resource.sharing_level")
         .join("reservation_resource",null, "reservation.reservation_id = reservation_resource.reservation_id")
         .join("resource", null, "resource.resource_id = reservation_resource.resource_id")
         .join("reservation", "res2", overlapping_query)
+       .join("reservation_resource", "reservation_resource2", "reservation_resource2.reservation_id=reservation.reservation_id")
         .where("reservation_resource.resource_id = ?", reservation.resource_id)
-        .toString()
-    return query;
+        .where("reservation_resource2.resource_id = ?", reservation.resource_id)
+        if(only_confirmed){
+            query = query.where("reservation_resource2.is_confirmed = ?", 1)
+            query = query.where("reservation_resource.is_confirmed = ?", 1)
+        }
+    return query.toString();
 }
 
 module.exports.buildQueryForDeleteConflictingReservations = function(reservation){

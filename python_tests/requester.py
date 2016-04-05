@@ -238,7 +238,7 @@ def update_resource(id, name = None, description = None, resource_state = None, 
 	if resource_state:
 		params['resource_state'] = resource_state
 	if sharing_level:
-		params['']
+		params['sharing_level'] = sharing_level
 	return send_request(method, params, url)
 
 def delete_resource(id):

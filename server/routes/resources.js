@@ -172,9 +172,22 @@ router.post('/', function(req, res, next){
     var get_overlapping_reservation_callback = function(result){
         if(result.error){
             res.status(400).json(result);
-        } else if(result.results.length > 0 && req.body.resource_state != 'restricted' && result.results[0]['resource_state'] == 'restricted'){
-            result.err = "This resource is oversubscribed. Please resolve all conflicts before removing restriction.";
-            res.status(400).json(result);
+        } else if(result.results.length > 0){
+            var sharing_level = ''
+            if("sharing_level" in req.body){
+                sharing_level = req.body.sharing_level
+            }else{
+                sharing_level = result.results[0].sharing_level
+            }
+
+            var oversubscribed = reservation_service.get_overbooked_reservations_from_conflicts(result.results, sharing_level);
+            if(oversubscribed.length > 0){
+                result.err = "Unable to change restriction or sharing level of resource due to too many conflicts on reservations in response body.";
+                res.status(400).json(oversubscribed);
+                return;
+            }
+
+            res_service.update_resource_by_id(req.body, update_resource_callback);
         }  
         else{
             res_service.update_resource_by_id(req.body, update_resource_callback);
@@ -185,7 +198,14 @@ router.post('/', function(req, res, next){
         return;
     }
 
-    reservation_service.getOverlappingReservationsByResource(req.body, get_overlapping_reservation_callback)
+    //No need to see if resource is oversubscribed if we are not modifying resource_state or sharing_level
+    if(!("resource_state" in req.body || "sharing_level" in req.body)){
+        res_service.update_resource_by_id(req.body, update_resource_callback);
+    }
+
+    //If resource_state is not being changed to free, we need to look at confirmed and unconfirmed
+    var confirmed_only = !("resource_state" in req.body && req.body["resource_state"] == 'free')
+    reservation_service.getOverlappingReservationsByResource(req.body, confirmed_only, get_overlapping_reservation_callback)
 
 });
 

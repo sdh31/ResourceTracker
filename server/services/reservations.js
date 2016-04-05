@@ -17,6 +17,38 @@ function get_reservations_by_resources(body, callback) {
     get_conflicting_reservations(reservation, callback);
 }
 
+function get_overbooked_reservations_from_conflicts(reservation_conflicts, sharing_level){
+    var conflicts_per_reservation_id = {}
+    var overbooked_resources = []
+    var reservation_titles = {}
+
+    //initialize everything
+    for(var i = 0; i<reservation_conflicts.length;i++){
+        conflicts_per_reservation_id[reservation_conflicts[i].id1] = 1;
+        reservation_titles[reservation_conflicts[i].id1] = reservation_conflicts[i].title1
+        conflicts_per_reservation_id[reservation_conflicts[i].id2] = 1;
+        reservation_titles[reservation_conflicts[i].id2] = reservation_conflicts[i].title2
+
+    }
+    //count total conflicts for each reservation
+    for (var i = 0; i < reservation_conflicts.length; i++){
+        var id1 = reservation_conflicts[i].id1;
+        var id2 = reservation_conflicts[i].id2;
+        conflicts_per_reservation_id[id1] ++;
+        conflicts_per_reservation_id[id2] ++;
+    }
+    //find and return overbooked resources
+    for(var reservation_id in conflicts_per_reservation_id){
+        reservation = {}
+        if(conflicts_per_reservation_id[reservation_id] > sharing_level){
+            reservation['reservation_title'] = (reservation_titles[reservation_id])
+            reservation['reservation_id'] = reservation_id
+            overbooked_resources.push(reservation)
+        }
+    }
+    return overbooked_resources;
+}
+
 function get_reservation_by_id(reservation, callback){
     var getReservationByIdQuery = reservation_query_builder.buildQueryForGetReservationById(reservation);
     basic_db_utility.performMultipleRowDBOperation(getReservationByIdQuery, callback);
@@ -151,8 +183,9 @@ function filterResourcesByPermission(resources, minPermission) {
     return resourcesWithPermission;
 };
 
-function getOverlappingReservationsByResource(reservation, callback){
-    var getoverlappingQuery = reservation_query_builder.buildQueryForGetOverlappingReservationsByResource(reservation)
+//Only_confirmed specifies if you only want to return conflicts in confirmed reservations
+function getOverlappingReservationsByResource(reservation, only_confirmed, callback){
+    var getoverlappingQuery = reservation_query_builder.buildQueryForGetOverlappingReservationsByResource(reservation, only_confirmed)
     basic_db_utility.performMultipleRowDBOperation(getoverlappingQuery, callback)
 }
 
@@ -269,5 +302,6 @@ module.exports = {
     getOverlappingReservationsByResource: getOverlappingReservationsByResource,
     confirmAllReservationsOnResource: confirmAllReservationsOnResource,
     removeUsersThatHaveReservePermission: removeUsersThatHaveReservePermission,
-    filter_unconfirmed_overbooked_resources:filter_unconfirmed_overbooked_resources
+    filter_unconfirmed_overbooked_resources:filter_unconfirmed_overbooked_resources,
+    get_overbooked_reservations_from_conflicts:get_overbooked_reservations_from_conflicts
 }
