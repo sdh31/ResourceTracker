@@ -26,6 +26,7 @@ angular.module('resourceTracker')
 	    };
 
 	    this.createResource = function(resource) {
+	    	console.log(resource);
 	    	var deferred = $q.defer();
 			if (resource.name == '') {
 				deferred.reject(this.alertMessages.emptyResourceName);

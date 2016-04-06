@@ -38,27 +38,65 @@
 
 	 	</div>
 	 	<div ng-switch-when="resourceCreatePanel" ng-controller="CreateResourceCtrl">
-	 			<h5>Create a Resource</h5>
-			 	<input type="text" class="form-control" placeholder="name" ng-model="newResource.name"><br>
-				<textarea class="form-control" placeholder="description of resource" ng-model="newResource.description"></textarea><br>
-                Resource State:
-                <label>
-                    <input type="radio" ng-model="newResource.resource_state" value="free">
-                    Free
-                </label>
-                <label>
-                    <input type="radio" ng-model="newResource.resource_state" value="restricted">
-                    Restricted
-                </label><br/>
-				<input type="text" class="form-control" placeholder="tag" ng-model="activeTag">
-				<div class="tags">
-					<span ng-repeat="(index, tag) in newResource.tags" class="tag">{{tag}}
-						<a class="glyphicon glyphicon-remove glyph_top" aria-hidden="true" ng-click="removeCreateTag(index)"></a>
-					</span>
-				</div>
-				<button type="button" class="btn btn-default btn-sm" ng-click="addCreateTag()">Add Tag</button>
-				<button type="button" class="btn btn-default btn-sm" ng-click="createResource()">Create</button>
+ 			<h5>Create a Resource</h5>
+ 			<form>
+ 				<fieldset class="form-group">
+			 		<input type="text" class="form-control" placeholder="Name" ng-model="newResource.name">
+				</fieldset>
+				<fieldset class="form-group">
+					<textarea class="form-control" placeholder="Description" ng-model="newResource.description"></textarea>
+				</fieldset>
+				<fieldset class="form-group">
+					<label>Resource or Folder:</label>
+					<label>
+                    	<input type="radio" ng-model="newResource.is_folder" value="0"> Resource
+                	</label>
+                	<label>
+                    	<input type="radio" ng-model="newResource.is_folder" value="1"> Folder
+                	</label>
+				</fieldset>
+				<fieldset class="form-group">
+                	<label>Resource State:</label>
+                	<label>
+                    	<input type="radio" ng-model="newResource.resource_state" value="free"> Free
+                	</label>
+                	<label>
+                    	<input type="radio" ng-model="newResource.resource_state" value="restricted"> Restricted
+                	</label>
+                </fieldset>
+                <fieldset class="form-group">
+                	<label>Resource Sharing: </label>
+                	<label>
+                		<input type="radio" ng-model="unlimitedResource" ng-value="false"> Limited
+                	</label>
+                	<label>
+                		<input type="radio" ng-model="unlimitedResource" ng-value="true"> Unlimited
+                	</label>
+                </fieldset>
+                <fieldset class="form-group">
+                	<input type="number" class="form-control" placeholder="Resource Sharing Level" ng-model="newResource.sharing_level" min="1" max="2147483647" ng-disabled="unlimitedResource">
+           	 	</fieldset>
+           	 	<fieldset class="form-group">
+					<label>Select a Parent: </label>
+					<input type="number" class="form-control" placeholder="Parent Resource ID" ng-model="newResource.parent_id"><br>
+					<button type="button" class="btn btn-link" ng-click="addParent()">Add Parent</button>
+				</fieldset>
+           	 	<fieldset class="form-group">
+					<input type="text" class="form-control" placeholder="Tag" ng-model="activeTag">
+					<div class="tags">
+						<span ng-repeat="(index, tag) in newResource.tags" class="tag">{{tag}}
+							<a class="glyphicon glyphicon-remove glyph_top" aria-hidden="true" ng-click="removeCreateTag(index)"></a>
+						</span>
+					</div>
+				</fieldset>
+				<button type="button" class="btn btn-secondary btn-md" ng-click="addCreateTag()">Add Tag</button>
+				<button type="button" class="btn btn-primary btn-md" ng-click="createResource()">Create</button>
+			</form>
+			<div modal-show="showAddParentModal.value" class="modal fade">
+    			<ng-include src="'views/add_parent.html'" ng-if="showAddParentModal.value"></ng-include>
+			</div>
 	 	</div>
+	 	
 	 	<div class="alert alert-danger" ng-show="hasError.value">
 			<strong>Warning:</strong> {{alertMessage.value}}
 			<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
