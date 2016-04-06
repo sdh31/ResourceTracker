@@ -5,13 +5,18 @@ angular.module('resourceTracker')
 
     	$scope.clearError();
         $scope.clearSuccess();
+        $scope.unlimitedResource = false;
+        $scope.showAddParentModal = {value: false};
 
 		var initializeNewResource = function() {
 			$scope.newResource = {
 				name: '',
 				description: '',
                 resource_state: '',
-				tags: []
+				tags: [],
+				sharing_level: '',
+				parent_id: 0,
+				is_folder: 0
 			};
 		};
 
@@ -37,6 +42,10 @@ angular.module('resourceTracker')
 		};
 
 		$scope.createResource = function() {
+			if($scope.unlimitedResource){
+				$scope.newResource.sharing_level = Number.MAX_SAFE_INTEGER;
+			}
+			console.log($scope.newResource);
 			var self = this;
 			resourceService.createResource($scope.newResource).then(function(response) {
                 if ($scope.newResource.tags.length > 0) {
@@ -49,6 +58,10 @@ angular.module('resourceTracker')
 				$scope.addError(alertMessage);
 			})
 		};
+
+		$scope.addParent = function() {
+			$scope.showAddParentModal.value = true;
+		}
 
         $scope.addTags = function(resource_id) {
 			var self = this;
