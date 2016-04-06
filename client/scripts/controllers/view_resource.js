@@ -177,7 +177,6 @@ angular.module('resourceTracker')
 			$scope.clearError();
 			$http.get('/resource/all').then(function(response) {
 				$scope.allResources = response.data;
-				console.log("SCOPE ALL RESOURCES");
 				console.log($scope.allResources);
             }, function(error) {
 				console.log(error);
