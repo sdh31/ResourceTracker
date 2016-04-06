@@ -88,7 +88,7 @@ router.delete('/', function(req,res,next){
             res.status(400).json(result);
         } else {
             if (result.results.length == 0) {
-                res.status(200).json(result);
+                group_service.delete_group_by_id(req.query, delete_group_callback);
             } else {
                 var alreadyDeletedReservationIds = [];
                 for (var i = 0; i<result.results.length; i++) {

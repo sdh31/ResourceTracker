@@ -166,12 +166,48 @@ module.exports.buildQueryForRemoveGroupPermissionToResource = function(body) {
     return expr.toString();
 };
 
+// body contains resource_ids, group_ids
+module.exports.buildQueryForRemoveGroupsPermissionToResource = function(body) {
+
+    var filter = squel.expr();
+    filter.or_begin();
+    for(var i = 0; i < body.group_ids.length; i++){
+        filter.or("group_id = " + body.group_ids[i]);
+        filter.and_begin();
+        for (var j = 0; j<body.resource_ids.length; j++) {
+            filter.or("resource_id = " + body.resource_ids[j]);
+        }
+        filter.end();
+    }
+
+    filter.end();
+    return squel.delete().from("resource_group").where(filter).toString();
+};
+
 // body contains resource_id
 module.exports.buildQueryForGetGroupPermissionToResource = function(body) {
-
     return squel.select()
             .from("resource_group")
             .where("resource_id = " + body.resource_id)
             .toString();
+};
+
+// body contains resource_id
+module.exports.buildQueryForDeleteAncestorLinks = function(body) {
+    return "DELETE a FROM folder_tree AS a JOIN folder_tree AS d ON a.descendant_id = d.descendant_id LEFT JOIN folder_tree AS x ON x.ancestor_id = d.ancestor_id AND x.descendant_id = a.ancestor_id WHERE d.ancestor_id = " + body.resource_id + " AND x.ancestor_id IS NULL";
+};
+
+// body contains resource_id, parent_id
+module.exports.buildQueryForInsertSubtree = function(body) {
+    return "INSERT INTO folder_tree (ancestor_id, descendant_id, path_length) SELECT supertree.ancestor_id, subtree.descendant_id, supertree.path_length+subtree.path_length+1 FROM folder_tree AS supertree JOIN folder_tree AS subtree WHERE subtree.ancestor_id = " + body.resource_id + " AND supertree.descendant_id = " + body.parent_id;
+};
+
+// body contains resource_id, parent_id
+module.exports.buildQueryForUpdateParentId = function(body) {
+    return squel.update()
+        .table('resource')
+        .where("resource_id=" + body.resource_id)
+        .set("parent_id=" + body.parent_id)
+        .toString();
 };
 

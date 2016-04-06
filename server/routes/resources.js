@@ -146,6 +146,63 @@ router.put('/', function(req, res, next){
     res_service.create_resource(req.body, create_resource_callback);
 });
 
+router.post('/updateParent', function(req,res, next) {
+
+    var insertSubtreeCallback = function(result){
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            res.status(200).json(result);
+        }
+    }
+
+    var deleteAncestorLinksCallback = function(result){
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            res_service.insertSubtree(req.body, insertSubtreeCallback);
+        }
+    }
+
+    var updateParentIdCallback = function(result){
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            res_service.deleteAncestorLinks(req.body, deleteAncestorLinksCallback);
+        }
+    }
+
+    var checkPermissionForResourceCallback = function(result){
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, perm_service.get_permission_id(['view']));
+
+            if (resourcesWithPermission.length == 2) {
+                for (var i = 0; i<result.results.length; i++) {
+                    if (result.results[i].resource_id == req.body.parent_id && result.results[i].is_folder == 0) {
+                        res.status(400).json(result);
+                        return;
+                    }
+                }
+                res_service.updateParentId(req.body, updateParentIdCallback);
+            } else {
+                res.status(400).json(result);
+            }
+        }
+    }
+
+    if(!perm_service.check_resource_permission(req.session)){
+        res.status(403).json(perm_service.denied_error)
+        return;
+    }
+
+    var resources = [];
+    resources.push({resource_id: req.body.resource_id});
+    resources.push({resource_id: req.body.parent_id});
+    perm_service.check_permission_for_resources(resources, [req.session.user], [], checkPermissionForResourceCallback);
+});
+
 router.post('/', function(req, res, next){
 
     var confirmAllReservationsOnResourceCallback = function(result){
@@ -231,11 +288,15 @@ router.delete('/', function(req, res, next){
        if (result.error){
             res.status(400).json(result);
         } else {
-            for (var i = 0; i<result.results.length; i++) {
-                res_service.notifyUserOnReservationDelete(result.results[i]);
-            }
+            if (result.results.length == 0) {
+                res_service.delete_resource_by_id(req.query, delete_resource_callback);
+            } else {
+                for (var i = 0; i<result.results.length; i++) {
+                    res_service.notifyUserOnReservationDelete(result.results[i]);
+                }
 
-            reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
+                reservation_service.deleteReservationsById(result.results, deleteReservationsCallback);
+            }
         }
     }
 
@@ -451,11 +512,54 @@ router.post('/updatePermission', function(req, res, next) {
 // req.body should have resource_id, group_ids
 router.post('/removePermission', function(req, res, next) {
 
+    var is_folder = -1;
+    var resources = [];
+
+    var removePermissionsCallback = function(result) {
+        if (result.error) {
+            res.status(400).json(result);
+        } else {
+            // resources has all of the leaf resources
+            console.log("HERE");
+            req.body.resourcesToCheck = resources;
+            deleteReservationsIfNecessary(req, res);
+        }
+    }
+
+    var getSubtreeCallback = function(result){
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            var resource_ids = [];
+            for (var i = 0; i<result.results.length; i++) {
+                if (result.results[i].resource_id == req.body.resource_id) {
+                    continue;
+                }
+
+                if (result.results[i].is_folder == 0) {
+                    resources.push(result.results[i]);
+                }
+                resource_ids.push(result.results[i].resource_id);
+            }
+
+            if (resource_ids.length == 0) {
+                console.log("herere");
+                res.status(200).json(result);
+            } else {
+                res_service.removeGroupsPermissionToResources({group_ids: req.body.group_ids, resource_ids: resource_ids}, removePermissionsCallback);
+            }
+        }
+    };
+
     var removeGroupPermissionCallback = function(result){
         if (result.error){
             res.status(400).json(result);
         } else {
-            deleteReservationsIfNecessary(req, res);
+            if (is_folder == 1) {
+                 res_service.getSubtree(req.session.user, req.body, getSubtreeCallback);
+            } else {
+                deleteReservationsIfNecessary(req, res);
+            } 
         }
     };
 
@@ -476,6 +580,7 @@ router.post('/removePermission', function(req, res, next) {
             var resourcesWithPermission = reservation_service.filterResourcesByPermission(result.results, perm_service.get_permission_id(['view']));
 
             if (resourcesWithPermission.length == 1) {
+                is_folder = result.results[0].is_folder;
                 res_service.removeGroupPermissionToResource(req.body, removeGroupPermissionCallback);
             } else {
                 result = perm_service.denied_error;
@@ -545,7 +650,11 @@ function deleteReservationsIfNecessary(req, res) {
             if (allUsers.length == 0) {
                 res.status(200).json(result);
             } else {
-                reservation_service.getAllReservationsOnResourceByUsers(req.body.resource_id, allUsers, getReservationsCallback);
+                if ("resourcesToCheck" in req.body) {
+                    reservation_service.getAllReservationsOnResourcesByUsers(req.body.resourcesToCheck, allUsers, getReservationsCallback);
+                } else {
+                    reservation_service.getAllReservationsOnResourceByUsers(req.body.resource_id, allUsers, getReservationsCallback);
+                }
             }
         }
     };
@@ -555,7 +664,12 @@ function deleteReservationsIfNecessary(req, res) {
             res.status(400).json(result);
         } else {
             allUsers = result.results;
-            perm_service.check_permission_for_resources([req.body], allUsers, [], checkPermissionForResourceCallback);
+
+            if ("resourcesToCheck" in req.body) {
+                perm_service.check_permission_for_resources(req.body.resourcesToCheck, allUsers, [], checkPermissionForResourceCallback);
+            } else {
+                perm_service.check_permission_for_resources([req.body], allUsers, [], checkPermissionForResourceCallback);
+            }
         }
     };
 

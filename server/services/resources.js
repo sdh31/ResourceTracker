@@ -63,6 +63,13 @@ function removeGroupPermissionToResource(body, callback) {
     basic_db_utility.performSingleRowDBOperation(removeGroupPermissionToResourceQuery, callback);
 };
 
+// body has resource_ids and group_ids
+function removeGroupsPermissionToResources(body, callback) {
+
+    var removeGroupsPermissionToResourcesQuery = resource_query_builder.buildQueryForRemoveGroupsPermissionToResource(body);
+    basic_db_utility.performSingleRowDBOperation(removeGroupsPermissionToResourcesQuery, callback);
+};
+
 function getGroupPermissionToResource(body, callback) {
     
     var getGroupPermissionToResourceQuery = resource_query_builder.buildQueryForGetGroupPermissionToResource(body);
@@ -92,6 +99,26 @@ function getSubtree(user, resource, callback) {
     basic_db_utility.performMultipleRowDBOperation(getSubtreeQuery, callback);
 }
 
+function deleteAncestorLinks(body, callback) {
+    var deleteAncestorLinksQuery = resource_query_builder.buildQueryForDeleteAncestorLinks(user, resource);
+    basic_db_utility.performSingleRowDBOperation(deleteAncestorLinksQuery, callback);
+}
+
+function deleteAncestorLinks(body, callback) {
+    var deleteAncestorLinksQuery = resource_query_builder.buildQueryForDeleteAncestorLinks(body);
+    basic_db_utility.performSingleRowDBOperation(deleteAncestorLinksQuery, callback);
+}
+
+function insertSubtree(body, callback) {
+    var insertSubtreeQuery = resource_query_builder.buildQueryForInsertSubtree(body);
+    basic_db_utility.performSingleRowDBOperation(insertSubtreeQuery, callback);
+}
+
+function updateParentId(body, callback) {
+    var updateParentIdQuery = resource_query_builder.buildQueryForUpdateParentId(body);
+    basic_db_utility.performSingleRowDBOperation(updateParentIdQuery, callback);
+}
+
 var notifyUserOnReservationDelete = function(info) {
     var emailInfo = {
         resource_name: info.name,
@@ -113,7 +140,7 @@ var notifyUserOnReservationDelete = function(info) {
     
     var currentTime = new Date();
 
-    if (currentTime.valueOf() <= emailInfo.reservation.start_time) {
+    if (currentTime.valueOf() <= emailInfo.reservation.end_time) {
         agenda.now('notify on delete reservation', emailInfo);
     }
 };
@@ -132,5 +159,9 @@ module.exports = {
     getAllAncestors: getAllAncestors,
     insertIntoFolderTree: insertIntoFolderTree,
     getAllDirectChildren: getAllDirectChildren,
-    getSubtree: getSubtree
+    getSubtree: getSubtree,
+    removeGroupsPermissionToResources: removeGroupsPermissionToResources,
+    deleteAncestorLinks: deleteAncestorLinks,
+    updateParentId: updateParentId,
+    insertSubtree: insertSubtree
 };
