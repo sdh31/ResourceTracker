@@ -11,7 +11,7 @@ angular.module('resourceTracker')
                 var root = $scope.resourceMap.get(1);
                 var promise = getChildren(root); 
                 promise.then(function(result){
-                    $scope.tree = result;
+                    $scope.tree = [result];
                     console.log($scope.tree);
                 })
             });
@@ -52,6 +52,16 @@ angular.module('resourceTracker')
                 console.log(error);
             });
         }
+
+        $scope.$watch( 'myTree.currentNode', function( newObj, oldObj ) {
+            if( $scope.myTree && angular.isObject($scope.myTree.currentNode) ) {
+                console.log( $scope.myTree.currentNode );
+            }
+        }, false);
+
+        $scope.submit = function(){
+            $scope.newResource.parent_id = $scope.myTree.currentNode.id;
+        };
 
     	initAddParentController();
 
