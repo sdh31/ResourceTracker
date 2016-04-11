@@ -16,6 +16,8 @@ angular.module('resourceTracker')
         $scope.onReservationInvalidEndDate = "Please select a valid end date.";
         $scope.noTitleSpecified = "You must specify a reservation title!";
 
+        $scope.showSelectResourceModal = {value: false};
+
     	var currentTime = new Date();
     	$scope.startTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
     							    currentTime.getDate(), currentTime.getHours(), currentTime.getMinutes());
@@ -226,6 +228,10 @@ angular.module('resourceTracker')
                 }
             });
         };
+
+        $scope.selectResources = function(){
+            $scope.showSelectResourceModal.value = true;
+        }
 
         initializeResourceReservations();
      });

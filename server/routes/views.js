@@ -28,7 +28,8 @@ var loginViews = [
     'token_modal.html',
     'filter_reservation.html',
     'user_reservation.html',
-    'pending_reservations.html'
+    'pending_reservations.html',
+    'select_resources.html'
     ];
 
 loginViews.forEach(function(view) {
