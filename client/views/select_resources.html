@@ -1,9 +1,19 @@
 <div class="modal-dialog" style="width: 350px;" ng-controller="SelectRsrcCtrl">
 	<div class="modal-content">
 	    <div class="modal-header"><h4 class="modal-title">Select Resources</h4></div>
-		<div class="modal-body container"></div>
+		<div class="modal-body container">
+			<div 
+				data-angular-multitreeview="true"
+				data-tree-id="myTree"
+				data-tree-model="tree"
+				data-node-id="id"
+				data-node-label="title"
+				data-node-children="children">
+			</div>
+		</div>
 		<div class="modal-footer">
-      		<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<button type="button" class="btn btn-primary" ng-click="submit()" data-dismiss="modal">Submit</button>
+			<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
       </div>
 	</div>
 </div>

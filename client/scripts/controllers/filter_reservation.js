@@ -33,6 +33,9 @@ angular.module('resourceTracker')
         // map from tag_id to tag_name
         $scope.tagMap = {};
 
+        // create resource dropdown model
+        $scope.resourcesToCreate = {values: []}; 
+
         $scope.tagIncludeTranslationText = {buttonDefaultText: 'Tags to Include', dynamicButtonTextSuffix: 'Tag(s) to Include'};
         $scope.tagExcludeTranslationText = {buttonDefaultText: 'Tags to Exclude', dynamicButtonTextSuffix: 'Tag(s) to Exclude'};
         $scope.timeRangeError = "Ensure the end time is later than the start time."
@@ -114,7 +117,6 @@ angular.module('resourceTracker')
         };
 
         var initializeResourceReservations = function() {
-
             var currentTime = new Date();
 
             $scope.startReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
@@ -140,9 +142,6 @@ angular.module('resourceTracker')
 
             // all resources found in database, so admin can use them to modify/delete
             $scope.allResources = [];
-
-            // create resource dropdown model
-            $scope.resourcesToCreate = []; 
 
             // modify a reservation dropdown model for RESOURCE
             $scope.resourceReservationToModify = {};
@@ -183,10 +182,9 @@ angular.module('resourceTracker')
                 reservation_description: $scope.reservationDescription
             };
 
-            $scope.resourcesToCreate.forEach(function(resourceToCreate) {
-                reservationData.resource_ids.push(resourceToCreate.id);
+            $scope.resourcesToCreate.values.forEach(function(resourceToCreate) {
+                reservationData.resource_ids.push(resourceToCreate.resource_id);
             });
-
             if(!validateCreateReservation(reservationData)){ 
                 return;
             }

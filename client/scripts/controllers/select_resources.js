@@ -12,7 +12,6 @@ angular.module('resourceTracker')
                 var promise = getChildren(root); 
                 promise.then(function(result){
                     $scope.tree = [result];
-                    console.log($scope.tree);
                 })
             });
     	}
@@ -36,32 +35,38 @@ angular.module('resourceTracker')
 
         var getChildren = function(rsrc){
             return $http.get('resource/children?resource_id=' + rsrc.resource_id).then(function(response) {
-                var folders = response.data.results;
-                var children = [];
-                folders.forEach(function(folder){
-                    if(folder.is_folder){
-                        var tempPromise = getChildren(folder);
+                var kids = response.data.results;
+                var youngbloods = [];
+                kids.forEach(function(kid){
+                    if(kid.is_folder){
+                        var tempPromise = getChildren(kid);
                         tempPromise.then(function(result){
-                            children.push(result);
+                            if(result.children.length){
+                                youngbloods.push(result);
+                            }
                         });
+                    } else{
+                        var res = {id: kid.resource_id, title: kid.name, children: [], is_folder: 0};
+                        youngbloods.push(res);
                     }
                 });
-                var val = {id: rsrc.resource_id, title: rsrc.name, children: children};
-                // console.log(val);
+                var val = {id: rsrc.resource_id, title: rsrc.name, children: youngbloods, is_folder: 1};
                 return val;
             }, function(error){
                 console.log(error);
             });
         }
 
-        $scope.$watch( 'myTree.currentNode', function( newObj, oldObj ) {
-            if( $scope.myTree && angular.isObject($scope.myTree.currentNode) ) {
-                console.log( $scope.myTree.currentNode );
-            }
-        }, false);
+/*        $scope.$watchCollection('myTree.currentNodes', function (newObj, oldObj ) {
+            console.log(newObj);
+        }); */
 
         $scope.submit = function(){
-            $scope.newResource.parent_id = $scope.myTree.currentNode.id;
+            var selected_resources = [];
+            $scope.myTree.currentNodes.forEach(function(node){
+                var rsrc = $scope.resourceMap.get(node.id);
+                $scope.resourcesToCreate.values.push(rsrc);
+            })
         };
 
     	initSelectResourceController();
