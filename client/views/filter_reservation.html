@@ -25,20 +25,30 @@
 </div>
 <div class="input-group panel panel-default col-md-5" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
 	<div class="panel-body">
-		<h4 style="text-align: center;">Create a Reservation</h4><br>
-		<input type="text" class="form-control" placeholder="name" ng-model="reservationName"><br>
-		<textarea class="form-control" placeholder="description of reservation" ng-model="reservationDescription"></textarea><br>
-		<h5>Select a Start Time:</h5> 
-		<input type="datetime-local" id="exampleInput" name="input" ng-model="startReservationTime" placeholder="yyyy-MM-ddTHH:mm:ss"required />
-		<h5>Select an End Time:</h5>
-		<input type="datetime-local" id="exampleInput" name="input" ng-model="endReservationTime" placeholder="yyyy-MM-ddTHH:mm:ss"required />
-		<div class="control-group" style="margin-top: 10px;">
-			<span ng-dropdown-multiselect="" options="allResources" selected-model="resourcesToCreate"
-		 	 extra-settings="{ enableSearch: true, smartButtonMaxItems: 3 }"
-		 	 translation-texts="{ buttonDefaultText: 'Select Resources to Reserve' }"></span>
-		 	 <br/><br/>
-			<button type="button" class="btn btn-primary btn-md" ng-click="createReservation()">Create Reservation</button>
-		</div>
+		<h4 style="text-align: center;">Create a Reservation</h4>
+		<form>
+			<fieldset class="form-group">
+				<input type="text" class="form-control" placeholder="Name" ng-model="reservationName">
+			</fieldset>
+			<fieldset class-"form-group">
+				<textarea class="form-control" placeholder="Description of Reservation (optional)" ng-model="reservationDescription"></textarea><br>
+			</fieldset>
+			<br/>
+			<fieldset class="form-group" style="width: 100%;">
+				<label style="width: 25%;">Start Time:</label>
+				<input type="datetime-local" id="exampleInput" name="input" ng-model="startReservationTime" placeholder="yyyy-MM-ddTHH:mm:ss" required style="width: 73.7%;"/>
+			</fieldset>
+			<fieldset class="form-group">
+				<label style="width: 25%;">End Time:</label>
+				<input type="datetime-local" id="exampleInput" name="input" ng-model="endReservationTime" placeholder="yyyy-MM-ddTHH:mm:ss"required style="width: 73.7%;"/>
+			</fieldset>
+			<button type="button" class="btn btn-link" ng-click="selectResources()" style="padding: 0;">Select Resources:</button>
+		 	<br/><br/>
+		<button type="button" class="btn btn-primary btn-md" ng-click="createReservation()">Create Reservation</button>
+		</form>
+	</div>
+	<div modal-show="showSelectResourceModal.value" class="modal fade">
+		<ng-include src="'views/select_resources.html'" ng-if="showSelectResourceModal.value"></ng-include>
 	</div>
 </div>
 </div></div><br>

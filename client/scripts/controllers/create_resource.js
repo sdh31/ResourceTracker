@@ -3,17 +3,40 @@
 angular.module('resourceTracker')
     .controller('CreateResourceCtrl', function ($scope, $http, $location, resourceService) {
 
-    	$scope.clearError();
-        $scope.clearSuccess();
-
 		var initializeNewResource = function() {
 			$scope.newResource = {
 				name: '',
 				description: '',
                 resource_state: '',
-				tags: []
+				tags: [],
+				sharing_level: '',
+				parent_id: 1,
+				is_folder: 0
 			};
+			$scope.clearError();
+	        $scope.clearSuccess();
+	        $scope.unlimitedResource = false;
+	        $scope.showAddParentModal = {value: false};
+	        $scope.allResources = [];
+	        $scope.resourceMap = new Map();
+	        getAllResources();
 		};
+
+		var getAllResources = function() {
+	   		return $http.get('/resource/all').then(function(response) {
+		   		populateResourcesToDisplay(response.data, $scope.allResources);
+		   	}, function(error){
+		   		console.log(error);
+		   	});
+	   	};
+
+	   	var populateResourcesToDisplay = function(resourceData, resourceArray) {
+            resourceData.forEach(function(resource) {
+	            var resourceData = {id: resource.resource_id, label: resource.name};
+	            resourceArray.push(resourceData);
+	            $scope.resourceMap.set(resourceData.id, resource);
+            });
+        };
 
 		initializeNewResource();
 		$scope.activeTag = '';
@@ -37,6 +60,14 @@ angular.module('resourceTracker')
 		};
 
 		$scope.createResource = function() {
+			if($scope.unlimitedResource){
+				$scope.newResource.sharing_level = Number.MAX_SAFE_INTEGER;
+			}
+			if($scope.newResource.is_folder){
+				$scope.newResource.resource_state = "restricted";
+				$scope.newResource.sharing_level = 0;
+			}
+			console.log($scope.newResource);
 			var self = this;
 			resourceService.createResource($scope.newResource).then(function(response) {
                 if ($scope.newResource.tags.length > 0) {
@@ -49,6 +80,10 @@ angular.module('resourceTracker')
 				$scope.addError(alertMessage);
 			})
 		};
+
+		$scope.addParent = function() {
+			$scope.showAddParentModal.value = true;
+		}
 
         $scope.addTags = function(resource_id) {
 			var self = this;

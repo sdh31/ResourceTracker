@@ -10,7 +10,7 @@ headers = {
 	}
 
 session = ''
-baseUrl = 'https://colab-sbx-202.oit.duke.edu'
+baseUrl = 'https://colab-sbx-212.oit.duke.edu'
 
 passed = 0
 failed = 0
@@ -63,10 +63,17 @@ def send_request(method, params, url):
 	return response
 
 def initialize_and_clear_tables():
+	global session
 	os.system("mysql -u root -pdb test_db -e 'DROP DATABASE test_db; CREATE DATABASE test_db;'")
 	os.system("mysql -u root -pdb test_db < ~/ResourceTracker/server/create_tables.sql")
 	res = initialize_admin_user()
 	test_print("initialize create", res.status_code < 300)
+	session_response = login_to_session('admin', 'Treeadmin')
+	test_print('login as admin in init', session_response.status_code < 300)
+	admin_session = session_response.cookies
+	session = admin_session
+	res = add_group_permission_to_resource(1, [1], ['view'])
+	test_print("admin permission on root", res.status_code < 300)
 
 def login_to_session(username, password):
 	url = baseUrl + '/user/signin'
@@ -94,7 +101,7 @@ def create_user (username, password):
 	params = {
 		'username':username,
 		'password':password,
-		'email_address': 'a@a.com',
+		'email_address': 'a@example.com',
         'first_name': 'rahul',
         'last_name': 'abcd',
 		'is_shibboleth': 0
@@ -182,19 +189,42 @@ def get_all_resources():
 
 	return send_request(method, params, url)
 
-def create_resource(name, description, resource_state):
+def get_all_direct_children(resource_id):
+	url = baseUrl + '/resource/children'
+	method = "GET"
+
+	params = {
+    'resource_id': resource_id
+    }
+
+	return send_request(method, params, url)
+
+def get_subtree(resource_id):
+	url = baseUrl + '/resource/subtree'
+	method = "GET"
+
+	params = {
+    'resource_id': resource_id
+    }
+
+	return send_request(method, params, url)
+
+def create_resource(name, description, resource_state, sharing_level, is_folder, parent_id):
 	url = baseUrl + '/resource'
 	method = "PUT"
 
 	params = {
 	'name': name,
 	'description':description,
-	'resource_state': resource_state
+	'resource_state': resource_state,
+    'sharing_level': sharing_level,
+    'is_folder': is_folder,
+    'parent_id': parent_id
 	}
 
 	return send_request(method, params, url)
 
-def update_resource(id, name = None, description = None, resource_state = None):
+def update_resource(id, name = None, description = None, resource_state = None, sharing_level = None):
 	url = baseUrl + '/resource'
 	method = "POST"
     
@@ -207,7 +237,8 @@ def update_resource(id, name = None, description = None, resource_state = None):
 		params['description'] = description
 	if resource_state:
 		params['resource_state'] = resource_state
-
+	if sharing_level:
+		params['sharing_level'] = sharing_level
 	return send_request(method, params, url)
 
 def delete_resource(id):
@@ -232,6 +263,18 @@ def add_group_permission_to_resource(resource_id, group_ids, resource_permission
 
 	return send_request(method, params, url)
 
+def update_group_permission_to_resource(resource_id, group_id, resource_permission):
+	url = baseUrl + '/resource/updatePermission'
+	method = "POST"
+
+	params = {
+        'resource_id': resource_id,
+		'group_id': group_id,
+		'resource_permission': resource_permission
+    }
+
+	return send_request(method, params, url)
+
 def remove_group_permission_to_resource(resource_id, group_ids):
 	url = baseUrl + '/resource/removePermission'
 	method = "POST"
@@ -239,6 +282,17 @@ def remove_group_permission_to_resource(resource_id, group_ids):
 	params = {
         'resource_id': resource_id,
 		'group_ids': group_ids
+    }
+
+	return send_request(method, params, url)
+
+def update_parent_of_resource(resource_id, parent_id):
+	url = baseUrl + '/resource/updateParent'
+	method = "POST"
+
+	params = {
+        'resource_id': resource_id,
+		'parent_id': parent_id
     }
 
 	return send_request(method, params, url)

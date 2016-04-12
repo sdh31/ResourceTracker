@@ -16,6 +16,8 @@ angular.module('resourceTracker')
         $scope.onReservationInvalidEndDate = "Please select a valid end date.";
         $scope.noTitleSpecified = "You must specify a reservation title!";
 
+        $scope.showSelectResourceModal = {value: false};
+
     	var currentTime = new Date();
     	$scope.startTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
     							    currentTime.getDate(), currentTime.getHours(), currentTime.getMinutes());
@@ -30,6 +32,9 @@ angular.module('resourceTracker')
 
         // map from tag_id to tag_name
         $scope.tagMap = {};
+
+        // create resource dropdown model
+        $scope.resourcesToCreate = {values: []}; 
 
         $scope.tagIncludeTranslationText = {buttonDefaultText: 'Tags to Include', dynamicButtonTextSuffix: 'Tag(s) to Include'};
         $scope.tagExcludeTranslationText = {buttonDefaultText: 'Tags to Exclude', dynamicButtonTextSuffix: 'Tag(s) to Exclude'};
@@ -88,7 +93,7 @@ angular.module('resourceTracker')
 
 
         var populateTagArray = function(tagResponse) {
-            tagResponse.data.tags.forEach(function(tag) {
+            tagResponse.data.results.forEach(function(tag) {
                 var tag = {id: tag.tag_id, label: tag.tag_name};
                 $scope.tagMap[tag.id] = tag.label;
                 $scope.allTags.push(tag);
@@ -112,7 +117,6 @@ angular.module('resourceTracker')
         };
 
         var initializeResourceReservations = function() {
-
             var currentTime = new Date();
 
             $scope.startReservationTime = new Date(currentTime.getFullYear(), currentTime.getMonth(),
@@ -138,9 +142,6 @@ angular.module('resourceTracker')
 
             // all resources found in database, so admin can use them to modify/delete
             $scope.allResources = [];
-
-            // create resource dropdown model
-            $scope.resourcesToCreate = []; 
 
             // modify a reservation dropdown model for RESOURCE
             $scope.resourceReservationToModify = {};
@@ -181,10 +182,9 @@ angular.module('resourceTracker')
                 reservation_description: $scope.reservationDescription
             };
 
-            $scope.resourcesToCreate.forEach(function(resourceToCreate) {
-                reservationData.resource_ids.push(resourceToCreate.id);
+            $scope.resourcesToCreate.values.forEach(function(resourceToCreate) {
+                reservationData.resource_ids.push(resourceToCreate.resource_id);
             });
-
             if(!validateCreateReservation(reservationData)){ 
                 return;
             }
@@ -226,6 +226,10 @@ angular.module('resourceTracker')
                 }
             });
         };
+
+        $scope.selectResources = function(){
+            $scope.showSelectResourceModal.value = true;
+        }
 
         initializeResourceReservations();
      });

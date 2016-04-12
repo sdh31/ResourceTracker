@@ -8,7 +8,7 @@ function get_resource_by_id(resource, callback){
     /*
     return resource specified by resource_id in resource.resource_id
     */
-	var getResourceByIdQuery = resource_query_builder.buildQueryForGetResourceById(resource);
+    var getResourceByIdQuery = resource_query_builder.buildQueryForGetResourceById(resource);
     basic_db_utility.performSingleRowDBOperation(getResourceByIdQuery, callback);
 };
 
@@ -22,7 +22,7 @@ function create_resource(resource, callback){
     Create a resource, given all parameters 
     resource: dictionary of all parameters, as stored in the json body of a request    
     */
-	var createResourceQuery = resource_query_builder.buildQueryForCreateResource(resource);
+    var createResourceQuery = resource_query_builder.buildQueryForCreateResource(resource);
     basic_db_utility.performSingleRowDBOperation(createResourceQuery, callback);
 }
 
@@ -31,7 +31,7 @@ function update_resource_by_id(resource, callback){
 Update specified fields of specified resource
 resource: dictionary of fields TO UPDATE, and the id of specified resource
 */
-	var updateResourceQuery = resource_query_builder.buildQueryForUpdateResource(resource);
+    var updateResourceQuery = resource_query_builder.buildQueryForUpdateResource(resource);
     basic_db_utility.performSingleRowDBOperation(updateResourceQuery, callback);
 }
 
@@ -63,12 +63,61 @@ function removeGroupPermissionToResource(body, callback) {
     basic_db_utility.performSingleRowDBOperation(removeGroupPermissionToResourceQuery, callback);
 };
 
+// body has resource_ids and group_ids
+function removeGroupsPermissionToResources(body, callback) {
+
+    var removeGroupsPermissionToResourcesQuery = resource_query_builder.buildQueryForRemoveGroupsPermissionToResource(body);
+    basic_db_utility.performSingleRowDBOperation(removeGroupsPermissionToResourcesQuery, callback);
+};
+
 function getGroupPermissionToResource(body, callback) {
     
     var getGroupPermissionToResourceQuery = resource_query_builder.buildQueryForGetGroupPermissionToResource(body);
     basic_db_utility.performMultipleRowDBOperation(getGroupPermissionToResourceQuery, callback);
     
 };
+
+function getAllAncestors(body, callback) {
+
+    var getAllAncestorsQuery = resource_query_builder.buildQueryForGetAllAncestors(body);
+    basic_db_utility.performMultipleRowDBOperation(getAllAncestorsQuery, callback);
+}
+
+function insertIntoFolderTree(descendant_id, ancestor_ids, path_lengths, callback) {
+
+    var insertIntoFolderTreeQuery = resource_query_builder.buildQueryForInsertIntoFolderTree(descendant_id, ancestor_ids, path_lengths);
+    basic_db_utility.performSingleRowDBOperation(insertIntoFolderTreeQuery, callback);
+}
+
+function getAllDirectChildren(user, resource, callback) {
+    var getAllDirectChildrenQuery = resource_query_builder.buildQueryForGetAllDirectChildren(user, resource);
+    basic_db_utility.performMultipleRowDBOperation(getAllDirectChildrenQuery, callback);
+}
+
+function getSubtree(user, resource, callback) {
+    var getSubtreeQuery = resource_query_builder.buildQueryForGetSubtree(user, resource);
+    basic_db_utility.performMultipleRowDBOperation(getSubtreeQuery, callback);
+}
+
+function deleteAncestorLinks(body, callback) {
+    var deleteAncestorLinksQuery = resource_query_builder.buildQueryForDeleteAncestorLinks(user, resource);
+    basic_db_utility.performSingleRowDBOperation(deleteAncestorLinksQuery, callback);
+}
+
+function deleteAncestorLinks(body, callback) {
+    var deleteAncestorLinksQuery = resource_query_builder.buildQueryForDeleteAncestorLinks(body);
+    basic_db_utility.performSingleRowDBOperation(deleteAncestorLinksQuery, callback);
+}
+
+function insertSubtree(body, callback) {
+    var insertSubtreeQuery = resource_query_builder.buildQueryForInsertSubtree(body);
+    basic_db_utility.performSingleRowDBOperation(insertSubtreeQuery, callback);
+}
+
+function updateParentId(body, callback) {
+    var updateParentIdQuery = resource_query_builder.buildQueryForUpdateParentId(body);
+    basic_db_utility.performSingleRowDBOperation(updateParentIdQuery, callback);
+}
 
 var notifyUserOnReservationDelete = function(info) {
     var emailInfo = {
@@ -91,20 +140,28 @@ var notifyUserOnReservationDelete = function(info) {
     
     var currentTime = new Date();
 
-    if (currentTime.valueOf() <= emailInfo.reservation.start_time) {
+    if (currentTime.valueOf() <= emailInfo.reservation.end_time) {
         agenda.now('notify on delete reservation', emailInfo);
     }
 };
 
 module.exports = {
-	get_resource_by_id: get_resource_by_id,
+    get_resource_by_id: get_resource_by_id,
     get_resources_by_ids: get_resources_by_ids,
-	create_resource: create_resource,
+    create_resource: create_resource,
     update_resource_by_id: update_resource_by_id,
     delete_resource_by_id:delete_resource_by_id,
     addGroupPermissionToResource: addGroupPermissionToResource,
     removeGroupPermissionToResource: removeGroupPermissionToResource,
     updateGroupPermissionToResource: updateGroupPermissionToResource,
     getGroupPermissionToResource: getGroupPermissionToResource,
-    notifyUserOnReservationDelete: notifyUserOnReservationDelete
+    notifyUserOnReservationDelete: notifyUserOnReservationDelete,
+    getAllAncestors: getAllAncestors,
+    insertIntoFolderTree: insertIntoFolderTree,
+    getAllDirectChildren: getAllDirectChildren,
+    getSubtree: getSubtree,
+    removeGroupsPermissionToResources: removeGroupsPermissionToResources,
+    deleteAncestorLinks: deleteAncestorLinks,
+    updateParentId: updateParentId,
+    insertSubtree: insertSubtree
 };

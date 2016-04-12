@@ -2,7 +2,7 @@ var squel = require('squel').useFlavour('mysql');
 
 exports.buildQueryForIncludedTags = function(includedTags, start_time, end_time, group_ids) {
     var included_filter = squel.expr();
-	for (var i = 0; i < includedTags.length; i++){
+    for (var i = 0; i < includedTags.length; i++){
         included_filter.or("tag_name = '" + includedTags[i] + "'");
     }
 
@@ -18,7 +18,9 @@ exports.buildQueryForIncludedTags = function(includedTags, start_time, end_time,
         .field("resource.resource_id")
         .field("resource.description")
         .field("resource.resource_state")
-        .field("resource.created_by")
+        .field("resource.is_folder")
+        .field("resource.sharing_level")
+        .field("resource.parent_id")
         .field("tag.tag_name")
         .field("reservation.reservation_id")
         .field("reservation.start_time")
@@ -33,7 +35,7 @@ exports.buildQueryForIncludedTags = function(includedTags, start_time, end_time,
         .field("resource_group.resource_permission")
         .field("permission_group.group_id")
         .from("resource")
-        .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")		
+        .left_join("resource_tag", null, "resource.resource_id = resource_tag.resource_id")     
         .left_join("tag", null, "resource_tag.tag_id = tag.tag_id")
         .join("resource_group", null, "resource.resource_id = resource_group.resource_id")
         .left_join("permission_group", null, "resource_group.group_id = permission_group.group_id")
@@ -42,15 +44,15 @@ exports.buildQueryForIncludedTags = function(includedTags, start_time, end_time,
         .left_join("user_reservation", null, "reservation.reservation_id = user_reservation.reservation_id")
         .left_join("user", null, "user_reservation.user_id = user.user_id")
         
-		.where(included_filter).toString();
+        .where(included_filter).toString();
 };
 
 exports.buildQueryForExcludedTags = function(excludedTags) {
     var excluded_filter = squel.expr();
      
-	for (var j = 0; j < excludedTags.length; j++) {
-		excluded_filter.or("tag_name = '" + excludedTags[j] + "'");
-	}
+    for (var j = 0; j < excludedTags.length; j++) {
+        excluded_filter.or("tag_name = '" + excludedTags[j] + "'");
+    }
 
     // this is necessary because we dont want to make an excluded query if there are no tags to exclude!
     var excludedQuery;
@@ -58,11 +60,11 @@ exports.buildQueryForExcludedTags = function(excludedTags) {
         excludedQuery = "";
     } else{
         excludedQuery = squel.select()
-		    .from("resource_tag")
+            .from("resource_tag")
 
-		    //can add more joins (i.e. reservations, resources if more info is needed in return)
-		    .join("tag", null, "resource_tag.tag_id = tag.tag_id")
-		    .where(excluded_filter).toString();
+            //can add more joins (i.e. reservations, resources if more info is needed in return)
+            .join("tag", null, "resource_tag.tag_id = tag.tag_id")
+            .where(excluded_filter).toString();
     }
 
     return excludedQuery;
@@ -70,7 +72,7 @@ exports.buildQueryForExcludedTags = function(excludedTags) {
 };
 
 exports.buildQueryForCreateResourceTagLink = function(resource_id, tag_ids) {
-	var rows_to_add = [];
+    var rows_to_add = [];
     for(var i = 0; i < tag_ids.length; i++){
         var row = {"tag_id": tag_ids[i], "resource_id": resource_id};
         rows_to_add.push(row);
@@ -129,4 +131,3 @@ exports.buildQueryForRemoveTagFromObject = function(tag_info) {
         .where(tag_filter)
         .toString();
 };
-

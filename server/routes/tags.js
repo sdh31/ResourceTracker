@@ -2,20 +2,19 @@ var express = require('express');
 var router = express.Router();
 var tag_service = require('../services/tags');
 var group_service = require('../services/groups');
-var auth = require('../services/authorization');
 var perm_service = require('../services/permissions')
 
 // this gets all tags
-router.get('/', auth.is('user'), function(req, res, next){
+router.get('/', function(req, res, next){
     if(!req.session.auth){
         res.status(403).json(perm_service.denied_error)
         return;
     }
 	var tags_callback = function(result){
-		if (result.error == true){
+		if (result.error){
 			res.status(400).json(result);
 		} else {
-			res.send(JSON.stringify(result));
+			res.status(200).json(result);
 		}
 	}
 
@@ -23,16 +22,16 @@ router.get('/', auth.is('user'), function(req, res, next){
 });
 
 // this takes includedTags and excludedTags in req.body and returns all resources that have any one of the included tags and none of the excluded tags
-router.post('/filter', auth.is('user'), function(req, res, next){
+router.post('/filter', function(req, res, next){
     if(!req.session.auth){
         res.status(403).json(perm_service.denied_error)
         return;
     }
     var filter_callback = function(result){
-		if (result.error == true){
+		if (result.error){
 		  res.status(400).json(result);
 		} else {
-			res.send(JSON.stringify(result));
+			res.status(200).json(result);
 		}
 	}
 
@@ -56,7 +55,7 @@ router.post('/filter', auth.is('user'), function(req, res, next){
     group_service.get_all_groups_for_user(req.session.user, getAllGroupsForUserCallback);
 });
 
-router.put('/', auth.is('user'), function(req, res, next){
+router.put('/', function(req, res, next){
 
     if(!perm_service.check_resource_permission(req.session)){
         res.status(403).json(perm_service.denied_error)
@@ -127,7 +126,7 @@ router.put('/', auth.is('user'), function(req, res, next){
     tag_service.select_tag_ids(req.body.addedTags, initialSelectTagsIdsCallback);
 });
 
-router.post('/', auth.is('user'), function(req, res, next){
+router.post('/', function(req, res, next){
     if(!perm_service.check_resource_permission(req.session)){
         res.status(403).json(perm_service.denied_error)
         return;

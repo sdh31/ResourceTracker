@@ -16,11 +16,7 @@ def get_id(res):
 	 	return json_content['insertId']
 	return json_content['results']['insertId']
 
-desc = '#### initialize session ####'
-res = r.login_to_session('admin', 'Treeadmin')
-is_success(desc, res)
-admin_session = res.cookies
-r.session = admin_session
+admin_session = r.session
 
 desc = '### create non-admin user & session ###'
 res = r.create_user("chris", "dee")
@@ -33,17 +29,17 @@ non_admin_session = res.cookies
 r.session = admin_session
 
 desc = '### create restricted resource ###'
-res = r.create_resource("restricted", "restricted", "restricted")
+res = r.create_resource("restricted", "restricted", "restricted", 1, 0, 1)
 is_success(desc, res)
 restricted_id1 = get_id(res)
 
 desc = '### create another restricted resource ###'
-res = r.create_resource("restricted2", "restricted2", "restricted")
+res = r.create_resource("restricted2", "restricted2", "restricted", 1, 0, 1)
 is_success(desc, res)
 restricted_id2 = get_id(res)
 
 desc = '### create free resource ###'
-res = r.create_resource("free", "free", "free")
+res = r.create_resource("free", "free", "free", 1000, 0, 1)
 is_success(desc, res)
 free_id = get_id(res)
 

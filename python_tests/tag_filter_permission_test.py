@@ -15,11 +15,7 @@ def get_id(res):
 	 	return json_content['insertId']
 	return json_content['results']['insertId']
 
-desc = '#### initialize session ####'
-res = r.login_to_session('admin', 'Treeadmin')
-is_success(desc, res)
-admin_session = res.cookies
-r.session = admin_session
+admin_session = r.session
 
 desc = '### create non-admin user & session ###'
 res = r.create_user("chris", "dee")
@@ -32,26 +28,26 @@ non_admin_session = res.cookies
 r.session = admin_session
 
 desc = "### create 3 resources with tags ###"
-res = r.create_resource("r1", "r1", "free")
+res = r.create_resource("r1", "r1", "free", 1000, 0, 1)
 resource1 = get_id(res)
 is_success(desc, res)
 res = r.add_tag(resource1, ["resource1", "a resource"])
 is_success(desc, res)
-res = r.create_resource("r2", "r2", "free")
+res = r.create_resource("r2", "r2", "free", 1000, 0, 1)
 resource2 = get_id(res)
 is_success(desc, res)
 res = r.add_tag(resource2, ["resource2", "a resource"])
 is_success(desc, res)
-res = r.create_resource("r2", "r2", "free")
+res = r.create_resource("r2", "r2", "free", 1000, 0, 1)
 resource3 = get_id(res)
 is_success(desc, res)
 res = r.add_tag(resource3, ["resource3"])
 is_success(desc, res)
 
-desc = "### check that the tag filter sees three resources as admin ###"
+desc = "### check that the tag filter sees 4 resources as admin (including root) ###"
 res = r.filter_tags([], [], 0, 99999999)
 is_success(desc, res)
-r.test_print(desc, len(r.json.loads(res.content)['resources']) == 3)
+r.test_print(desc, len(r.json.loads(res.content)['resources']) == 4)
 
 desc = "### Check included and excluded tags work ###"
 res = r.filter_tags(["resource2", "resource3"], ["a resource"], 0, 999999999)
@@ -62,8 +58,8 @@ r.test_print(desc, r.json.loads(res.content)['resources'][0]['resource_id'] == r
 desc = "### Check behavior with empty included tags ###"
 res = r.filter_tags([], ["a resource"], 0, 999999999)
 is_success(desc, res)
-r.test_print(desc, len(r.json.loads(res.content)['resources']) == 1)
-r.test_print(desc, r.json.loads(res.content)['resources'][0]['resource_id'] == resource3)
+r.test_print(desc, len(r.json.loads(res.content)['resources']) == 2)
+r.test_print(desc, r.json.loads(res.content)['resources'][1]['resource_id'] == resource3)
 
 desc = "### Add permission to one resource to non_admin user ###"
 res = r.get_groups()

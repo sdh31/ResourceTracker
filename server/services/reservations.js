@@ -17,6 +17,38 @@ function get_reservations_by_resources(body, callback) {
     get_conflicting_reservations(reservation, callback);
 }
 
+function get_overbooked_reservations_from_conflicts(reservation_conflicts, sharing_level){
+    var conflicts_per_reservation_id = {}
+    var overbooked_resources = []
+    var reservation_titles = {}
+
+    //initialize everything
+    for(var i = 0; i<reservation_conflicts.length;i++){
+        conflicts_per_reservation_id[reservation_conflicts[i].id1] = 1;
+        reservation_titles[reservation_conflicts[i].id1] = reservation_conflicts[i].title1
+        conflicts_per_reservation_id[reservation_conflicts[i].id2] = 1;
+        reservation_titles[reservation_conflicts[i].id2] = reservation_conflicts[i].title2
+
+    }
+    //count total conflicts for each reservation
+    for (var i = 0; i < reservation_conflicts.length; i++){
+        var id1 = reservation_conflicts[i].id1;
+        var id2 = reservation_conflicts[i].id2;
+        conflicts_per_reservation_id[id1] ++;
+        conflicts_per_reservation_id[id2] ++;
+    }
+    //find and return overbooked resources
+    for(var reservation_id in conflicts_per_reservation_id){
+        reservation = {}
+        if(conflicts_per_reservation_id[reservation_id] > sharing_level){
+            reservation['reservation_title'] = (reservation_titles[reservation_id])
+            reservation['reservation_id'] = reservation_id
+            overbooked_resources.push(reservation)
+        }
+    }
+    return overbooked_resources;
+}
+
 function get_reservation_by_id(reservation, callback){
     var getReservationByIdQuery = reservation_query_builder.buildQueryForGetReservationById(reservation);
     basic_db_utility.performMultipleRowDBOperation(getReservationByIdQuery, callback);
@@ -47,21 +79,63 @@ function update_reservation_by_id(reservation, user, has_auth, callback){
     basic_db_utility.performSingleRowDBOperation(updateReservationByIdQuery, callback);
 }
 
+function filter_unconfirmed_overbooked_resources(reservations){
+    var sharing_check = {};
+    var unconfirmed_reservations = [];
+    for (var i = 0; i<reservations.length; i++){
+         var thisReservation = reservations[i];
+        for (var j = 0; j<thisReservation.resources.length; j++) {
+            if(!sharing_check[j]){
+                //Initialize sharing_check value to 1 -- we have found a reservation on that resource
+                sharing_check[j] = 1;
+            }
+            if(thisReservation.resources[j].is_confirmed){
+                sharing_check[j] ++;
+            }
+        }
+    }
+    for (var i = 0; i<reservations.length; i++) {
+        var thisReservation = reservations[i];
+        var theseResources = thisReservation.resources;
+        for (var j = 0; j<thisReservation.resources.length; j++) {
+            if((sharing_check[j] >= theseResources[j].sharing_level)){
+                if(!theseResources[j].is_confirmed){
+                    unconfirmed_reservations.push(thisReservation)
+                    break;
+                }
+            }
+        }
+    }
+    return unconfirmed_reservations
+}
+
 function filterAllowedOverlappingReservations(reservations) {
-
+    //Gets rid of the allowed ones
     var confirmedReservations = [];
-
+    var sharing_check = {};
+    var is_overbooked;
     for (var i = 0; i<reservations.length; i++) {
         var thisReservation = reservations[i];
         var allConfirmed = true;
+        is_overbooked = false;
         for (var j = 0; j<thisReservation.resources.length; j++) {
+            if(!sharing_check[j]){
+                //Initialize sharing_check value to 1 -- we have found a reservation on that resource
+                sharing_check[j] = 1
+            }
             if (!thisReservation.resources[j].is_confirmed) {
                 allConfirmed = false;
                 break;
             }
+            else{
+                sharing_check[j] ++;
+            }
+            //update number of shared reservations on each resource -- if too many, don't filter
+            if(sharing_check[j] > thisReservation.resources[j].sharing_level){
+                is_overbooked = (true || is_overbooked);
+            }
         }
-
-        if (allConfirmed) {
+        if (allConfirmed && is_overbooked) {
             confirmedReservations.push(thisReservation);
         }
     }
@@ -101,18 +175,17 @@ function getAllReservationsForUser(user, callback) {
 
 function filterResourcesByPermission(resources, minPermission) {
     var resourcesWithPermission = [];
-    console.log(minPermission)
     for (var i = 0; i<resources.length; i++) {
         if ((resources[i].resource_permission >= minPermission) && resourcesWithPermission.indexOf(resources[i].resource_id) == -1) {
             resourcesWithPermission.push(resources[i].resource_id);
         }
     }
-
     return resourcesWithPermission;
 };
 
-function getOverlappingReservationsByResource(reservation, callback){
-    var getoverlappingQuery = reservation_query_builder.buildQueryForGetOverlappingReservationsByResource(reservation)
+//Only_confirmed specifies if you only want to return conflicts in confirmed reservations
+function getOverlappingReservationsByResource(reservation, only_confirmed, callback){
+    var getoverlappingQuery = reservation_query_builder.buildQueryForGetOverlappingReservationsByResource(reservation, only_confirmed)
     basic_db_utility.performMultipleRowDBOperation(getoverlappingQuery, callback)
 }
 
@@ -146,6 +219,9 @@ function organizeReservations(reservations) {
             name: thisRow.name,
             description: thisRow.description,
             resource_state: thisRow.resource_state,
+            sharing_level: thisRow.sharing_level,
+            is_folder: thisRow.is_folder,
+            parent_id: thisRow.parent_id,
             is_confirmed: thisRow.is_confirmed
         };
         if (seenReservationIds.indexOf(thisRow.reservation_id) == -1) {
@@ -179,6 +255,29 @@ function organizeReservations(reservations) {
     return finalReservations;
 };
 
+function removeUsersThatHaveReservePermission(allUsers, allGroupsForUsers, resourcePermissions) {
+
+    var groupsThatHaveReservePermission = [];
+
+    for (var i = 0; i<resourcePermissions.length; i++) {
+        if (resourcePermissions[i].resource_permission >= 1) {
+            groupsThatHaveReservePermission.push(resourcePermissions[i].group_id);
+        }
+    }
+
+    for (i = 0; i<allGroupsForUsers.length; i++) {
+        if (groupsThatHaveReservePermission.indexOf(allGroupsForUsers[i].group_id) != -1) {
+            for (var j = 0; j < allUsers.length; j++) {
+                if (allUsers[j].user_id == allGroupsForUsers[i].user_id) {
+                    allUsers.splice(j, 1);
+                    break;
+                }
+            }
+        }
+    }
+    return allUsers;
+}
+
 module.exports = {
     get_conflicting_reservations:get_conflicting_reservations,
     get_reservations_by_resources: get_reservations_by_resources,
@@ -201,5 +300,8 @@ module.exports = {
     deleteConflictingReservations:deleteConflictingReservations,
     get_unconfirmed_resources_for_reservation:get_unconfirmed_resources_for_reservation,
     getOverlappingReservationsByResource: getOverlappingReservationsByResource,
-    confirmAllReservationsOnResource: confirmAllReservationsOnResource
+    confirmAllReservationsOnResource: confirmAllReservationsOnResource,
+    removeUsersThatHaveReservePermission: removeUsersThatHaveReservePermission,
+    filter_unconfirmed_overbooked_resources:filter_unconfirmed_overbooked_resources,
+    get_overbooked_reservations_from_conflicts:get_overbooked_reservations_from_conflicts
 }

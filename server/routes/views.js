@@ -1,8 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var app = express();
-
-var auth = require('../services/authorization');
 var perm_service = require('../services/permissions');
 
 var basePath =  '/home/bitnami/ResourceTracker/client';
@@ -30,7 +28,8 @@ var loginViews = [
     'token_modal.html',
     'filter_reservation.html',
     'user_reservation.html',
-    'pending_reservations.html'
+    'pending_reservations.html',
+    'select_resources.html'
     ];
 
 loginViews.forEach(function(view) {
@@ -71,7 +70,8 @@ var resourceManagementViews = [
     'resource.html',
     'resource_permission.html',
     'edit_group_resource_permission.html',
-    'edit_user_resource_permission.html'
+    'edit_user_resource_permission.html',
+    'add_parent.html'
 ];
 resourceManagementViews.forEach(function(view) {
    router.get('/views/' + view, function (req, res) {
