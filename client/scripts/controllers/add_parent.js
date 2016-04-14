@@ -55,7 +55,7 @@ angular.module('resourceTracker')
                         });
                     }
                 });
-                var val = {id: rsrc.resource_id, title: rsrc.name, children: children};
+                var val = {id: rsrc.resource_id, title: rsrc.name, children: children, is_folder: 1};
                 return val;
             }, function(error){
                 console.log(error);

@@ -33,10 +33,6 @@ angular.module('resourceTracker')
         // map from tag_id to tag_name
         $scope.tagMap = {};
 
-        // create resource dropdown model
-        $scope.resourcesToCreate = {values: []}; 
-        $scope.tree = [];
-        $scope.myTree = {};
 
         $scope.tagIncludeTranslationText = {buttonDefaultText: 'Tags to Include', dynamicButtonTextSuffix: 'Tag(s) to Include'};
         $scope.tagExcludeTranslationText = {buttonDefaultText: 'Tags to Exclude', dynamicButtonTextSuffix: 'Tag(s) to Exclude'};
@@ -83,10 +79,16 @@ angular.module('resourceTracker')
 
 
             $http.post('/tag/filter', filter).then(function(response) {
+                var res = [];
+                response.data.resources.forEach(function(rsrc){
+                    if(!rsrc.is_folder){
+                        res.push(rsrc);
+                    }
+                })
                 var timelineInfo = {};
                 timelineInfo.startTime = $scope.startTime;
                 timelineInfo.endTime = $scope.endTime;
-                timelineInfo.resources = response.data.resources;
+                timelineInfo.resources = res;
                 timelineService.drawTimeline(timelineInfo, timelineSelectHandler);
             }, function(error) {
                 console.log(error);
@@ -153,6 +155,11 @@ angular.module('resourceTracker')
 
             // final reservation that needs modification
             $scope.reservationToModify = {};
+
+            // create resource dropdown model
+            $scope.resourcesToCreate = {values: []}; 
+            $scope.tree = [];
+            $scope.myTree = {};
 
             getAllResources();
         };

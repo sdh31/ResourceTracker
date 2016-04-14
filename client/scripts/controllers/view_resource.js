@@ -241,7 +241,6 @@ angular.module('resourceTracker')
 			$http.get('/resource/all').then(function(response) {
                 $scope.allResources = response.data;
 				populateResourcesMap($scope.allResources);
-				console.log($scope.allResources);
             }, function(error) {
 				console.log(error);
             });		

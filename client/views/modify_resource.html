@@ -4,7 +4,7 @@
 <div class="input-group panel panel-default col-md-5" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
 	<div class="panel-body">
         <div>
-  			<span><b>Selected Node</b> : {{selectedResource.name}}</span>
+  			<span><b>Selected</b> : {{selectedResource.name}}</span>
 		</div>
 		<div 
 			data-angular-treeview="true"
@@ -17,52 +17,56 @@
 	</div>
 </div>
 <div ng-show="isResourceSelected()" class="input-group panel panel-default col-md-5" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
-    <div>
-        <fieldset class="form-group">
-		    <input type="text" class="form-control" placeholder="name" ng-model="editingResource.name">
-        </fieldset>
-        <fieldset class="form-group">
-		    <textarea class="form-control" placeholder="description of resource/folder" ng-model="editingResource.description"></textarea>
-        </fieldset>
-        <fieldset class="form-group" ng-hide="editingResource.is_folder==1">  
-            <label>Resource State: </label>            
-            <label>
-                <input type="radio" ng-model="editingResource.resource_state" value="free">
-                Free
-            </label>
-            <label>
-                <input type="radio" ng-model="editingResource.resource_state" value="restricted">
-                Restricted
-            </label>
-        </fieldset>
-        <fieldset class="form-group" ng-hide="editingResource.is_folder==1">
-        	<label>Resource Sharing: </label>
-        	<label>
-        		<input type="radio" ng-model="unlimitedResource" ng-value="false"> Limited
-        	</label>
-        	<label>
-        		<input type="radio" ng-model="unlimitedResource" ng-value="true"> Unlimited
-        	</label>
-        	<input type="number" class="form-control" placeholder="Resource Sharing Level" ng-model="editingResource.sharing_level" min="1" max="2147483647" ng-disabled="unlimitedResource">
-        </fieldset>
-        <fieldset class="form-group">
-			<button type="button" class="btn btn-link" ng-click="addParent()" style="padding: 0;">Select Parent Folder:</button>
-			{{resourceMap.get(editingResource.parent_id).name}}
-		</fieldset>
-		<input type="text" class="form-control" placeholder="tag" ng-model="currentTag">
-		<div class="tags">
-			<span ng-repeat="(index, tag) in editingResource.tags" class="tag">{{tag}}
-				<a class="glyphicon glyphicon-remove glyph_top" aria-hidden="true" ng-click="removeTag(index)"></a>
-			</span>
-		</div>
-		<button type="button" class="btn btn-default btn-sm" ng-click="addTag()">Add Tag</button>
-		<button type="button" class="btn btn-default btn-sm" ng-click='revertEditing()'>Revert Editing</button> <br><br>
-		<button type="button" class="btn btn-primary btn-md" ng-click='updateResource()'>Update Resource</button>
-		<button type="button" class="btn btn-danger btn-md" ng-click='deleteResource()'>Delete Resource</button>
-        <div modal-show="showAddParentModal.value" class="modal fade">
-			<ng-include src="'views/add_parent.html'" ng-if="showAddParentModal.value"></ng-include>
-		</div>
+    <div class="panel-header">
+        <h3 style="text-align: center;">Edit Resource/Folder</h3>
+    </div>
+    <div class="panel-body">
+        <form>
+            <fieldset class="form-group">
+    		    <input type="text" class="form-control" placeholder="Name" ng-model="editingResource.name">
+            </fieldset>
+            <fieldset class="form-group">
+    		    <textarea class="form-control" placeholder="Description (optional)" ng-model="editingResource.description"></textarea>
+            </fieldset>
+            <fieldset class="form-group" ng-hide="editingResource.is_folder==1">  
+                <label>Resource State: </label>            
+                <label>
+                    <input type="radio" ng-model="editingResource.resource_state" value="free">
+                    Free
+                </label>
+                <label>
+                    <input type="radio" ng-model="editingResource.resource_state" value="restricted">
+                    Restricted
+                </label>
+            </fieldset>
+            <fieldset class="form-group" ng-hide="editingResource.is_folder==1">
+            	<label>Resource Sharing: </label>
+            	<label>
+            		<input type="radio" ng-model="unlimitedResource" ng-value="false"> Limited
+            	</label>
+            	<label>
+            		<input type="radio" ng-model="unlimitedResource" ng-value="true"> Unlimited
+            	</label>
+            	<input type="number" class="form-control" placeholder="Resource Sharing Level" ng-model="editingResource.sharing_level" min="1" max="2147483647" ng-disabled="unlimitedResource">
+            </fieldset>
+            <fieldset class="form-group">
+    			<button type="button" class="btn btn-link" ng-click="addParent()" style="padding: 0;">Select Parent Folder:</button>
+    			{{resourceMap.get(editingResource.parent_id).name}}
+    		</fieldset>
+    		<input type="text" class="form-control" placeholder="Tag" ng-model="currentTag">
+    		<div class="tags">
+    			<span ng-repeat="(index, tag) in editingResource.tags" class="tag">{{tag}}
+    				<a class="glyphicon glyphicon-remove glyph_top" aria-hidden="true" ng-click="removeTag(index)"></a>
+    			</span>
+    		</div>
+    		<button type="button" class="btn btn-default btn-sm" ng-click="addTag()">Add Tag</button>
+    		<button type="button" class="btn btn-default btn-sm" ng-click='revertEditing()'>Revert Editing</button> <br><br>
+    		<button type="button" class="btn btn-primary btn-md" ng-click='updateResource()'>Update Resource</button>
+    		<button type="button" class="btn btn-danger btn-md" ng-click='deleteResource()'>Delete Resource</button>
+        </form>
+            <div modal-show="showAddParentModal.value" class="modal fade">
+    			<ng-include src="'views/add_parent.html'" ng-if="showAddParentModal.value"></ng-include>
+    		</div>
     </div>
 
-</div></div><br>
-
+</div></div></div>

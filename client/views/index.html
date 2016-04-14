@@ -101,20 +101,15 @@
                             ng-click="goToResourcePermissionPage()">
                             <a href="" data-toggle="tab">Manage Resource Permissions</a></li>
 
-                        <li ng-class="isTabSelected('/modify_resources')"
-                            ng-show="user.resource_management_permission"
-                            ng-click="goToModifyResourcesPage()">
-                            <a href="" data-toggle="tab">Modify Resources and Folders</a></li>
-
-                        <li ng-class="isTabSelected('/register')"
-                            ng-show="user.user_management_permission"
-                            ng-click="goToRegisterPage()">
-                            <a href="" data-toggle="tab">Register Users</a></li>
-
                         <li ng-class="isTabSelected('/resource')"
                             ng-show="user.resource_management_permission"
                             ng-click="goToResourcePage()">
-                            <a href="" data-toggle="tab">Create Resource Or Folder</a></li>
+                            <a href="" data-toggle="tab">Create Resources or Folders</a></li>
+
+                        <li ng-class="isTabSelected('/modify_resources')"
+                            ng-show="user.resource_management_permission"
+                            ng-click="goToModifyResourcesPage()">
+                            <a href="" data-toggle="tab">Modify Resources or Folders</a></li>
 
                         <li ng-class="isTabSelected('/filter_reservation')"
                             ng-show="user.loggedIn"
@@ -135,6 +130,11 @@
                             ng-show="user.loggedIn"
                             ng-click="goToPendingReservationsPage()">
                             <a href="" data-toggle="tab">Pending Reservations</a></li>
+
+                        <li ng-class="isTabSelected('/register')"
+                            ng-show="user.user_management_permission"
+                            ng-click="goToRegisterPage()">
+                            <a href="" data-toggle="tab">Register Users</a></li>
                     </ul>
                 </div>
 

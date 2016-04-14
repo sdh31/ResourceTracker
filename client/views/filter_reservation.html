@@ -2,8 +2,10 @@
 <div class="row vertical-align">
 <div class="col-md-2"></div>
 <div class="input-group panel panel-default col-md-5" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
+    <div class="panel-header">
+        <h3 style="text-align: center;">Filter Reservations</h3>
+    </div>
 	<div class="panel-body">
-        <h4 style="text-align: center;">Filter Reservations</h4>
 		<h5>Pick a Start Time: </h5>
 		<input type="datetime-local" id="exampleInput" name="input" ng-model="startTime" placeholder="yyyy-MM-ddTHH:mm:ss"required />
 		<br><br>
@@ -24,8 +26,10 @@
 	</div>
 </div>
 <div class="input-group panel panel-default col-md-5" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
+	<div class="panel-header">
+		<h3 style="text-align: center;">Create a Reservation</h3>
+	</div>
 	<div class="panel-body">
-		<h4 style="text-align: center;">Create a Reservation</h4>
 		<form>
 			<fieldset class="form-group">
 				<input type="text" class="form-control" placeholder="Name" ng-model="reservationName">
