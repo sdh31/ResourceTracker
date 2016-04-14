@@ -116,6 +116,12 @@ function get_all_system_permissions(user, callback){
     });
 }
 
+function get_ancestors_with_permissions(body, callback){
+    //Takes in resource info and group_ids
+    var getAncestorPermissionQuery = permission_queries.buildQueryForGetAncestorsWithPermission(body)
+    basic_db_utility.performMultipleRowDBOperation(getAncestorPermissionQuery, callback);
+}
+
 function check_permission_for_resource(resource_id, group_ids, callback) {
     var checkPermissionForResourceQuery = permission_queries.buildQueryForCheckPermissionForResource(resource_id, group_ids);
     basic_db_utility.performMultipleRowDBOperation(checkPermissionForResourceQuery, callback);
@@ -167,5 +173,6 @@ module.exports = {
     check_reservation_permission:check_reservation_permission,
     denied_error:denied_error,
     get_permission_id: get_permission_id,
-    resource_permissions: resource_permissions
+    resource_permissions: resource_permissions,
+    get_ancestors_with_permissions:get_ancestors_with_permissions
 }

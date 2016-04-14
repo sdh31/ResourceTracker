@@ -61,20 +61,23 @@ is_success(desc, res)
 r.test_print(desc, len(r.json.loads(res.content)['resources']) == 2)
 r.test_print(desc, r.json.loads(res.content)['resources'][1]['resource_id'] == resource3)
 
-desc = "### Add permission to one resource to non_admin user ###"
+desc = "### Add permission to root folder & one resource to non_admin user ###"
 res = r.get_groups()
 is_success(desc, res)
 group_id = r.json.loads(res.content)['results'][1]['group_id']
+res = r.add_group_permission_to_resource(1, [group_id], ['view'])
 res = r.add_group_permission_to_resource(resource1, [group_id], ['view'])
 is_success(desc, res)
 
 """" ---login as non_admin user with permissions to resource1--- """
 r.session = non_admin_session
 
-desc = "### ensure that tag filter can only see one resource ###"
+desc = "### ensure that tag filter can only see one resource and the root folder ###"
 res = r.filter_tags([],[], 0, 99999999)
 is_success(desc, res)
-r.test_print(desc, len(r.json.loads(res.content)['resources']) == 1)
+r.test_print(desc, len(r.json.loads(res.content)['resources']) == 2)
+r.test_print(desc, r.json.loads(res.content)['resources'][0]['name'] == 'root')
+r.test_print(desc, r.json.loads(res.content)['resources'][1]['name'] == 'r1')
 
 
 

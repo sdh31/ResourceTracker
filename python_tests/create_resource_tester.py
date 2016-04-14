@@ -8,6 +8,8 @@ r.initialize_and_clear_tables()
 
 admin_session = r.session
 
+root_resource_id = 1
+
 desc = '#### create two folders ####'
 res = r.create_resource("folder1", "folder1", 'free', 1000, 1, 1)
 test_print(desc, res.status_code < 300)
@@ -55,6 +57,7 @@ desc =  '#### create 1 more user ####'
 res = r.create_user('rahul', 'rahul123')
 test_print(desc, res.status_code < 300)
 rahul_user_id = r.json.loads(res.content)['insertId']
+rahul_group_id = 2
 
 desc =  '#### create 1 group ####'
 res = r.create_group("group1", "nope", True, True, True, False)
@@ -66,6 +69,14 @@ desc =  '#### add rahul to the first group ####'
 res = r.add_users_to_group([rahul_user_id], group_id1)
 test_print(desc, res.status_code < 300)
 
+desc = '#### Give group 1 view access to root resource ####'
+res = r.add_group_permission_to_resource(root_resource_id, [group_id1], ['view'])
+test_print(desc, res.status_code < 300)
+
+desc = '#### Give rahul view access to root ####'
+res = r.add_group_permission_to_resource(root_resource_id, [rahul_group_id], ['view'])
+test_print(desc, res.status_code < 300)
+
 desc = '#### try adding reserve permission to a folder ####'
 res = r.add_group_permission_to_resource(folder_id1, [group_id1], ['reserve'])
 test_print(desc, res.status_code > 300)
@@ -74,10 +85,37 @@ desc = '#### try adding manage permission to a folder ####'
 res = r.add_group_permission_to_resource(folder_id2, [group_id1], ['manage'])
 test_print(desc, res.status_code > 300)
 
+desc = '#### try adding permission to resource before its parent folder can be seen ####'
+res = r.add_group_permission_to_resource(resource_id1, [group_id1], ['view'])
+test_print(desc, res.status_code == 403)
+res = r.remove_group_permission_to_resource(resource_id1, [group_id1])
+
 desc = '#### successfully add view permissions to folders ####'
 res = r.add_group_permission_to_resource(folder_id2, [group_id1], ['view'])
 test_print(desc, res.status_code < 300)
 res = r.add_group_permission_to_resource(folder_id1, [group_id1], ['view'])
+test_print(desc, res.status_code < 300)
+
+desc= '#### Try adding permission for two groups when only one can view ancestor folders ###'
+res = r.add_group_permission_to_resource(resource_id1, [group_id1, rahul_group_id], ['view', 'view'])
+test_print(desc, res.status_code == 403)
+
+desc= '#### Try adding permission for two groups when both can view ancestor folders ###'
+res = r.add_group_permission_to_resource(folder_id1, [rahul_group_id], ['view'])
+test_print(desc, res.status_code < 300)
+res = r.add_group_permission_to_resource(resource_id1, [rahul_group_id, group_id1], ['view', 'view'])
+test_print(desc, res.status_code < 300)
+
+desc = '#### cleanup from last test ####'
+res = r.remove_group_permission_to_resource(resource_id1, [group_id1, rahul_group_id])
+test_print(desc, res.status_code < 300)
+
+desc = '#### Try adding permission when all ancestor folders have requisite permission ####'
+res = r.add_group_permission_to_resource(resource_id1, [group_id1], ['view'])
+test_print(desc, res.status_code < 300)
+
+desc = '### Clean up from last test ###'
+res = r.remove_group_permission_to_resource(resource_id1, [group_id1])
 test_print(desc, res.status_code < 300)
 
 desc = '#### successfully add reserve permission to a resource ####'

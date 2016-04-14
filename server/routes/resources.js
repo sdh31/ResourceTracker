@@ -419,12 +419,32 @@ router.post('/addPermission', function(req, res, next) {
         return;
     }
     if (req.body.group_ids.length != req.body.resource_permissions.length) {
-        res.status(400).json({error: true, err: "need same amount of permissions as resources"})
+        res.status(400).json({error: true, err: "need same amount of permissions as groups"})
         return;
     }
 
     // convert string permissions to their INT equivalents
     req.body.resource_permissions = perm_service.get_permission_id(req.body.resource_permissions);
+
+    var checkHierarchyPermissionsCallback = function(result){
+        if(result.error){
+            res.status(400).json(result);
+        } else if(result.results.length == 0){
+            //Allow groups to be added to root
+            if(req.body.resource_id == 1){
+                res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);   
+                return;
+            }
+            result['err'] = "One or more groups cannot view a folder above this resource"
+            res.status(403).json(result)
+        //If not all groups have permission on whole path, don't allow it.
+        } else if(((result.results[0].path_length) * req.body.group_ids.length) > result.results.length){
+            result['err'] = "One or more groups cannot view a folder above this resource"
+            res.status(403).json(result)
+        } else{
+            res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);
+        }
+    }
 
     var checkPermissionForResourceCallback = function(result){
         if (result.error) {
@@ -446,17 +466,18 @@ router.post('/addPermission', function(req, res, next) {
                         return;
                     }
                 }
+                
+                perm_service.get_ancestors_with_permissions(req.body, checkHierarchyPermissionsCallback)
 
-                res_service.addGroupPermissionToResource(req.body, addGroupPermissionCallback);
             } else {
                 result = perm_service.denied_error;
                 res.status(403).json(result);
             }
         }
     };
-
     perm_service.check_permission_for_resources([{resource_id: req.body.resource_id}], [req.session.user], [], checkPermissionForResourceCallback);
 });
+
 
 router.post('/updatePermission', function(req, res, next) {
 

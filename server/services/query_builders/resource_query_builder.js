@@ -156,13 +156,14 @@ module.exports.buildQueryForUpdateGroupPermissionToResource = function(body) {
 
 // body contains resource_id, group_ids
 module.exports.buildQueryForRemoveGroupPermissionToResource = function(body) {
-
-    var expr = squel.delete().from("resource_group");
-
-    for(var i = 0; i < body.group_ids.length; i++){
-        expr.where("group_id = " + body.group_ids[i] + " AND resource_id = " + body.resource_id);
+    var group_filter = squel.expr()
+     for(var i = 0; i < body.group_ids.length; i++){
+        group_filter.or("group_id = " + body.group_ids[i] + " AND resource_id = " + body.resource_id);
     }
 
+    var expr = squel.delete().from("resource_group")
+        .where(group_filter)
+   
     return expr.toString();
 };
 

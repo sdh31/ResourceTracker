@@ -6,11 +6,10 @@ requests.packages.urllib3.disable_warnings()
 
 
 headers = {
-		
 	}
 
 session = ''
-baseUrl = 'https://colab-sbx-212.oit.duke.edu'
+baseUrl = 'https://colab-sbx-202.oit.duke.edu'
 
 passed = 0
 failed = 0
