@@ -93,7 +93,6 @@ angular.module('resourceTracker')
         var removeResources = function(){
             var deferred = $q.defer();
             var promise = deferred.promise;
-            console.log($scope.resourcesToRemove);
             if($scope.resourcesToRemove.values.length == 0){
                 deferred.resolve();
                 return promise;

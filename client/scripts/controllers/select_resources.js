@@ -64,10 +64,12 @@ angular.module('resourceTracker')
 
         $scope.select = function(){
             $scope.resourcesToCreate.values = [];
-            $scope.myTree.currentNodes.forEach(function(node){
-                var rsrc = $scope.resourceMap.get(node.id);
-                $scope.resourcesToCreate.values.push(rsrc);
-            })
+            if($scope.myTree.currentNodes){
+                $scope.myTree.currentNodes.forEach(function(node){
+                    var rsrc = $scope.resourceMap.get(node.id);
+                    $scope.resourcesToCreate.values.push(rsrc);
+                })
+            }
         };
 
     	initSelectResourceController();

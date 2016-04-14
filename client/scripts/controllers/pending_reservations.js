@@ -11,7 +11,11 @@ angular.module('resourceTracker')
             $scope.resourcesToDisplayMap = new Map();            
             $scope.resourcesToDisplay = [];
             $scope.showReservations = false;
+            $scope.resourcesToCreate = {values: []};
 
+            $scope.showResourceModal = {value: true};
+            $scope.tree = [];
+            $scope.myTree = {};
             $scope.onResourceApproved = "Resource Approved!";
             $scope.onResourceDenied = "Resource Denied!";
     		getAllResources();
@@ -35,12 +39,29 @@ angular.module('resourceTracker')
             });
         };
 
-        $scope.getReservationsForSelectedResources = function(){
+        $scope.openModal = function(){
+            $scope.showResourceModal.value = true;
+        }
+
+        $scope.showSelectResources = function(){
+            $scope.showResourceModal.value = true;
+        }
+
+        $scope.$watch("resourcesToCreate.values", function(newValue, oldValue) {
+            if ($scope.resourcesToCreate.values.length != 0) {
+                $scope.selectedResourcesIDs = $scope.resourcesToCreate.values;
+                getReservationsForSelectResources();
+            } else {
+                $scope.showReservations = false;
+            }
+        });
+
+        var getReservationsForSelectResources = function(){
             $scope.showReservations = false;
             var rIDArray = [];
             $scope.selectedResourcesIDs.forEach(function(resource){
-                rIDArray.push(resource.id);
-            });            
+                rIDArray.push(resource.resource_id);
+            });
             var reqBody = {resource_ids: rIDArray};
         	$http.post('/reservation/getReservationsByResources', reqBody).then(function(response) {
                 createResourceToReservationMap(response.data.results);
@@ -102,7 +123,7 @@ angular.module('resourceTracker')
             if(result){
                 $http.post('/reservation/confirm_request', reqBody).then(function(response) {
                     $scope.addSuccess($scope.onResourceApproved);
-                    $scope.getReservationsForSelectedResources();
+                    getReservationsForSelectResources();
                 }, function(error){
                     console.log(error);
                 });
@@ -138,7 +159,7 @@ angular.module('resourceTracker')
             if(result){       
                 $http.post('/reservation/deny_request', reqBody).then(function(response) {
                     $scope.addSuccess($scope.onResourceDenied);
-                    $scope.getReservationsForSelectedResources();
+                    getReservationsForSelectResources();
                 }, function(error){
                     console.log(error);
                 });     
