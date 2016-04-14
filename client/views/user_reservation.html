@@ -1,45 +1,56 @@
 <div class="container">
-<div class="row vertical-align">
-<div class="input-group panel panel-default col-md-12" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
-	<div class="panel-body">
-		<h4 style="text-align: center;">My Reservations</h4>
-		<h5>Select a Reservation</h5>
-		<span ng-dropdown-multiselect="" options="reservationsToDisplay" selected-model="reservationIDToModify"
-		 	 extra-settings="{enableSearch: true, selectionLimit: 1}"
-		 	 translation-texts="{buttonDefaultText: 'Select a Reservation'}"
-		 	 events="{onItemSelect: onReservationSelect}"></span>
-        <br><h5>Reservation Title:</h5>
-        <input type="text" placeholder="Title" ng-model="reservationToModifyInfo.title" ng-change="updateValid = true" ng-disabled="!reservationSelected" onC>
-        <br><h5>Reservation Description:</h5>
-        <input type="text" placeholder="Description" ng-model="reservationToModifyInfo.description" ng-change="updateValid = true"  ng-disabled="!reservationSelected">
-        <br>
-        <h5>Resources:</h5>
-        <span ng-dropdown-multiselect="" options="resourcesToDisplay" selected-model="resourcesToRemove"
-        	 extra-settings="{enableSearch: true, smartButtonMaxItems: 3 }" translation-texts="{buttonDefaultTexts: 'Resources to Remove from Reservation'}" ng-disabled="!reservationSelected"></span>
-        	 <md-icon data-toggle="tooltip2" class="material-icons" style="width: 24px; height: 24px; vertical-align: middle">help outline</md-icon>
-        <br>
-		<h5>Start Time:</h5> 
-		<input type="datetime-local" id="exampleInput" name="input" ng-change="updateValid = true"  ng-model="startReservationTime" placeholder="yyyy-MM-ddTHH:mm"required />
-		<h5>End Time:</h5> 
-		<input type="datetime-local" id="exampleInput" name="input" ng-change="updateValid = true"  ng-model="endReservationTime" placeholder="yyyy-MM-ddTHH:mm"required /> <br>
-		<div class="control-group" style="margin-top: 15px;">
-			<button type="button" class="btn btn-primary btn-md" ng-disabled="!(reservationSelected && updateValid)" ng-click="print()">Update Reservation</button>
-			<button type="button" class="btn btn-danger btn-md" ng-disabled="!reservationSelected" ng-click="deleteReservation()">Delete Reservation</button>
-            <button type="button" class="btn btn-secondary btn-md" ng-disabled="!reservationSelected || oldReservationTitle == reservationToModify.reservation_title" ng-click="createNewReservation()" style="margin-top: 2px;">Create New Reservation</button>
-            <md-icon data-toggle="tooltip" class="material-icons" style="width: 24px; height: 24px; vertical-align: middle">help outline</md-icon>
-		</div><br>
-
-		<div class="alert alert-danger" ng-show="hasError.value">
-			<strong>Warning:</strong> {{alertMessage.value}}
-			<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
-		</div>
-		<div class="alert alert-success" ng-show="hasSuccess.value">
-			<strong>Success:</strong> {{successMessage.value}}
-			<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
+	<div class="row vertical-align">
+		<div class="input-group panel panel-default col-md-12" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
+			<div class="panel-body">
+				<h3 style="text-align: center;">My Reservations</h3>
+				<div style="text-align: center;">
+					<span ng-dropdown-multiselect="" options="reservationsToDisplay" selected-model="reservationIDToModify"
+					 	 extra-settings="{enableSearch: true, selectionLimit: 1}"
+					 	 translation-texts="{buttonDefaultText: 'Select a Reservation'}"
+					 	 events="{onItemSelect: onReservationSelect}"></span>
+				</div><br>
+				<form>
+					<fieldset class="form-group">
+				        <input type="text" placeholder="Title" ng-model="reservationToModifyInfo.title" ng-change="updateValid.value = true" ng-disabled="!reservationSelected" class="form-control">
+				    </fieldset clss="form-group">
+				    <fieldset class="form-group">
+				        <textarea placeholder="Description" ng-model="reservationToModifyInfo.description" ng-change="updateValid.value = true"  ng-disabled="!reservationSelected" class="form-control"></textarea>
+				    </fieldset>
+				    <fieldset class="form-group">
+						<button type="button" class="btn btn-link btn-md" style="padding-left: 0;" ng-disabled = "!reservationSelected" ng-click="showResources()">Select Resources</button>
+			        </fieldset>
+		       <!--  <span ng-dropdown-multiselect="" options="resourcesToDisplay" selected-model="resourcesToRemove"
+		        	 extra-settings="{enableSearch: true, smartButtonMaxItems: 3 }" translation-texts="{buttonDefaultTexts: 'Resources to Remove from Reservation'}" ng-disabled="!reservationSelected"></span>
+		        	 <md-icon data-toggle="tooltip2" class="material-icons" style="width: 24px; height: 24px; vertical-align: middle">help outline</md-icon> -->
+		        	 <fieldset class="form-group">
+						<label style="width: 25%;">Start Time:</label>
+						<input type="datetime-local" id="exampleInput" name="input" ng-change="updateValid.value = true"  ng-model="startReservationTime" placeholder="yyyy-MM-ddTHH:mm" required style="width: 73.7%;"/>
+					</fieldset>
+					<fieldset class="form-group">
+						<label style="width: 25%;">End Time:</label>
+						<input type="datetime-local" id="exampleInput" name="input" ng-change="updateValid.value = true"  ng-model="endReservationTime" placeholder="yyyy-MM-ddTHH:mm" required style="width: 73.7%;" />
+					</fieldset>
+					<fieldset class="form-group">
+						<button type="button" class="btn btn-primary btn-md" ng-disabled="!(reservationSelected && updateValid.value)" ng-click="updateReservation()">Update Reservation</button>
+						<button type="button" class="btn btn-danger btn-md" ng-disabled="!reservationSelected" ng-click="deleteReservation()">Delete Reservation</button>
+			            <button type="button" class="btn btn-secondary btn-md" ng-disabled="!reservationSelected || oldReservationTitle == reservationToModify.reservation_title" ng-click="createNewReservation()" style="margin-top: 2px;">Create New Reservation</button>
+		    	        <md-icon data-toggle="tooltip" class="material-icons" style="width: 24px; height: 24px; vertical-align: middle">help outline</md-icon>
+		    	    </fieldset>
+    			</form>
+				<div modal-show="showResourceModal.value" class="modal fade">
+					<ng-include src="'views/show_resources.html'" ng-if="showResourceModal.value"></ng-include>
+				</div>
+				<div class="alert alert-danger" ng-show="hasError.value">
+					<strong>Warning:</strong> {{alertMessage.value}}
+					<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
+				</div>
+				<div class="alert alert-success" ng-show="hasSuccess.value">
+					<strong>Success:</strong> {{successMessage.value}}
+					<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
+				</div>
+			</div>
 		</div>
 	</div>
-</div>
-</div>
 </div>
 
 

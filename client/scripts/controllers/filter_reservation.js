@@ -35,6 +35,8 @@ angular.module('resourceTracker')
 
         // create resource dropdown model
         $scope.resourcesToCreate = {values: []}; 
+        $scope.tree = [];
+        $scope.myTree = {};
 
         $scope.tagIncludeTranslationText = {buttonDefaultText: 'Tags to Include', dynamicButtonTextSuffix: 'Tag(s) to Include'};
         $scope.tagExcludeTranslationText = {buttonDefaultText: 'Tags to Exclude', dynamicButtonTextSuffix: 'Tag(s) to Exclude'};

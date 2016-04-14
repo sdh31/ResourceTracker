@@ -31,7 +31,7 @@
 				<input type="text" class="form-control" placeholder="Name" ng-model="reservationName">
 			</fieldset>
 			<fieldset class-"form-group">
-				<textarea class="form-control" placeholder="Description of Reservation (optional)" ng-model="reservationDescription"></textarea><br>
+				<textarea class="form-control" placeholder="Description of Reservation (optional)" ng-model="reservationDescription"></textarea>
 			</fieldset>
 			<br/>
 			<fieldset class="form-group" style="width: 100%;">
@@ -42,7 +42,7 @@
 				<label style="width: 25%;">End Time:</label>
 				<input type="datetime-local" id="exampleInput" name="input" ng-model="endReservationTime" placeholder="yyyy-MM-ddTHH:mm:ss"required style="width: 73.7%;"/>
 			</fieldset>
-			<button type="button" class="btn btn-link" ng-click="selectResources()" style="padding: 0;">Select Resources:</button>
+			<button type="button" class="btn btn-link" ng-click="selectResources()" style="padding: 0;">Select Resources</button>
 		 	<br/><br/>
 		<button type="button" class="btn btn-primary btn-md" ng-click="createReservation()">Create Reservation</button>
 		</form>
