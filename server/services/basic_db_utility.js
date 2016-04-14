@@ -4,7 +4,7 @@ module.exports.performSingleRowDBOperation = function(query, callback) {
     console.log(query);
     var results = {};
     var error = false;
-    var err = '';
+    var err_message = '';
 	db_sql.connection.query(query)
 		.on('result', function (row) {
 	        results = row;
@@ -12,10 +12,10 @@ module.exports.performSingleRowDBOperation = function(query, callback) {
 	    .on('error', function (err) {
             console.log(err)
 	        error = true;
-            err = err;
+            err_message = err;
 	    })
 	    .on('end', function () {
-	        callback({error: error, results: results, err: err});
+	        callback({error: error, results: results, err: err_message});
 	    });
 };
 
@@ -23,7 +23,7 @@ module.exports.performMultipleRowDBOperation = function(query, callback) {
     console.log(query);
     var results = [];
     var error = false;
-    var err = '';
+    var err_message = '';
     db_sql.connection.query(query)
 	    .on('result', function (row) {
             results.push(row);
@@ -31,10 +31,10 @@ module.exports.performMultipleRowDBOperation = function(query, callback) {
         .on('error', function (err) {
             console.log(err)
             error = true;
-            err = err;
+            err_message = err;
         })
         .on('end', function () {
-            callback({error: error, results: results, err: err});
+            callback({error: error, results: results, err: err_message});
         });
 };
 
@@ -42,7 +42,7 @@ module.exports.performMultipleRowDBOperationOnlyUniqueValues = function(query, f
     console.log(query);
     var results = [];
     var error = false;
-    var err = '';
+    var err_message = '';
     var alreadySeen = [];
     db_sql.connection.query(query)
 	    .on('result', function (row) {
@@ -54,10 +54,10 @@ module.exports.performMultipleRowDBOperationOnlyUniqueValues = function(query, f
         .on('error', function (err) {
             console.log(err);
             error = true;
-            err = err;
+            err_message = err;
         })
         .on('end', function () {
-            callback({error: error, results: results, err: err});
+            callback({error: error, results: results, err: err_message});
         });
 };
 

@@ -76,12 +76,13 @@ res = r.get_all_users()
 test_print(desc, len(r.json.loads(res.content)['results']) == 2)
 test_print(desc, r.json.loads(res.content)['results'][1]['username'] == 'rahul')
 
-desc =  '#### create a group ####'
+desc =  '#### create a group and let it view the root ####'
 res = r.create_group("fungroup", "nope", True, True, True, False)
 test_print(desc, res.status_code < 300)
 test_print(desc, res.content)
 
 group_id = r.json.loads(res.content)['results']['insertId']
+res = r.add_group_permission_to_resource(1, [group_id], ['view'])
 
 desc =  '#### get groups and check if there are 3 ####'
 res = r.get_groups()

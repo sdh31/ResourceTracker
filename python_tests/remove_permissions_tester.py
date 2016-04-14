@@ -33,6 +33,13 @@ test_print(desc, res.status_code < 300)
 test_print(desc, res.content)
 group_id2 = r.json.loads(res.content)['results']['insertId']
 
+desc = '#### Give both groups permission to root ####'
+res = r.add_group_permission_to_resource(1, [group_id1], ['view'])
+test_print(desc, res.status_code < 300)
+res = r.add_group_permission_to_resource(1, [group_id2], ['view'])
+test_print(desc, res.status_code < 300)
+
+
 desc =  '#### add rahul, and ashwin to the first group ####'
 res = r.add_users_to_group([rahul_user_id, ashwin_user_id], group_id1)
 test_print(desc, res.status_code < 300)
