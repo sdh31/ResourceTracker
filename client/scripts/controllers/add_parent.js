@@ -13,6 +13,16 @@ angular.module('resourceTracker')
                     if($scope.tree.length == 0){
                         $scope.tree.push(result);
                     }
+
+          /*          if ($scope.editingResource) {
+                        console.log("EHRE");
+                        for (var i = 0; i<$scope.tree.length; i++) {
+                            if ($scope.tree[i].id == $scope.editingResource.parent_id) {
+                                $scope.tree[i].selected = 'selected';
+                                $scope.myTree.currentNode = $scope.tree[i];
+                            }
+                        }
+                    }*/
                 })
             });
     	};
@@ -59,7 +69,14 @@ angular.module('resourceTracker')
         }, false);*/
 
         $scope.submit = function(){
-            $scope.newResource.parent_id = $scope.myTree.currentNode.id;
+
+            if ($scope.editingResource) {
+                $scope.editingResource.parent_id = $scope.myTree.currentNode.id;
+            }
+
+            if ($scope.newResource) {
+                $scope.newResource.parent_id = $scope.myTree.currentNode.id;
+            }
         };
 
     	initAddParentController();

@@ -17,7 +17,11 @@ angular
             })
             .when('/resource', {
                 templateUrl: '/views/resource.html',
-                controller: 'MainResourceCtrl'
+                controller: 'CreateResourceCtrl'
+            })
+			.when('/modify_resource', {
+                templateUrl: '/views/modify_resource.html',
+                controller: 'ModifyResourcesCtrl'
             })
             .when('/filter_reservation', {
                 templateUrl: '/views/filter_reservation.html',

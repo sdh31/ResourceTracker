@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('resourceTracker')
-    .controller('ViewResourceCtrl', function ($scope, $http, $location, resourceService) {
+    .controller('ModifyResourcesCtrl', function ($scope, $http, $location, resourceService) {
         
         $scope.clearError();
         $scope.clearSuccess();
@@ -16,6 +16,11 @@ angular.module('resourceTracker')
 		var oldName = "";
 		var oldDescription = "";
         var oldResourceState = "";
+        var oldSharingLevel = 0;
+        var oldParentId = 0;
+        $scope.unlimitedResource = false;
+        $scope.resourceMap = new Map();
+        $scope.showAddParentModal = {value: false};
 
 		$scope.isResourceSelected = function() {
 			return $scope.selectedResource.name && $scope.selectedResource.name.length > 0;
@@ -31,6 +36,13 @@ angular.module('resourceTracker')
 			oldDescription = $scope.selectedResource.description;
             oldResourceState = $scope.selectedResource.resource_state;
 			oldTags = [];
+            oldParentId = $scope.selectedResource.parent_id;
+            oldSharingLevel = $scope.selectedResource.sharing_level;
+
+            if (($scope.selectedResource.sharing_level == 2147483647)) {
+                $scope.unlimitedResource = true;
+            }
+
 			$scope.editingResource.tags = []; 
 
 			var length = ($scope.selectedResource.tags == null) ? 0 : $scope.selectedResource.tags.length;
@@ -43,6 +55,9 @@ angular.module('resourceTracker')
 			$scope.editingResource.resource_state = oldResourceState;
 			$scope.editingResource.name = oldName;
 			$scope.editingResource.description = oldDescription;
+            $scope.editingResource.sharing_level = oldSharingLevel;
+            $scope.editingResource.parent_id = oldParentId;
+            $scope.editingResource.is_folder = $scope.selectedResource.is_folder;
 		};
 
 		$scope.revertEditing = function() {
@@ -50,6 +65,8 @@ angular.module('resourceTracker')
 			$scope.editingResource.name = oldName;
 			$scope.editingResource.description = oldDescription;
 			$scope.editingResource.tags = oldTags;
+            $scope.editingResource.sharing_level = oldSharingLevel;
+            $scope.editingResource.parent_id = oldParentId;
             addedTags = [];
             deletedTags = [];
 			$scope.saveOldResourceState();
@@ -113,8 +130,11 @@ angular.module('resourceTracker')
 		};
 
 		$scope.updateResource = function() {
+            if ($scope.unlimitedResource) {
+                $scope.editingResource.sharing_level = Number.MAX_SAFE_INTEGER;
+            }
 			$http.post('/resource', $scope.editingResource).then(function(response) {
-				addTagsToResource();
+				updateParent();
             }, function(error) {
                 if (error.data.err == "This resource is oversubscribed. Please resolve all conflicts before removing restriction.") {
                     $scope.addError(error.data.err);
@@ -123,6 +143,14 @@ angular.module('resourceTracker')
                 }
             });
 		};
+
+        var updateParent = function() {
+            $http.post('/resource/updateParent', $scope.editingResource).then(function(response) {
+				addTagsToResource();
+            }, function(error) {
+                $scope.addError(resourceService.alertMessages.resourceUpdatingFailed);
+            });
+        };
 
 		var addTagsToResource = function() {
 			if (addedTags.length > 0) {
@@ -164,7 +192,42 @@ angular.module('resourceTracker')
 		var showMessageAndReload = function(message) {
 			alert(message);
 			getAllResources();
+            initModifyResourcesController();
 		};
+
+        $scope.modifyResourcesTree = [];
+        $scope.tree = [];
+        var initModifyResourcesController = function(){
+            $scope.modifyResourcesTree = [];
+            var promise = getChildren({resource_id: 1, name: "root"}); 
+            promise.then(function(result){
+                if($scope.modifyResourcesTree.length == 0){
+                    $scope.modifyResourcesTree.push(result);
+                }
+            });
+    	};
+
+        var getChildren = function(rsrc){
+            return $http.get('resource/children?resource_id=' + rsrc.resource_id).then(function(response) {
+                var kids = response.data.results;
+                var youngbloods = [];
+                kids.forEach(function(kid){
+                    if(kid.is_folder){
+                        var tempPromise = getChildren(kid);
+                        tempPromise.then(function(result){
+                            youngbloods.push(result);
+                        });
+                    } else{
+                        var res = {id: kid.resource_id, title: kid.name, children: [], is_folder: 0};
+                        youngbloods.push(res);
+                    }
+                });
+                var val = {id: rsrc.resource_id, title: rsrc.name, children: youngbloods, is_folder: 1};
+                return val;
+            }, function(error){
+                console.log(error);
+            });
+        }
 
 		var getAllResources = function() {
 			oldName = '';
@@ -176,14 +239,39 @@ angular.module('resourceTracker')
 			$scope.selectedResource = {};
 			$scope.clearError();
 			$http.get('/resource/all').then(function(response) {
-				$scope.allResources = response.data;
+                $scope.allResources = response.data;
+				populateResourcesMap($scope.allResources);
 				console.log($scope.allResources);
             }, function(error) {
 				console.log(error);
             });		
 		};
 
+	   	var populateResourcesMap = function(resources) {
+            resources.forEach(function(resource) {
+	            $scope.resourceMap.set(resource.resource_id, resource);
+            });
+        };
+
+        $scope.$watch( 'myTree.currentNode', function( newObj, oldObj ) {
+            if( $scope.myTree && angular.isObject($scope.myTree.currentNode) && !$scope.showAddParentModal.value) {
+                console.log($scope.myTree.currentNode);
+                for (var i = 0; i<$scope.allResources.length; i++) {
+                    if ($scope.myTree.currentNode.id == $scope.allResources[i].resource_id) {
+                        $scope.selectedResource = $scope.allResources[i];
+                        $scope.saveOldResourceState();
+                        break;
+                    }
+                }
+            }
+        }, false);
+
+        $scope.addParent = function() {
+            $scope.showAddParentModal.value = true;
+        };
+
 		getAllResources();
+        initModifyResourcesController();
 
      });
 

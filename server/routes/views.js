@@ -72,7 +72,8 @@ var resourceManagementViews = [
     'resource_permission.html',
     'edit_group_resource_permission.html',
     'edit_user_resource_permission.html',
-    'add_parent.html'
+    'add_parent.html',
+    'modify_resource.html'
 ];
 resourceManagementViews.forEach(function(view) {
    router.get('/views/' + view, function (req, res) {
