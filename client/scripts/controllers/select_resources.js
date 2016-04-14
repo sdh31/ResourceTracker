@@ -6,12 +6,13 @@ angular.module('resourceTracker')
     	var initSelectResourceController = function(){
 			$scope.allResources = [];
             $scope.resourceMap = new Map();
-            $scope.tree = [];
     		getAllResources().then(function(){
                 var root = $scope.resourceMap.get(1);
                 var promise = getChildren(root); 
                 promise.then(function(result){
-                    $scope.tree = [result];
+                    if($scope.tree.length == 0){
+                        $scope.tree.push(result);
+                    }
                 })
             });
     	}
@@ -61,8 +62,8 @@ angular.module('resourceTracker')
             console.log(newObj);
         }); */
 
-        $scope.submit = function(){
-            var selected_resources = [];
+        $scope.select = function(){
+            $scope.resourcesToCreate.values = [];
             $scope.myTree.currentNodes.forEach(function(node){
                 var rsrc = $scope.resourceMap.get(node.id);
                 $scope.resourcesToCreate.values.push(rsrc);

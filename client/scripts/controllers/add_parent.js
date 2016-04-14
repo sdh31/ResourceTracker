@@ -6,13 +6,13 @@ angular.module('resourceTracker')
     	var initAddParentController = function(){
     		$scope.allResources = [];
             $scope.resourceMap = new Map();
-            $scope.tree = [];
     		getAllResources().then(function(){
                 var root = $scope.resourceMap.get(1);
                 var promise = getChildren(root); 
                 promise.then(function(result){
-                    $scope.tree = [result];
-                    console.log($scope.tree);
+                    if($scope.tree.length == 0){
+                        $scope.tree.push(result);
+                    }
                 })
             });
     	};
@@ -46,18 +46,17 @@ angular.module('resourceTracker')
                     }
                 });
                 var val = {id: rsrc.resource_id, title: rsrc.name, children: children};
-                // console.log(val);
                 return val;
             }, function(error){
                 console.log(error);
             });
         }
 
-        $scope.$watch( 'myTree.currentNode', function( newObj, oldObj ) {
+ /*       $scope.$watch( 'myTree.currentNode', function( newObj, oldObj ) {
             if( $scope.myTree && angular.isObject($scope.myTree.currentNode) ) {
                 console.log( $scope.myTree.currentNode );
             }
-        }, false);
+        }, false);*/
 
         $scope.submit = function(){
             $scope.newResource.parent_id = $scope.myTree.currentNode.id;

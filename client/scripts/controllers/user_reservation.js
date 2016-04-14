@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('resourceTracker')
-    .controller('UserReservationCtrl', function ($scope, $http, $filter, modifyReservationsService) {
+    .controller('UserReservationCtrl', function ($scope, $http, $filter, modifyReservationsService, $q) {
 
         $scope.clearError();
         $scope.clearSuccess();
@@ -26,11 +26,14 @@ angular.module('resourceTracker')
             // final reservation that needs modification
             $scope.reservationToModify = {};
             $scope.reservationToModifyInfo = {title: "", description: ""};
+            $scope.showResourceModal = {value: false};
             $scope.reservationSelected = false;
-            $scope.updateValid = false;
+            $scope.updateValid = {value: false};
             $scope.selectedReservationResources = [];
             $scope.resourcesToDisplay = [];
-            $scope.resourcesToRemove = [];
+            $scope.resourcesToRemove = {values: []};
+            $scope.tree = [];
+            $scope.myTree = {};
             getAllReservations();
         };
 
@@ -75,7 +78,7 @@ angular.module('resourceTracker')
             $scope.reservationToModifyInfo.title = $scope.reservationToModify.reservation_title;
             $scope.reservationToModifyInfo.description = $scope.reservationToModify.reservation_description;
             $scope.resourcesToDisplay = [];
-            $scope.resourcesToRemove = [];
+            $scope.resourcesToRemove.values = [];
             populateResourcesToDisplay($scope.selectedReservationResources, $scope.resourcesToDisplay);
         };
 
@@ -88,9 +91,14 @@ angular.module('resourceTracker')
         };
 
         var removeResources = function(){
+            var deferred = $q.defer();
+            var promise = deferred.promise;
             console.log($scope.resourcesToRemove);
-            var resourceIDs = populateResourceIds($scope.resourcesToRemove);
-            var reqBody = {resource_ids: resourceIDs, reservation_id: $scope.reservationToModify.reservation_id};
+            if($scope.resourcesToRemove.values.length == 0){
+                deferred.resolve();
+                return promise;
+            }
+            var reqBody = {resource_ids: $scope.resourcesToRemove.values, reservation_id: $scope.reservationToModify.reservation_id};
             var promise = $http.post('reservation/remove_resources', reqBody).then(function(response){
                 console.log(response);
             }, function(error){
@@ -163,7 +171,7 @@ angular.module('resourceTracker')
             if (!validateReservationInfo()) {
                 return;
             }
-            if($scope.reservationToModify.resources.length == $scope.resourcesToRemove.length){
+            if($scope.reservationToModify.resources.length == $scope.resourcesToRemove.values.length){
                 $scope.deleteReservation();
             } else {
                 var result = confirm("Are you sure you want to update reservation " + $scope.reservationToModify.reservation_title);
@@ -185,7 +193,7 @@ angular.module('resourceTracker')
 		};
 
         $scope.deleteReservation = function() {
-            var result = ($scope.reservationToModify.resources.length == $scope.resourcesToRemove.length) ?
+            var result = ($scope.reservationToModify.resources.length == $scope.resourcesToRemove.values.length) ?
                 confirm("By removing all resources, you will be deleting reservation " + $scope.reservationToModify.reservation_title + ". Are you sure this is what you want to do?")
                 : confirm("Are you sure you want to delete reservation " + $scope.reservationToModify.reservation_title)
             if(!result){ return;}
@@ -197,6 +205,10 @@ angular.module('resourceTracker')
                 initializeResourceReservations();
 			})
         };
+
+        $scope.showResources = function() {
+            $scope.showResourceModal.value = true;            
+        }
 
         initializeResourceReservations();
      });

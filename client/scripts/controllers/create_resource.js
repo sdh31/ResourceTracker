@@ -19,6 +19,8 @@ angular.module('resourceTracker')
 	        $scope.showAddParentModal = {value: false};
 	        $scope.allResources = [];
 	        $scope.resourceMap = new Map();
+	        $scope.tree = [];
+	        $scope.myTree = {};
 	        getAllResources();
 		};
 
