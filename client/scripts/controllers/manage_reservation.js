@@ -7,7 +7,7 @@ angular.module('resourceTracker')
         $scope.clearSuccess();
         $scope.onReservationInvalidStartDate = "Please select a valid start date.";
         $scope.onReservationInvalidEndDate = "Please select a valid end date.";
-        $('[data-toggle="tooltip2"]').tooltip({title: "Select resources you wish to remove from this reservation.", placement: "right"});
+        $('[data-toggle="tooltip"]').tooltip({title: "Select resources you wish to remove from this reservation.", placement: "right"});
 
 
         // this function initializes all global data on this page. 

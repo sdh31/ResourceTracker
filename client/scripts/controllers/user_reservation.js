@@ -8,8 +8,8 @@ angular.module('resourceTracker')
         $scope.onReservationInvalidStartDate = "Please select a valid start date.";
         $scope.onReservationInvalidEndDate = "Please select a valid end date.";
         $scope.oldReservationTitle = "";
-        $('[data-toggle="tooltip"]').tooltip({title: "You cannot extend the time of your reservation. This button allows you to create a new reservation on the same resources as your original reservation. You have to give the reservation a new title. Keep in mind that you'll still need approval on any restricted resources.", placement: "right"});
-        $('[data-toggle="tooltip2"]').tooltip({title: "Select resources you wish to remove from this reservation.", placement: "right"});
+        $('[data-toggle="tooltip2"]').tooltip({title: "You cannot extend the time of your reservation. This button allows you to create a new reservation on the same resources as your original reservation. You have to give the reservation a new title. Keep in mind that you'll still need approval on any restricted resources.", placement: "right"});
+        $('[data-toggle="tooltip"]').tooltip({title: "Select resources you wish to remove from this reservation.", placement: "right"});
 
         // this function initializes all global data on this page. 
         var initializeResourceReservations = function() {

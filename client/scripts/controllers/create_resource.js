@@ -9,7 +9,7 @@ angular.module('resourceTracker')
 				description: '',
                 resource_state: '',
 				tags: [],
-				sharing_level: '',
+				sharing_level: 1,
 				parent_id: 1,
 				is_folder: 0
 			};

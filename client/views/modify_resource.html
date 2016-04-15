@@ -1,7 +1,7 @@
 <div class="container">
 <div class="row vertical-align">
 <div class="col-md-2"></div>
-<div class="input-group panel panel-default col-md-5" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
+<div class="input-group panel panel-default col-md-5" id="login" aria-describedby="sizing-addon3" style="margin-top: 0px; display: inline-block;">
 	<div class="panel-body">
         <div>
   			<span><b>Selected</b> : {{selectedResource.name}}</span>
@@ -53,20 +53,31 @@
     			<button type="button" class="btn btn-link" ng-click="addParent()" style="padding: 0;">Select Parent Folder:</button>
     			{{resourceMap.get(editingResource.parent_id).name}}
     		</fieldset>
-    		<input type="text" class="form-control" placeholder="Tag" ng-model="currentTag">
-    		<div class="tags">
-    			<span ng-repeat="(index, tag) in editingResource.tags" class="tag">{{tag}}
-    				<a class="glyphicon glyphicon-remove glyph_top" aria-hidden="true" ng-click="removeTag(index)"></a>
-    			</span>
-    		</div>
-    		<button type="button" class="btn btn-default btn-sm" ng-click="addTag()">Add Tag</button>
+            <fieldset class="form-group">
+        		<input type="text" class="form-control" placeholder="Tag" ng-model="currentTag">
+        		<div class="tags">
+        			<span ng-repeat="(index, tag) in editingResource.tags" class="tag">{{tag}}
+        				<a class="glyphicon glyphicon-remove glyph_top" aria-hidden="true" ng-click="removeTag(index)"></a>
+        			</span>
+    		    </div>
+                <button type="button" class="btn btn-secondary btn-sm" ng-click="addTag()">Add Tag</button>
+            </fieldset>
     		<button type="button" class="btn btn-default btn-sm" ng-click='revertEditing()'>Revert Editing</button> <br><br>
     		<button type="button" class="btn btn-primary btn-md" ng-click='updateResource()'>Update Resource</button>
     		<button type="button" class="btn btn-danger btn-md" ng-click='deleteResource()'>Delete Resource</button>
         </form>
-            <div modal-show="showAddParentModal.value" class="modal fade">
-    			<ng-include src="'views/add_parent.html'" ng-if="showAddParentModal.value"></ng-include>
-    		</div>
+        <div modal-show="showAddParentModal.value" class="modal fade">
+			<ng-include src="'views/add_parent.html'" ng-if="showAddParentModal.value"></ng-include>
+		</div>
     </div>
-
-</div></div></div>
+</div>
+</div>
+<div class="alert alert-danger" ng-show="hasError.value" style="max-width: 350px;" id="login">
+    <strong>Warning:</strong> {{alertMessage.value}}
+    <a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
+</div>
+<div class="alert alert-success" ng-show="hasSuccess.value" style="max-width: 350px;" id="login">
+    <strong>Success:</strong> {{successMessage.value}}
+    <a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
+</div>
+</div>

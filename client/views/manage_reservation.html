@@ -1,3 +1,9 @@
+<script>
+	$(document).ready(function(){
+    	$('[data-toggle="tooltip"]').tooltip();   	
+	});
+</script>
+
 <div class="container">
 	<div class="row vertical-align">
 		<div class="input-group panel panel-default col-md-12" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
@@ -18,11 +24,8 @@
 				        <textarea placeholder="Description" ng-model="reservationToModify.reservation_description" ng-change="updateValid.value = true" ng-disabled="!reservationSelected" class="form-control"></textarea>
 				    </fieldset> 
 				    <fieldset class="form-group">
-						<button type="button" class="btn btn-link btn-md" style="padding-left: 0;" ng-disabled = "!reservationSelected" ng-click="showResources()">Show Resources</button>
+						<button type="button" class="btn btn-link btn-md" style="padding-left: 0; padding-right: 0;" ng-disabled = "!reservationSelected" ng-click="showResources()" data-toggle="tooltip">Show Resources</button>
 			        </fieldset>
-			        <!-- <span ng-dropdown-multiselect="" options="resourcesToDisplay" selected-model="resourcesToRemove" 
-		        	 extra-settings="{enableSearch: true, smartButtonMaxItems: 3 }" translation-texts="{buttonDefaultTexts: 'Resources to Remove from Reservation'}" ng-disabled="!reservationSelected"></span> 
-		        	 <md-icon data-toggle="tooltip2" class="material-icons" style="width: 24px; height: 24px; vertical-align: middle">help outline</md-icon> -->
 		        	<fieldset class="form-group" style="width: 100%;">
 						<label style="width: 25%;">Start Time:</label>
 						<input type="datetime-local" id="exampleInput" name="input" ng-model="startReservationTime" ng-change="updateValid.value = true" placeholder="yyyy-MM-ddTHH:mm:ss" required style="width: 73.7%;"/>
@@ -40,15 +43,15 @@
 			<div modal-show="showResourceModal.value" class="modal fade">
 				<ng-include src="'views/show_resources.html'" ng-if="showResourceModal.value"></ng-include>
 			</div>
-			<div class="alert alert-danger" ng-show="hasError.value">
-				<strong>Warning:</strong> {{alertMessage.value}}
-				<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
-			</div>
-			<div class="alert alert-success" ng-show="hasSuccess.value">
-				<strong>Success:</strong> {{successMessage.value}}
-				<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
-			</div>
 		</div>
+	</div>
+	<div class="alert alert-danger" ng-show="hasError.value" id="login">
+		<strong>Warning:</strong> {{alertMessage.value}}
+		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearError()"></a>
+	</div>
+	<div class="alert alert-success" ng-show="hasSuccess.value" id="login">
+		<strong>Success:</strong> {{successMessage.value}}
+		<a class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="clearSuccess()"></a>
 	</div>
 </div>
 

@@ -108,7 +108,9 @@ angular.module('resourceTracker')
 			}
 			var deleteQueryString = '/resource?resource_id=' + $scope.editingResource.resource_id;
 			$http.delete(deleteQueryString).then(function(response) {
-				showMessageAndReload("Successfully deleted resource!");
+				$scope.addSuccess("Successfully deleted!");
+				getAllResources();
+				initModifyResourcesController();
             }, function(error) {
 				$scope.addError(resourceService.alertMessages.resourceUpdatingFailed);
             });
@@ -129,9 +131,23 @@ angular.module('resourceTracker')
 		    	(conflictingReservation && confirm(conflictingReservationMessage));
 		};
 
+		var validateUpdateResource = function(){
+			if($scope.editingResource.resource_id == 1){
+				$scope.addError("You may not edit the root folder!");
+				return false;
+			} if(!$scope.editingResource.name){
+				$scope.addError("You must provide a name!");
+				return false;
+			}
+			return true;
+
+		}
 		$scope.updateResource = function() {
             if ($scope.unlimitedResource) {
                 $scope.editingResource.sharing_level = Number.MAX_SAFE_INTEGER;
+            }
+            if(!validateUpdateResource()){
+            	return;
             }
 			$http.post('/resource', $scope.editingResource).then(function(response) {
 				updateParent();
@@ -186,13 +202,9 @@ angular.module('resourceTracker')
 		};
 
 		var showSuccessEditingMessageAndReload = function() {
-			showMessageAndReload("Successfully updated resource!");
-		};
-
-		var showMessageAndReload = function(message) {
-			alert(message);
+			$scope.addSuccess("Successfully updated!");
 			getAllResources();
-            initModifyResourcesController();
+			initModifyResourcesController();
 		};
 
         $scope.modifyResourcesTree = [];
