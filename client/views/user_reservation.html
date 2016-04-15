@@ -20,7 +20,7 @@
 				        <input type="text" placeholder="Title" ng-model="reservationToModifyInfo.title" ng-change="updateValid.value = true" ng-disabled="!reservationSelected" class="form-control">
 				    </fieldset clss="form-group">
 				    <fieldset class="form-group">
-				        <textarea placeholder="Description" ng-model="reservationToModifyInfo.description" ng-change="updateValid.value = true"  ng-disabled="!reservationSelected" class="form-control"></textarea>
+				        <textarea placeholder="Description (optional)" ng-model="reservationToModifyInfo.description" ng-change="updateValid.value = true"  ng-disabled="!reservationSelected" class="form-control"></textarea>
 				    </fieldset>
 				    <fieldset class="form-group">
 						<button type="button" class="btn btn-link btn-md" style="padding-left: 0; padding-right: 0;" ng-disabled = "!reservationSelected" ng-click="showResources()" data-toggle="tooltip">Show Resources</button>

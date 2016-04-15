@@ -2,10 +2,10 @@
 <div class="row vertical-align">
 <div class="col-md-2"></div>
 <div class="input-group panel panel-default col-md-5" id="login" aria-describedby="sizing-addon3" style="margin-top: 0px; display: inline-block;">
+    <div class="panel-header">
+        <h3 style="text-align: center;">Select Resource or Folder</h3>
+    </div>
 	<div class="panel-body">
-        <div>
-  			<span><b>Selected</b> : {{selectedResource.name}}</span>
-		</div>
 		<div 
 			data-angular-treeview="true"
 			data-tree-id="myTree"
@@ -18,7 +18,7 @@
 </div>
 <div ng-show="isResourceSelected()" class="input-group panel panel-default col-md-5" id="login" aria-describedby="sizing-addon3" style="display: inline-block;">
     <div class="panel-header">
-        <h3 style="text-align: center;">Edit Resource/Folder</h3>
+        <h3 style="text-align: center;">Edit Resource or Folder</h3>
     </div>
     <div class="panel-body">
         <form>
@@ -47,7 +47,7 @@
             	<label>
             		<input type="radio" ng-model="unlimitedResource" ng-value="true"> Unlimited
             	</label>
-            	<input type="number" class="form-control" placeholder="Resource Sharing Level" ng-model="editingResource.sharing_level" min="1" max="2147483647" ng-disabled="unlimitedResource">
+            	<input type="number" class="form-control" placeholder="Resource Sharing Level" ng-model="editingResource.sharing_level" min="1" max="2147483647" ng-if="!unlimitedResource">
             </fieldset>
             <fieldset class="form-group">
     			<button type="button" class="btn btn-link" ng-click="addParent()" style="padding: 0;">Select Parent Folder:</button>

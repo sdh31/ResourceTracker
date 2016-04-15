@@ -21,10 +21,17 @@ angular.module('resourceTracker')
         $scope.unlimitedResource = false;
         $scope.resourceMap = new Map();
         $scope.showAddParentModal = {value: false};
+        $scope.sharingPlaceHolder = "";
 
 		$scope.isResourceSelected = function() {
 			return $scope.selectedResource.name && $scope.selectedResource.name.length > 0;
 		};
+
+		$scope.$watch( 'unlimitedResource', function( newObj, oldObj ) {
+            if(!newObj && $scope.selectedResource.sharing_level == 2147483647) {
+				$scope.editingResource.sharing_level = 1;
+            }
+        }, false);
 
 		$scope.saveOldResourceState = function () {
 			if (!$scope.isResourceSelected()) {
@@ -39,9 +46,7 @@ angular.module('resourceTracker')
             oldParentId = $scope.selectedResource.parent_id;
             oldSharingLevel = $scope.selectedResource.sharing_level;
 
-            if (($scope.selectedResource.sharing_level == 2147483647)) {
-                $scope.unlimitedResource = true;
-            }
+            $scope.unlimitedResource = ($scope.selectedResource.sharing_level == 2147483647)
 
 			$scope.editingResource.tags = []; 
 
@@ -266,7 +271,6 @@ angular.module('resourceTracker')
 
         $scope.$watch( 'myTree.currentNode', function( newObj, oldObj ) {
             if( $scope.myTree && angular.isObject($scope.myTree.currentNode) && !$scope.showAddParentModal.value) {
-                console.log($scope.myTree.currentNode);
                 for (var i = 0; i<$scope.allResources.length; i++) {
                     if ($scope.myTree.currentNode.id == $scope.allResources[i].resource_id) {
                         $scope.selectedResource = $scope.allResources[i];
