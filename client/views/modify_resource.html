@@ -8,7 +8,7 @@
 	<div class="panel-body">
 		<div 
 			data-angular-treeview="true"
-			data-tree-id="myTree"
+			data-tree-id="myTree2"
 			data-tree-model="modifyResourcesTree"
 			data-node-id="id"
 			data-node-label="title"
@@ -22,13 +22,13 @@
     </div>
     <div class="panel-body">
         <form>
-            <fieldset class="form-group">
+            <fieldset class="form-group" ng-disabled="selectedResource.resource_id == 1">
     		    <input type="text" class="form-control" placeholder="Name" ng-model="editingResource.name">
             </fieldset>
-            <fieldset class="form-group">
+            <fieldset class="form-group" ng-disabled="selectedResource.resource_id == 1">
     		    <textarea class="form-control" placeholder="Description (optional)" ng-model="editingResource.description"></textarea>
             </fieldset>
-            <fieldset class="form-group" ng-hide="editingResource.is_folder==1">  
+            <fieldset class="form-group" ng-hide="editingResource.is_folder==1" >  
                 <label>Resource State: </label>            
                 <label>
                     <input type="radio" ng-model="editingResource.resource_state" value="free">
@@ -49,11 +49,11 @@
             	</label>
             	<input type="number" class="form-control" placeholder="Resource Sharing Level" ng-model="editingResource.sharing_level" min="1" max="2147483647" ng-if="!unlimitedResource">
             </fieldset>
-            <fieldset class="form-group">
+            <fieldset class="form-group" ng-disabled="selectedResource.resource_id == 1">
     			<button type="button" class="btn btn-link" ng-click="addParent()" style="padding: 0;">Select Parent Folder:</button>
     			{{resourceMap.get(editingResource.parent_id).name}}
     		</fieldset>
-            <fieldset class="form-group">
+            <fieldset class="form-group" ng-disabled="selectedResource.resource_id == 1">
         		<input type="text" class="form-control" placeholder="Tag" ng-model="currentTag">
         		<div class="tags">
         			<span ng-repeat="(index, tag) in editingResource.tags" class="tag">{{tag}}
@@ -62,9 +62,9 @@
     		    </div>
                 <button type="button" class="btn btn-secondary btn-sm" ng-click="addTag()">Add Tag</button>
             </fieldset>
-    		<button type="button" class="btn btn-default btn-sm" ng-click='revertEditing()'>Revert Editing</button> <br><br>
-    		<button type="button" class="btn btn-primary btn-md" ng-click='updateResource()'>Update Resource</button>
-    		<button type="button" class="btn btn-danger btn-md" ng-click='deleteResource()'>Delete Resource</button>
+    		<button type="button" class="btn btn-default btn-sm" ng-click='revertEditing()' ng-disabled="selectedResource.resource_id == 1">Revert Editing</button> <br><br>
+    		<button type="button" class="btn btn-primary btn-md" ng-click='updateResource()' ng-disabled="selectedResource.resource_id == 1">Update Resource</button>
+    		<button type="button" class="btn btn-danger btn-md" ng-click='deleteResource()' ng-disabled="selectedResource.resource_id == 1">Delete Resource</button>
         </form>
         <div modal-show="showAddParentModal.value" class="modal fade">
 			<ng-include src="'views/add_parent.html'" ng-if="showAddParentModal.value"></ng-include>

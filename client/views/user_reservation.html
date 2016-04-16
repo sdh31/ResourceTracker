@@ -16,20 +16,20 @@
 					 	 events="{onItemSelect: onReservationSelect}"></span>
 				</div><br>
 				<form>
-					<fieldset class="form-group">
+					<fieldset class="form-group" ng-disabled="!reservationSelected">
 				        <input type="text" placeholder="Title" ng-model="reservationToModifyInfo.title" ng-change="updateValid.value = true" ng-disabled="!reservationSelected" class="form-control">
 				    </fieldset clss="form-group">
-				    <fieldset class="form-group">
-				        <textarea placeholder="Description (optional)" ng-model="reservationToModifyInfo.description" ng-change="updateValid.value = true"  ng-disabled="!reservationSelected" class="form-control"></textarea>
+				    <fieldset class="form-group" ng-disabled="!reservationSelected">
+				        <textarea placeholder="Description (optional)" ng-model="reservationToModifyInfo.description" ng-change="updateValid.value = true"  class="form-control"></textarea>
 				    </fieldset>
 				    <fieldset class="form-group">
-						<button type="button" class="btn btn-link btn-md" style="padding-left: 0; padding-right: 0;" ng-disabled = "!reservationSelected" ng-click="showResources()" data-toggle="tooltip">Show Resources</button>
+						<button type="button" class="btn btn-link btn-md" style="padding-left: 0; padding-right: 0;" ng-disabled = "!reservationSelected" ng-click="showResources()" data-toggle="tooltip">Remove Resources</button>
 			        </fieldset>
-		        	 <fieldset class="form-group">
+		        	 <fieldset class="form-group" ng-disabed="!reservationSelected">
 						<label style="width: 25%;">Start Time:</label>
 						<input type="datetime-local" id="exampleInput" name="input" ng-change="updateValid.value = true"  ng-model="startReservationTime" placeholder="yyyy-MM-ddTHH:mm" required style="width: 73.7%;"/>
 					</fieldset>
-					<fieldset class="form-group">
+					<fieldset class="form-group" ng-disabed="!reservationSelected">
 						<label style="width: 25%;">End Time:</label>
 						<input type="datetime-local" id="exampleInput" name="input" ng-change="updateValid.value = true"  ng-model="endReservationTime" placeholder="yyyy-MM-ddTHH:mm" required style="width: 73.7%;" />
 					</fieldset>

@@ -48,6 +48,8 @@ angular.module('resourceTracker')
                 var folders = response.data.results;
                 var children = [];
                 folders.forEach(function(folder){
+                    console.log($scope.selectedResource);
+                    if($scope.selectedResource && $scope.selectedResource.resource_id == folder.resource_id){ return;}
                     if(folder.is_folder){
                         var tempPromise = getChildren(folder);
                         tempPromise.then(function(result){

@@ -269,16 +269,18 @@ angular.module('resourceTracker')
             });
         };
 
-        $scope.$watch( 'myTree.currentNode', function( newObj, oldObj ) {
-            if( $scope.myTree && angular.isObject($scope.myTree.currentNode) && !$scope.showAddParentModal.value) {
+        $scope.$watch( 'myTree2.currentNode', function( newObj, oldObj ) {
+            if( $scope.myTree2 && angular.isObject($scope.myTree2.currentNode) && !$scope.showAddParentModal.value) {
                 for (var i = 0; i<$scope.allResources.length; i++) {
-                    if ($scope.myTree.currentNode.id == $scope.allResources[i].resource_id) {
+                    if ($scope.myTree2.currentNode.id == $scope.allResources[i].resource_id) {
                         $scope.selectedResource = $scope.allResources[i];
                         $scope.saveOldResourceState();
                         break;
                     }
                 }
             }
+            $scope.myTree = {};
+            $scope.tree = [];
         }, false);
 
         $scope.addParent = function() {

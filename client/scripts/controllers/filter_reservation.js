@@ -7,7 +7,7 @@ angular.module('resourceTracker')
         $scope.clearSuccess();
 
         $scope.onReservationCreateSuccess = "Reservation Created!";
-        $scope.onReservationCreateFailure = "Unable to create the reservation. One or more of the selected resources have already been reserved " +
+        $scope.onReservationCreateFailure = "Unable to create the reservation. One or more of the selected resources have already been reserved fully " +
                                             "during this time.";
         $scope.onReservationCreateInPast = "Please select a time in the present or future.";
         $scope.onReservationStartAfterEnd = "Please select a start time before the end time.";
