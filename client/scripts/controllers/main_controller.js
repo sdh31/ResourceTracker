@@ -131,6 +131,10 @@ angular.module('resourceTracker')
             $location.url('/resource');
         };
 
+	    $scope.goToModifyResourcesPage = function() {
+            $location.url('/modify_resource');
+        };
+
         $scope.goToFilterReservationPage = function() {
             $location.url('/filter_reservation');
         };

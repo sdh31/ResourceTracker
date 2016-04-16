@@ -13,6 +13,16 @@ angular.module('resourceTracker')
                     if($scope.tree.length == 0){
                         $scope.tree.push(result);
                     }
+
+          /*          if ($scope.editingResource) {
+                        console.log("EHRE");
+                        for (var i = 0; i<$scope.tree.length; i++) {
+                            if ($scope.tree[i].id == $scope.editingResource.parent_id) {
+                                $scope.tree[i].selected = 'selected';
+                                $scope.myTree.currentNode = $scope.tree[i];
+                            }
+                        }
+                    }*/
                 })
             });
     	};
@@ -38,6 +48,8 @@ angular.module('resourceTracker')
                 var folders = response.data.results;
                 var children = [];
                 folders.forEach(function(folder){
+                    console.log($scope.selectedResource);
+                    if($scope.selectedResource && $scope.selectedResource.resource_id == folder.resource_id){ return;}
                     if(folder.is_folder){
                         var tempPromise = getChildren(folder);
                         tempPromise.then(function(result){
@@ -45,7 +57,7 @@ angular.module('resourceTracker')
                         });
                     }
                 });
-                var val = {id: rsrc.resource_id, title: rsrc.name, children: children};
+                var val = {id: rsrc.resource_id, title: rsrc.name, children: children, is_folder: 1};
                 return val;
             }, function(error){
                 console.log(error);
@@ -59,7 +71,14 @@ angular.module('resourceTracker')
         }, false);*/
 
         $scope.submit = function(){
-            $scope.newResource.parent_id = $scope.myTree.currentNode.id;
+
+            if ($scope.editingResource) {
+                $scope.editingResource.parent_id = $scope.myTree.currentNode.id;
+            }
+
+            if ($scope.newResource) {
+                $scope.newResource.parent_id = $scope.myTree.currentNode.id;
+            }
         };
 
     	initAddParentController();

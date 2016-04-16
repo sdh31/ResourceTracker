@@ -3,12 +3,12 @@
 <div class="input-group panel panel-default col-md-12" id="login" aria-describedby="sizing-addon3" style="display: inline-block; width: auto;">
     <div class="panel-body">
         <div class="control-group" style="text-align:center;">
-            <span ng-dropdown-multiselect="" options="allResources" selected-model="selectedResourcesIDs"
+           <!--  <span ng-dropdown-multiselect="" options="allResources" selected-model="selectedResourcesIDs"
                   extra-settings="{enableSearch: true, smartButtonMaxItems: 3 }"
-                  translation-texts="{buttonDefaultText: 'Select one or more resource'}"></span> <br/><br/>
+                  translation-texts="{buttonDefaultText: 'Select one or more resource'}"></span>  -->
             <button type="button"
                     class="btn btn-primary btn-md"
-                    ng-click="getReservationsForSelectedResources()">Get Resources!</button>
+                    ng-click="showSelectResources()">Get Resources!</button>
         </div>
         <div ng-if="showReservations">
             <table class="table table-striped">
@@ -60,6 +60,9 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div modal-show="showResourceModal.value" class="modal fade">
+            <ng-include src="'views/select_resources.html'" ng-if="showResourceModal.value"></ng-include>
         </div>
         <div class="alert alert-danger" ng-show="hasError.value">
             <strong>Warning:</strong> {{alertMessage.value}}
