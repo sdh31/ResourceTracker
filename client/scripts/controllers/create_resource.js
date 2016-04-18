@@ -3,6 +3,9 @@
 angular.module('resourceTracker')
     .controller('CreateResourceCtrl', function ($scope, $http, $location, resourceService) {
 
+    	$scope.clearError();
+    	$scope.clearSuccess();
+
 		var initializeNewResource = function() {
 			$scope.newResource = {
 				name: '',
@@ -13,8 +16,6 @@ angular.module('resourceTracker')
 				parent_id: 1,
 				is_folder: 0
 			};
-			$scope.clearError();
-	        $scope.clearSuccess();
 	        $scope.unlimitedResource = false;
 	        $scope.showAddParentModal = {value: false};
 	        $scope.allResources = [];
@@ -69,7 +70,6 @@ angular.module('resourceTracker')
 				$scope.newResource.resource_state = "restricted";
 				$scope.newResource.sharing_level = 0;
 			}
-			console.log($scope.newResource);
 			var self = this;
 			resourceService.createResource($scope.newResource).then(function(response) {
                 if ($scope.newResource.tags.length > 0) {

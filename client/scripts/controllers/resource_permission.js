@@ -7,8 +7,7 @@ angular.module('resourceTracker')
 			$scope.publicGroupList = [];
             $scope.absoluteUserList = [];
 
-            $scope.showEditGroupModal = { value: false };
-            $scope.showEditUserModal  = { value: false };
+            $scope.showEditModal  = { value: false };
 
             $scope.selectedGroup = {};
             $scope.selectedUser = {};
@@ -20,11 +19,15 @@ angular.module('resourceTracker')
 		}
 		$scope.selectGroup = function(index) {
             $scope.selectedGroup = $scope.publicGroupList[index];
-            $scope.showEditGroupModal.value = true;
+            $scope.userPrivateGroup = $scope.selectedGroup;
+            $scope.displayName = $scope.selectedGroup.group_name;
+            $scope.showEditModal.value = true;
         };
         $scope.selectUser = function(index) {
             $scope.selectedUser = $scope.absoluteUserList[index];
-            $scope.showEditUserModal.value = true;
+            $scope.userPrivateGroup = $scope.usernameToPrivateGroupMap[$scope.selectedUser.username];
+            $scope.displayName = $scope.selectedUser.first_name + " " + $scope.selectedUser.last_name + " (" + $scope.selectedUser.username + ")";
+            $scope.showEditModal.value = true;
         };
 
         // gets all groups from db

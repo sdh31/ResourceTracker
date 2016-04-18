@@ -1,10 +1,7 @@
 'use strict';
 
-// at this point, there is a $scope.selectedGroup set through user_management.js
 angular.module('resourceTracker')
-    .controller('EditResourceUserCtrl', function ($scope, $http, $timeout) {
-
-        $scope.openEditUserSuccess = false;
+    .controller('EditResourceCtrl', function ($scope, $http, $timeout) {
 
         var nameToPermissionLevelMap = {
             none: -1,
@@ -20,54 +17,97 @@ angular.module('resourceTracker')
             2: 'manage',
             10: 'admin'
         };
+        $scope.tree = [];
 
-    	var initEditUserController = function() {
+    	var initEditRsrcController = function() {
+
     		$scope.allResources = [];
     		$scope.selectedResource = {};
     		$scope.resourceGroup = {};
+            $scope.showNode = false;
     		$scope.showPermission = false;
     		$scope.tempGroupPermission = {};
             $scope.permissionOptions = ['none', 'view', 'reserve', 'manage'];
+            $scope.resourceMap = new Map();
+            getAllResources().then(function(){
+                var root = $scope.resourceMap.get(1);
+                var promise = getChildren(root); 
+                promise.then(function(result){
+                    if($scope.tree.length == 0){
+                        $scope.tree.push(result);
+                    }
+                })
+            })
 
-    		$scope.userPrivateGroup = $scope.usernameToPrivateGroupMap[$scope.selectedUser.username];
-            getAllResources();
 		};
 
+        $scope.$watchCollection('myTree.currentNode', function (newObj, oldObj ) {
+            if($scope.myTree.currentNode){
+                $scope.showNode = true;
+                $scope.getPermission();
+            }
+        });
+
 	   	var getAllResources = function() {
-		   	$scope.allResources = {};
-	   		$http.get('/resource/all').then(function(response) {
-		   		$scope.allResources = response.data;
-		   	}, function(error){
-		   		console.log(error);
-		   	});
-	   	};
+            return $http.get('/resource/all').then(function(response) {
+                populateResourcesToDisplay(response.data, $scope.allResources);
+            }, function(error){
+                console.log(error);
+            });
+        };
+
+        var populateResourcesToDisplay = function(resourceData, resourceArray) {
+            resourceData.forEach(function(resource) {
+                var resourceData = {id: resource.resource_id, label: resource.name};
+                resourceArray.push(resourceData);
+                $scope.resourceMap.set(resourceData.id, resource);
+            });
+        };
 
         $scope.confirmation = function() {
-             if(nameToPermissionLevelMap[$scope.tempGroupPermission] >= 1 || nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] < 1 || (nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] >= 1 && confirm($scope.selectedUser.username + " may have reservations on " + $scope.selectedResource.name + ", are you sure you want to take away reserve permission?"))){
+             if(nameToPermissionLevelMap[$scope.tempGroupPermission] >= 1 || nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] < 1 || (nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] >= 1 && confirm($scope.displayName + " may have reservations on " + $scope.selectedResource.name + ", are you sure you want to take away reserve permission?"))){
                 doUpdate();
             }
         };
+
+        var getChildren = function(rsrc){
+            return $http.get('resource/children?resource_id=' + rsrc.resource_id).then(function(response) {
+                var kids = response.data.results;
+                var youngbloods = [];
+                kids.forEach(function(kid){
+                    if(kid.is_folder){
+                        var tempPromise = getChildren(kid);
+                        tempPromise.then(function(result){
+                            if(result.children.length){
+                                youngbloods.push(result);
+                            }
+                        });
+                    } else{
+                        var res = {id: kid.resource_id, title: kid.name, children: [], is_folder: 0};
+                        youngbloods.push(res);
+                    }
+                });
+                var val = {id: rsrc.resource_id, title: rsrc.name, children: youngbloods, is_folder: 1};
+                return val;
+            }, function(error){
+                console.log(error);
+            });
+        }
 
         var doUpdate = function() {
             var resourceID = $scope.selectedResource.resource_id;
             var groupID = [$scope.userPrivateGroup.group_id];
             var permissionReq = {resource_id: resourceID, group_ids: groupID};
-
-            console.log($scope.tempGroupPermission);
             if ($scope.tempGroupPermission == 'none') {
                 var promise = $http.post('/resource/removePermission', permissionReq).then(function(response) {
-                    openEditUserSuccess();
+                    openEditSuccess();
                 }, function(error){
-                    console.log(error);
+                    openEditError(error);
                 });
             } else if ($scope.resourceGroup.resource_permission == 'none') {
-                addPermission().then(function(){
-                    openEditUserSuccess();
-                });
+                addPermission();
             } else {
-                updatePermission().then(function(){
-                    openEditUserSuccess();
-                });
+                updatePermission();
             }
         };
 
@@ -78,9 +118,9 @@ angular.module('resourceTracker')
                                 group_id: groupID,
                                 resource_permission: $scope.tempGroupPermission};
             var promise = $http.post('/resource/updatePermission', permissionReq).then(function(response) {
-
+                openEditSuccess();
             }, function(error){
-                console.log(error);
+                openEditError(error);
             });
             return promise;
         };
@@ -92,15 +132,16 @@ angular.module('resourceTracker')
                                 group_ids: groupID,
                                 resource_permissions: [$scope.tempGroupPermission]};
             var promise = $http.post('/resource/addPermission', permissionReq).then(function(response) {
-
+                openEditSuccess();
             }, function(error){
-                console.log(error);
+                openEditError(error);
             });
             return promise;
         };
 
     	$scope.getPermission = function() {
-    		var resourceID = $scope.selectedResource.resource_id;
+    		var resourceID = $scope.myTree.currentNode.id;
+            $scope.selectedResource = $scope.resourceMap.get(resourceID);
     		var permissionReq = '/resource/getPermission' + '?resource_id=' + resourceID;
     		var promise = $http.get(permissionReq).then(function(response) {
     			var allGroupsPermissions = response.data.results;
@@ -115,6 +156,7 @@ angular.module('resourceTracker')
                     $scope.tempGroupPermission = 'none';
                 }
     		}, function(error){
+
     			console.log(error);	
     		}); 
 	   	};
@@ -130,14 +172,23 @@ angular.module('resourceTracker')
             return res_group;
         };
 
-        var openEditUserSuccess = function() {
-            $scope.showEditUserSuccess = true;
-            initEditUserController();
+        var openEditSuccess = function() {
+            $scope.showEditSuccess = true;
+            initEditRsrcController();
             $timeout(function(){
-                $scope.showEditUserSuccess = false;
+                $scope.showEditSuccess = false;
             }, 1500);
         };
 
-	   	initEditUserController();
+        var openEditError = function(msg) {
+            $scope.showEditError = true;
+            $scope.rsrcError = msg.data.err;
+            // initEditUserController();
+            $timeout(function(){
+                $scope.showEditError = false;
+            }, 1500);
+        }
+
+	   	initEditRsrcController();
 
 	});

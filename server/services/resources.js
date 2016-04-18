@@ -91,12 +91,12 @@ function insertIntoFolderTree(descendant_id, ancestor_ids, path_lengths, callbac
 
 function getAllDirectChildren(user, resource, callback) {
     var getAllDirectChildrenQuery = resource_query_builder.buildQueryForGetAllDirectChildren(user, resource);
-    basic_db_utility.performMultipleRowDBOperation(getAllDirectChildrenQuery, callback);
+    basic_db_utility.performMultipleRowDBOperationOnlyUniqueValues(getAllDirectChildrenQuery, 'resource_id', callback);
 }
 
 function getSubtree(user, resource, callback) {
     var getSubtreeQuery = resource_query_builder.buildQueryForGetSubtree(user, resource);
-    basic_db_utility.performMultipleRowDBOperation(getSubtreeQuery, callback);
+    basic_db_utility.performMultipleRowDBOperationOnlyUniqueValues(getSubtreeQuery, 'resource_id', callback);
 }
 
 function deleteAncestorLinks(body, callback) {
