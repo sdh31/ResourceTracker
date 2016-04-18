@@ -95,7 +95,7 @@ module.exports.buildQueryForGetAllDirectChildren = function(user, resource) {
         .join("permission_group", null, "resource_group.group_id = permission_group.group_id")
         .join("user_group", null, "user_group.group_id = permission_group.group_id")
         .join("user", null, "user_group.user_id = user.user_id")
-        .where("folder_tree.ancestor_id = " + resource.resource_id + " AND folder_tree.path_length = 1")
+        .where("folder_tree.ancestor_id = " + resource.resource_id + " AND folder_tree.path_length = 1" + " AND user.user_id = " + user.user_id)
         .toString();
 };
 
