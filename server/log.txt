@@ -1,0 +1,84 @@
+{ [Error: ER_DUP_ENTRY: Duplicate entry '1' for key 'PRIMARY'] code: 'ER_DUP_ENTRY', errno: 1062, sqlState: '23000', index: 0 }
+{ [Error: ER_DUP_ENTRY: Duplicate entry '1-1' for key 'PRIMARY'] code: 'ER_DUP_ENTRY', errno: 1062, sqlState: '23000', index: 0 }
+INSERT INTO user (username, password, first_name, last_name, email_address, is_shibboleth) VALUES ('admin', '$2a$10$xWtu0adcZGheI.hI3A0a.O8soWxLfx2.Ahy8ThONz345CdGWa4xHa', 'admin', 'admin', 'admin@admin.com', 0)
+{ [Error: ER_DUP_ENTRY: Duplicate entry 'admin' for key 'username'] code: 'ER_DUP_ENTRY', errno: 1062, sqlState: '23000', index: 0 }
+admin already created
+
+/views/login.html GET
+
+/user/signin POST
+SELECT user.username, user.first_name, user.last_name, user.user_id, user.password, user.is_shibboleth, user.email_address, user.emails_enabled, permission_group.group_id, permission_group.group_name, permission_group.user_management_permission, permission_group.resource_management_permission, permission_group.reservation_management_permission, permission_group.is_private FROM user LEFT JOIN user_group ON (user_group.user_id = user.user_id) LEFT JOIN permission_group ON (permission_group.group_id = user_group.group_id) WHERE (username = 'admin')
+{ SS_MID: 'd52a3012-8cf1-4c0f-9db8-ea3ec0c6ba3ci76kp89i',
+  ss_cid: 'ae645675-7e5e-4fd4-b3c4-ea576d8facf4',
+  _octo: 'GH1.1.1054483683.1427776460',
+  PS_DEVICEFEATURES: 'width:1366 height:768 pixelratio:1 touch:0 geolocation:1 websockets:1 webworkers:1 datepicker:1 dtpicker:1 timepicker:1 dnd:1 sessionstorage:1 localstorage:1 history:1 canvas:1 svg:1 postmessage:1 hc:0',
+  __unam: 'cc0a4ec-14c5cbac3e6-ad783f7-5',
+  bs_t_102996039541ecf743394915d27a0cc6: 'YTo2OntzOjE6InMiO3M6MzI6IjEwMjk5NjAzOTU0MWVjZjc0MzM5NDkxNWQyN2EwY2M2IjtzOjE6ImMiO3M6MzI6IjAyNDdjYjk1MDU2YTc1MWQwMDE0MzEyZDcxNjBiMjE0IjtzOjE6ImQiO3M6MzI6ImY0MzIxY2FjMDU4NThmMmNlOTIwZTNhODg3ZjFmZWU2IjtzOjM6ImNpZCI7czoyOToiYjZpazZmeWR2bG9vcGQzcTNqM3ppZTdzaHpyNm0iO3M6MzoidGlkIjtzOjUzOiIzLktSQS5CNHZDd0EuRFI3eC5BZmZvekEuLkFydFlSUS5iLi5zLkFpdlUubi4uLjYwUmlTZyI7czoxOiJlIjtpOjE0NTUyMzA1NTk7fQ==',
+  __utma: '76785792.1468742868.1402959226.1455731351.1455731351.1',
+  __utmz: '76785792.1455731351.1.1.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not provided)',
+  'siss-psweb-206-5600-PORTAL-PSJSESSIONID': 'd0Ebi_HDf9CUhJgXimd-F6SxzO3t-qu-!-1776285353',
+  ExpirePage: 'https://www.siss.duke.edu/psp/CSPRD01/',
+  PS_LOGINLIST: 'https://www.siss.duke.edu/CSPRD01',
+  PS_TOKEN: 'oQAAAAQDAgEBAAAAvAIAAAAAAAAsAAAABABTaGRyAk4Abwg4AC4AMQAwABRzZSvPbWiFMHTJ6u5QRwogJ+hV62EAAAAFAFNkYXRhVXicHYtLCoAwEENfq7jsTSzt+AHXKu5E9CBe0MOZdsLkQUJeoG28c+LnqReMxESWkr7bOTkIKw8XN1tNR6uY6cVRnjUpbsQ6jAxqiy/KTK3BD0QtCqg=',
+  SignOnDefault: '',
+  psback: '"url":"https://www.siss.duke.edu/psp/CSPRD01/EMPLOYEE/HRMS/h/?tab=DEFAULT" "label":"Home" "origin":"PIA"',
+  PS_TOKENEXPIRE: '15_Apr_2016_20:10:45_GMT',
+  sid: 's:Tui3UFnwi2KpqoylBbrG8JFlzAsc4met.4qxwgT2vuyaiiy8ftzhN5LC4LfGzzqGFx9/knPM9x7M',
+  MYSAPSSO2: 'AjExMDAgAAxwb3J0YWw6QUhLMTKIABNiYXNpY2F1dGhlbnRpY2F0aW9uAQAFQUhLMTICAAMwMDADAANOUFAEAAwyMDE2MDQxODAzMjUFAAQAAAAICgAFQUhLMTL/AQUwggEBBgkqhkiG9w0BBwKggfMwgfACAQExCzAJBgUrDgMCGgUAMAsGCSqGSIb3DQEHATGB0DCBzQIBATAiMB0xDDAKBgNVBAMTA05QUDENMAsGA1UECxMESjJFRQIBADAJBgUrDgMCGgUAoF0wGAYJKoZIhvcNAQkDMQsGCSqGSIb3DQEHATAcBgkqhkiG9w0BCQUxDxcNMTYwNDE4MDMyNTU0WjAjBgkqhkiG9w0BCQQxFgQUaQFbtQpzdefMIaC4!xaoA4j4EI4wCQYHKoZIzjgEAwQvMC0CFQC4BJXQoadq7HZpMkJn3JdMYc3eRAIUHZTfHqtQOmGCNckqrPxu!S/Q6!w=',
+  SAPWP_active: '1',
+  _ga: 'GA1.2.1468742868.1402959226' }
+
+/views/system_permission.html GET
+
+/group GET
+SELECT * FROM permission_group
+
+/user/all GET
+SELECT user.username, user.first_name, user.last_name, user.user_id, user.email_address FROM user
+
+/views/resource_permission.html GET
+
+/group GET
+
+/user/all GET
+SELECT * FROM permission_group
+SELECT user.username, user.first_name, user.last_name, user.user_id, user.email_address FROM user
+
+/resource/all GET
+SELECT * FROM user_group INNER JOIN permission_group ON (user_group.group_id = permission_group.group_id) WHERE (user_id = 1)
+SELECT resource.name, resource.resource_id, resource.description, resource.resource_state, resource.is_folder, resource.sharing_level, resource.parent_id, tag.tag_name, reservation.reservation_id, reservation.start_time, reservation.end_time, reservation.reservation_title, reservation.reservation_description, reservation_resource.is_confirmed, user.username, user.first_name, user.last_name, user.user_id, resource_group.resource_permission, permission_group.group_id FROM resource LEFT JOIN resource_tag ON (resource.resource_id = resource_tag.resource_id) LEFT JOIN tag ON (resource_tag.tag_id = tag.tag_id) INNER JOIN resource_group ON (resource.resource_id = resource_group.resource_id) LEFT JOIN permission_group ON (resource_group.group_id = permission_group.group_id) LEFT JOIN reservation ON (reservation.start_time <= 1.7976931348623157e+308 AND reservation.end_time >= 0) LEFT JOIN reservation_resource ON (reservation.reservation_id = reservation_resource.reservation_id AND resource.resource_id = reservation_resource.resource_id) LEFT JOIN user_reservation ON (reservation.reservation_id = user_reservation.reservation_id) LEFT JOIN user ON (user_reservation.user_id = user.user_id) WHERE ((permission_group.group_id = '1'))
+
+/resource/children GET
+SELECT * FROM user_group INNER JOIN permission_group ON (user_group.group_id = permission_group.group_id) WHERE (user_id = 1)
+SELECT * FROM permission_group INNER JOIN resource_group ON (permission_group.group_id = resource_group.group_id) INNER JOIN resource ON (resource_group.resource_id = resource.resource_id) WHERE (permission_group.group_id = 1) AND (resource.resource_id = 1)
+SELECT * FROM resource INNER JOIN folder_tree ON (resource.resource_id = folder_tree.descendant_id) INNER JOIN resource_group ON (resource_group.resource_id = resource.resource_id) INNER JOIN permission_group ON (resource_group.group_id = permission_group.group_id) INNER JOIN user_group ON (user_group.group_id = permission_group.group_id) INNER JOIN user ON (user_group.user_id = user.user_id) WHERE (folder_tree.ancestor_id = 1 AND folder_tree.path_length = 1)
+
+/resource/children GET
+SELECT * FROM user_group INNER JOIN permission_group ON (user_group.group_id = permission_group.group_id) WHERE (user_id = 1)
+SELECT * FROM permission_group INNER JOIN resource_group ON (permission_group.group_id = resource_group.group_id) INNER JOIN resource ON (resource_group.resource_id = resource.resource_id) WHERE (permission_group.group_id = 1) AND (resource.resource_id = 11)
+SELECT * FROM resource INNER JOIN folder_tree ON (resource.resource_id = folder_tree.descendant_id) INNER JOIN resource_group ON (resource_group.resource_id = resource.resource_id) INNER JOIN permission_group ON (resource_group.group_id = permission_group.group_id) INNER JOIN user_group ON (user_group.group_id = permission_group.group_id) INNER JOIN user ON (user_group.user_id = user.user_id) WHERE (folder_tree.ancestor_id = 11 AND folder_tree.path_length = 1)
+
+/resource/getPermission GET
+SELECT * FROM resource_group WHERE (resource_id = 9)
+
+/resource/addPermission POST
+SELECT * FROM user_group INNER JOIN permission_group ON (user_group.group_id = permission_group.group_id) WHERE (user_id = 1)
+SELECT * FROM permission_group INNER JOIN resource_group ON (permission_group.group_id = resource_group.group_id) INNER JOIN resource ON (resource_group.resource_id = resource.resource_id) WHERE (permission_group.group_id = 1) AND (resource.resource_id = 9)
+SELECT * FROM folder_tree INNER JOIN resource_group ON (resource_group.resource_id=folder_tree.ancestor_id) WHERE ((resource_group.group_id = 4) AND folder_tree.descendant_id=9 AND folder_tree.descendant_id != folder_tree.ancestor_id) ORDER BY ancestor_id ASC
+INSERT INTO resource_group (resource_id, group_id, resource_permission) VALUES (9, 4, 1)
+
+/resource/all GET
+SELECT * FROM user_group INNER JOIN permission_group ON (user_group.group_id = permission_group.group_id) WHERE (user_id = 1)
+SELECT resource.name, resource.resource_id, resource.description, resource.resource_state, resource.is_folder, resource.sharing_level, resource.parent_id, tag.tag_name, reservation.reservation_id, reservation.start_time, reservation.end_time, reservation.reservation_title, reservation.reservation_description, reservation_resource.is_confirmed, user.username, user.first_name, user.last_name, user.user_id, resource_group.resource_permission, permission_group.group_id FROM resource LEFT JOIN resource_tag ON (resource.resource_id = resource_tag.resource_id) LEFT JOIN tag ON (resource_tag.tag_id = tag.tag_id) INNER JOIN resource_group ON (resource.resource_id = resource_group.resource_id) LEFT JOIN permission_group ON (resource_group.group_id = permission_group.group_id) LEFT JOIN reservation ON (reservation.start_time <= 1.7976931348623157e+308 AND reservation.end_time >= 0) LEFT JOIN reservation_resource ON (reservation.reservation_id = reservation_resource.reservation_id AND resource.resource_id = reservation_resource.resource_id) LEFT JOIN user_reservation ON (reservation.reservation_id = user_reservation.reservation_id) LEFT JOIN user ON (user_reservation.user_id = user.user_id) WHERE ((permission_group.group_id = '1'))
+
+/node_modules/bootstrap/dist/fonts/glyphicons-halflings-regular.woff2 GET
+
+/resource/children GET
+SELECT * FROM user_group INNER JOIN permission_group ON (user_group.group_id = permission_group.group_id) WHERE (user_id = 1)
+SELECT * FROM permission_group INNER JOIN resource_group ON (permission_group.group_id = resource_group.group_id) INNER JOIN resource ON (resource_group.resource_id = resource.resource_id) WHERE (permission_group.group_id = 1) AND (resource.resource_id = 1)
+SELECT * FROM resource INNER JOIN folder_tree ON (resource.resource_id = folder_tree.descendant_id) INNER JOIN resource_group ON (resource_group.resource_id = resource.resource_id) INNER JOIN permission_group ON (resource_group.group_id = permission_group.group_id) INNER JOIN user_group ON (user_group.group_id = permission_group.group_id) INNER JOIN user ON (user_group.user_id = user.user_id) WHERE (folder_tree.ancestor_id = 1 AND folder_tree.path_length = 1)
+
+/resource/children GET
+SELECT * FROM user_group INNER JOIN permission_group ON (user_group.group_id = permission_group.group_id) WHERE (user_id = 1)
+SELECT * FROM permission_group INNER JOIN resource_group ON (permission_group.group_id = resource_group.group_id) INNER JOIN resource ON (resource_group.resource_id = resource.resource_id) WHERE (permission_group.group_id = 1) AND (resource.resource_id = 11)
+SELECT * FROM resource INNER JOIN folder_tree ON (resource.resource_id = folder_tree.descendant_id) INNER JOIN resource_group ON (resource_group.resource_id = resource.resource_id) INNER JOIN permission_group ON (resource_group.group_id = permission_group.group_id) INNER JOIN user_group ON (user_group.group_id = permission_group.group_id) INNER JOIN user ON (user_group.user_id = user.user_id) WHERE (folder_tree.ancestor_id = 11 AND folder_tree.path_length = 1)

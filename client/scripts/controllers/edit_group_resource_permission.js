@@ -1,6 +1,5 @@
 'use strict';
 
-
 // at this point, there is a $scope.selectedGroup set through user_management.js
 angular.module('resourceTracker')
     .controller('EditResourceGroupCtrl', function ($scope, $http, $timeout) {

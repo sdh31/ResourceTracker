@@ -20,10 +20,14 @@ angular.module('resourceTracker')
 		}
 		$scope.selectGroup = function(index) {
             $scope.selectedGroup = $scope.publicGroupList[index];
-            $scope.showEditGroupModal.value = true;
+            $scope.userPrivateGroup = $scope.selectedGroup;
+            $scope.displayName = $scope.selectedGroup.group_name;
+            $scope.showEditUserModal.value = true;
         };
         $scope.selectUser = function(index) {
             $scope.selectedUser = $scope.absoluteUserList[index];
+            $scope.userPrivateGroup = $scope.usernameToPrivateGroupMap[$scope.selectedUser.username];
+            $scope.displayName = $scope.selectedUser.first_name + " " + $scope.selectedUser.last_name + " (" + $scope.selectedUser.username + ")";
             $scope.showEditUserModal.value = true;
         };
 
