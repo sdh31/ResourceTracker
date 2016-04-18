@@ -148,6 +148,8 @@ router.put('/', function(req, res, next){
 
 router.post('/updateParent', function(req,res, next) {
 
+    var groupsWhoHavePermissionOnResource = [];
+    var groupsWhoHavePermissionOnParent = [];
     var insertSubtreeCallback = function(result){
         if (result.error){
             res.status(400).json(result);
@@ -172,6 +174,37 @@ router.post('/updateParent', function(req,res, next) {
         }
     }
 
+    var getGroupsWhoHavePermissionOnParentCallback = function(result){
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            groupsWhoHavePermissionOnParent = result.results;
+            var parentGroupIds = [];
+            for (var i = 0; i<groupsWhoHavePermissionOnParent.length; i++) {
+                parentGroupIds.push(groupsWhoHavePermissionOnParent[i].group_id);
+            }
+
+            for (i = 0; i<groupsWhoHavePermissionOnResource.length; i++) {
+                if (parentGroupIds.indexOf(groupsWhoHavePermissionOnResource[i].group_id) == -1) {
+                    result.error = true;
+                    result.parentResourcePermissionMismatchError = true;
+                    res.status(400).json(result);
+                    return;
+                }
+            }
+            res_service.updateParentId(req.body, updateParentIdCallback);
+        }
+    }
+
+    var getGroupsWhoHavePermissionOnResourceCallback = function(result){
+        if (result.error){
+            res.status(400).json(result);
+        } else {
+            groupsWhoHavePermissionOnResource = result.results;
+            res_service.getGroupPermissionToResource({resource_id: req.body.parent_id}, getGroupsWhoHavePermissionOnParentCallback);
+        }
+    }
+
     var checkPermissionForResourceCallback = function(result){
         if (result.error){
             res.status(400).json(result);
@@ -185,7 +218,7 @@ router.post('/updateParent', function(req,res, next) {
                         return;
                     }
                 }
-                res_service.updateParentId(req.body, updateParentIdCallback);
+                res_service.getGroupPermissionToResource({resource_id: req.body.resource_id}, getGroupsWhoHavePermissionOnResourceCallback);
             } else {
                 res.status(400).json(result);
             }
@@ -197,6 +230,10 @@ router.post('/updateParent', function(req,res, next) {
         return;
     }
 
+    if (req.body.resource_id == req.body.parent_id) {
+        res.status(400).json({message: "gooooood, ya cant make yourself the parent"});
+        return;
+    }
     var resources = [];
     resources.push({resource_id: req.body.resource_id});
     resources.push({resource_id: req.body.parent_id});
