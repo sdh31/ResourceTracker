@@ -1,10 +1,7 @@
 'use strict';
 
-// at this point, there is a $scope.selectedGroup set through user_management.js
 angular.module('resourceTracker')
-    .controller('EditResourceUserCtrl', function ($scope, $http, $timeout) {
-
-        $scope.openEditUserSuccess = false;
+    .controller('EditResourceCtrl', function ($scope, $http, $timeout) {
 
         var nameToPermissionLevelMap = {
             none: -1,
@@ -22,7 +19,7 @@ angular.module('resourceTracker')
         };
         $scope.tree = [];
 
-    	var initEditUserController = function() {
+    	var initEditRsrcController = function() {
 
     		$scope.allResources = [];
     		$scope.selectedResource = {};
@@ -68,7 +65,7 @@ angular.module('resourceTracker')
         };
 
         $scope.confirmation = function() {
-             if(nameToPermissionLevelMap[$scope.tempGroupPermission] >= 1 || nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] < 1 || (nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] >= 1 && confirm($scope.selectedUser.username + " may have reservations on " + $scope.selectedResource.name + ", are you sure you want to take away reserve permission?"))){
+             if(nameToPermissionLevelMap[$scope.tempGroupPermission] >= 1 || nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] < 1 || (nameToPermissionLevelMap[$scope.resourceGroup.resource_permission] >= 1 && confirm($scope.displayName + " may have reservations on " + $scope.selectedResource.name + ", are you sure you want to take away reserve permission?"))){
                 doUpdate();
             }
         };
@@ -101,13 +98,11 @@ angular.module('resourceTracker')
             var resourceID = $scope.selectedResource.resource_id;
             var groupID = [$scope.userPrivateGroup.group_id];
             var permissionReq = {resource_id: resourceID, group_ids: groupID};
-            console.log(permissionReq);
-            console.log($scope.tempGroupPermission);
             if ($scope.tempGroupPermission == 'none') {
                 var promise = $http.post('/resource/removePermission', permissionReq).then(function(response) {
-                    openEditUserSuccess();
+                    openEditSuccess();
                 }, function(error){
-                    openeditUserError(error);
+                    openEditError(error);
                 });
             } else if ($scope.resourceGroup.resource_permission == 'none') {
                 addPermission();
@@ -123,9 +118,9 @@ angular.module('resourceTracker')
                                 group_id: groupID,
                                 resource_permission: $scope.tempGroupPermission};
             var promise = $http.post('/resource/updatePermission', permissionReq).then(function(response) {
-                openEditUserSuccess();
+                openEditSuccess();
             }, function(error){
-                openeditUserError(error);
+                openEditError(error);
             });
             return promise;
         };
@@ -137,9 +132,9 @@ angular.module('resourceTracker')
                                 group_ids: groupID,
                                 resource_permissions: [$scope.tempGroupPermission]};
             var promise = $http.post('/resource/addPermission', permissionReq).then(function(response) {
-                openEditUserSuccess();
+                openEditSuccess();
             }, function(error){
-                openeditUserError(error);
+                openEditError(error);
             });
             return promise;
         };
@@ -177,23 +172,23 @@ angular.module('resourceTracker')
             return res_group;
         };
 
-        var openEditUserSuccess = function() {
-            $scope.showEditUserSuccess = true;
-            initEditUserController();
+        var openEditSuccess = function() {
+            $scope.showEditSuccess = true;
+            initEditRsrcController();
             $timeout(function(){
-                $scope.showEditUserSuccess = false;
+                $scope.showEditSuccess = false;
             }, 1500);
         };
 
-        var openeditUserError = function(msg) {
-            $scope.showEditUserError = true;
-            $scope.userError = msg.data.err;
+        var openEditError = function(msg) {
+            $scope.showEditError = true;
+            $scope.rsrcError = msg.data.err;
             // initEditUserController();
             $timeout(function(){
-                $scope.showEditUserError = false;
+                $scope.showEditError = false;
             }, 1500);
         }
 
-	   	initEditUserController();
+	   	initEditRsrcController();
 
 	});

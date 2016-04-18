@@ -70,8 +70,7 @@ userManagementViews.forEach(function(view) {
 var resourceManagementViews = [
     'resource.html',
     'resource_permission.html',
-    'edit_group_resource_permission.html',
-    'edit_user_resource_permission.html',
+    'edit_resource_permission.html',
     'add_parent.html',
     'modify_resource.html'
 ];

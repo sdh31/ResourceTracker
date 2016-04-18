@@ -1,4 +1,4 @@
-<div class="modal-dialog" style="width: 500px;" ng-controller="EditResourceUserCtrl">
+<div class="modal-dialog" style="width: 500px;" ng-controller="EditResourceCtrl">
     <div class="modal-content">
         <div class="modal-header">
             <h4 class="modal-title">{{displayName}}</h4>
@@ -19,10 +19,10 @@
             </div>
         </div>
         <div class="modal-footer">
-            <span class="alert alert-success animate-hide" style="width:40%;" ng-show="showEditUserSuccess">Success!
+            <span class="alert alert-success animate-hide" style="width:40%;" ng-show="showEditSuccess">Success!
                 <a class="glyphicon glyphicon-ok"></a>
             </span>
-            <span class="alert alert-danger animate-hide" ng-show="showEditUserError">{{userError}}
+            <span class="alert alert-danger animate-hide" ng-show="showEditError">{{rsrcError}}
                 <a class="glyphicon glyphicon-remove"></a><br> <br>
             </span>
             <button type="button" ng-show="showPermission && (tempGroupPermission != resourceGroup.resource_permission)"
