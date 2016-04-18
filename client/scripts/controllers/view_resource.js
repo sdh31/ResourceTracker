@@ -157,7 +157,7 @@ angular.module('resourceTracker')
 			$http.post('/resource', $scope.editingResource).then(function(response) {
 				updateParent();
             }, function(error) {
-                if (error.data.err == "This resource is oversubscribed. Please resolve all conflicts before removing restriction.") {
+                if (error.data.err == "Unable to change restriction or sharing level of resource due to too many conflicts on reservations in response body.") {
                     $scope.addError(error.data.err);
                 } else {
                     $scope.addError(resourceService.alertMessages.resourceUpdatingFailed);
@@ -169,7 +169,13 @@ angular.module('resourceTracker')
             $http.post('/resource/updateParent', $scope.editingResource).then(function(response) {
 				addTagsToResource();
             }, function(error) {
-                $scope.addError(resourceService.alertMessages.resourceUpdatingFailed);
+                if (error.data.parentResourcePermissionMismatchError) {
+                    alert("Can't update parent because not all groups/users that have permission on the selected resource/folder have permission on the new parent you've selected. Still gonna make the rest of your changes thoo");
+                    $scope.editingResource.parent_id = oldParentId;
+                    $scope.updateResource();
+                } else {
+                    $scope.addError(resourceService.alertMessages.resourceUpdatingFailed);
+                }
             });
         };
 
