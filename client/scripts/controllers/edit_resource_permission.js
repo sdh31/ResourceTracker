@@ -17,6 +17,7 @@ angular.module('resourceTracker')
             2: 'manage',
             10: 'admin'
         };
+
         $scope.tree = [];
 
     	var initEditRsrcController = function() {
@@ -24,10 +25,8 @@ angular.module('resourceTracker')
     		$scope.allResources = [];
     		$scope.selectedResource = {};
     		$scope.resourceGroup = {};
-            $scope.showNode = false;
     		$scope.showPermission = false;
     		$scope.tempGroupPermission = {};
-            $scope.permissionOptions = ['none', 'view', 'reserve', 'manage'];
             $scope.resourceMap = new Map();
             getAllResources().then(function(){
                 var root = $scope.resourceMap.get(1);
@@ -43,7 +42,6 @@ angular.module('resourceTracker')
 
         $scope.$watchCollection('myTree.currentNode', function (newObj, oldObj ) {
             if($scope.myTree.currentNode){
-                $scope.showNode = true;
                 $scope.getPermission();
             }
         });
@@ -142,6 +140,12 @@ angular.module('resourceTracker')
     	$scope.getPermission = function() {
     		var resourceID = $scope.myTree.currentNode.id;
             $scope.selectedResource = $scope.resourceMap.get(resourceID);
+            if($scope.selectedResource.is_folder){
+                $scope.permissionOptions = ['none', 'view'];
+
+            } else {
+                $scope.permissionOptions = ['none', 'view', 'reserve', 'manage'];
+            }
     		var permissionReq = '/resource/getPermission' + '?resource_id=' + resourceID;
     		var promise = $http.get(permissionReq).then(function(response) {
     			var allGroupsPermissions = response.data.results;
