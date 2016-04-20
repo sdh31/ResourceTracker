@@ -76,6 +76,7 @@ angular.module('resourceTracker')
 
 
         timelineData.resources.forEach(function(resource) {
+            var resourceSharing = (resource.sharing_level == 2147483647) ? 'Unlimited' : resource.sharing_level.toString();
             var existsReservation = false;
             resource.reservations.forEach(function(reservation) {
                 existsReservation = true;
@@ -98,6 +99,7 @@ angular.module('resourceTracker')
                                         "<b>End Time: </b> "   + new Date(reservation.end_time)   + "<br>" +  
                                         "<b>Resource Description: </b> " + resource.description            + "<br>" +
                                         "<b>Resource Status: </b> " + resourceStatus + "<br>" + 
+                                        "<b>Resource Sharing Level: </b>" + resourceSharing + "<br>" +
                                         "<b>Reservation Title: </b> " + reservation.reservation_title + "<br>" + 
                                         "<b>Reservation Description: </b> " + reservation.reservation_description + "<br>" + 
                                         "<b>Reservation Status: </b> " + reservationStatus + "<br>" + 

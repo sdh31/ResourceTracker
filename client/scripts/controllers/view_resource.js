@@ -144,6 +144,10 @@ angular.module('resourceTracker')
 				$scope.addError("You must provide a name!");
 				return false;
 			}
+			if(!$scope.editingResource.sharing_level && !$scope.editingResource.is_folder){
+				$scope.addError('You cannot have a resource sharing level of less than 1');
+				return false;
+			}
 			return true;
 
 		}
