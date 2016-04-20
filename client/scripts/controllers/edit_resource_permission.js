@@ -76,9 +76,7 @@ angular.module('resourceTracker')
                     if(kid.is_folder){
                         var tempPromise = getChildren(kid);
                         tempPromise.then(function(result){
-                            if(result.children.length){
-                                youngbloods.push(result);
-                            }
+                            youngbloods.push(result);
                         });
                     } else{
                         var res = {id: kid.resource_id, title: kid.name, children: [], is_folder: 0};
