@@ -63,8 +63,13 @@ angular.module('resourceTracker')
 		};
 
 		$scope.createResource = function() {
+			console.log($scope.newResource);
 			if($scope.unlimitedResource){
 				$scope.newResource.sharing_level = Number.MAX_SAFE_INTEGER;
+			}
+			if(!$scope.newResource.sharing_level && !$scope.newResource.is_folder){
+				$scope.addError('You cannot have a resource sharing level of less than 1');
+				return;
 			}
 			if($scope.newResource.is_folder){
 				$scope.newResource.resource_state = "restricted";
