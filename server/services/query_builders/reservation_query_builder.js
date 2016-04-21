@@ -59,7 +59,7 @@ module.exports.buildQueryForGetOverlappingReservationsByResource = function(rese
         .join("reservation_resource",null, "reservation.reservation_id = reservation_resource.reservation_id")
         .join("resource", null, "resource.resource_id = reservation_resource.resource_id")
         .join("reservation", "res2", overlapping_query)
-       .join("reservation_resource", "reservation_resource2", "reservation_resource2.reservation_id=reservation.reservation_id")
+       .join("reservation_resource", "reservation_resource2", "reservation_resource2.reservation_id=res2.reservation_id")
         .where("reservation_resource.resource_id = ?", reservation.resource_id)
         .where("reservation_resource2.resource_id = ?", reservation.resource_id)
         if(only_confirmed){
