@@ -99,7 +99,7 @@ is_success(desc, res)
 
 desc = '### make sure overlapping reservations were deleted ###'
 res = r.get_reservations_by_resources([restricted_id1, restricted_id2])
-test_print(desc, len(r.json.loads(res.content)['results']))
+test_print(desc, len(r.json.loads(res.content)['results']) == 2)
 
 desc = "### make sure you can't deny an already confirmed reservation ###"
 res = r.deny_resource_reservation(restricted_id1, r2r1_id)

@@ -398,10 +398,10 @@ router.post('/confirm_request', function(req, res, next){
     }
 
     var check_reservation_confirmation_callback = function(result){
-        if(result.error){
+	 if(result.error){
             res.status(400).json(result);
         }
-        else if(result.results.length == 0){
+        else if(result.results.length < req.body.sharing_level){
             // get conflicting reservations to send notification emails for their deletion
             reservation_service.get_conflicting_reservations(req.body, getConflictingReservationsCallback);
         }
@@ -422,13 +422,18 @@ router.post('/confirm_request', function(req, res, next){
         }
     }
     var get_reservation_info_callback = function(result){
-        if(result.error){
+	if(result.error){
             res.status(400).json(result);
         }
         else if(result.results.length == 0){
             res.status(403).json(perm_service.denied_error)
         }
         else{
+            for (var i=0; i<result.results.length; i++){
+                if(result.results[i].resource_id == req.body.resource_id){
+                    req.body.sharing_level = result.results[i].sharing_level
+                }
+            }
             reservation = reservation_service.organizeReservations(result.results)[0];
             req.body.start_time = result.results[0].start_time;
             req.body.end_time = result.results[0].end_time;
